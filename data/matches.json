@@ -1,0 +1,117 @@
+[
+  {
+    "match_id": "ESP_CPV_20260616",
+    "home_team": "西班牙",
+    "away_team": "佛得角",
+    "home_aliases": ["Spain", "España"],
+    "away_aliases": ["Cape Verde", "Cabo Verde"],
+    "kickoff": "2026-06-16T00:00:00+08:00",
+    "stage": "周一013",
+    "neutral": true,
+    "home_elo": 2105,
+    "away_elo": 1625,
+    "manual_odds": {"home": 1.12, "draw": 7.6, "away": 17.0},
+    "manual_odds_drift": {"home": -0.006, "draw": 0.01, "away": 0.02},
+    "sporttery_handicap": -2,
+    "expected_goals": {"home": 2.85, "away": 0.55},
+    "lineup_status": "unknown",
+    "injury_notes": "临场首发待确认。强队深盘重点看轮换、领先后的节奏管理和替补强度。",
+    "tactical_notes": "西班牙控球、压迫和禁区前沿连续传切优势明显；佛得角主要依靠低位防守、门将发挥和定位球消耗时间。",
+    "weather_notes": "美国亚特兰大，中立场。赛前天气和草皮需临场复核。",
+    "referee_notes": "待确认",
+    "upset_triggers": {
+      "strong_low_motivation": {"enabled": true, "strength": 0.55},
+      "underdog_low_block": true,
+      "underdog_goalkeeper": true,
+      "early_event_risk": true
+    },
+    "open_game_triggers": {
+      "favorite_multi_finishers": {"enabled": true, "strength": 0.8},
+      "underdog_chase_fragility": {"enabled": true, "strength": 0.55}
+    }
+  },
+  {
+    "match_id": "BEL_EGY_20260616",
+    "home_team": "比利时",
+    "away_team": "埃及",
+    "home_aliases": ["Belgium"],
+    "away_aliases": ["Egypt"],
+    "kickoff": "2026-06-16T03:00:00+08:00",
+    "stage": "周一014",
+    "neutral": true,
+    "home_elo": 1945,
+    "away_elo": 1785,
+    "manual_odds": {"home": 1.41, "draw": 3.92, "away": 6.05},
+    "manual_odds_drift": {"home": -0.004, "draw": 0.004, "away": 0.006},
+    "sporttery_handicap": -1,
+    "expected_goals": {"home": 1.8, "away": 0.85},
+    "lineup_status": "unknown",
+    "injury_notes": "临场首发待确认。比利时若前场轮换，穿盘稳定性下降；埃及反击核心状态影响爆冷路径。",
+    "tactical_notes": "比利时整体推进和前场个人能力更强；埃及适合低位压缩空间后打反击，比分可能被压在一球差。",
+    "weather_notes": "美国西雅图，中立场。天气和草皮需临场复核。",
+    "referee_notes": "待确认",
+    "upset_triggers": {
+      "strong_low_block_problem": true,
+      "underdog_low_block": true,
+      "underdog_counter_speed": true,
+      "early_event_risk": {"enabled": true, "strength": 0.6}
+    }
+  },
+  {
+    "match_id": "KSA_URU_20260616",
+    "home_team": "沙特阿拉伯",
+    "away_team": "乌拉圭",
+    "home_aliases": ["Saudi Arabia", "Saudi"],
+    "away_aliases": ["Uruguay"],
+    "kickoff": "2026-06-16T06:00:00+08:00",
+    "stage": "周一015",
+    "neutral": true,
+    "home_elo": 1680,
+    "away_elo": 1985,
+    "manual_odds": {"home": 7.65, "draw": 4.25, "away": 1.31},
+    "manual_odds_drift": {"home": 0.006, "draw": 0.004, "away": -0.004},
+    "sporttery_handicap": 1,
+    "expected_goals": {"home": 0.75, "away": 1.85},
+    "lineup_status": "unknown",
+    "injury_notes": "临场首发待确认。乌拉圭赛前长途旅行和恢复质量会影响大胜概率。",
+    "tactical_notes": "乌拉圭对抗、转换和禁区终结更强；沙特需要通过压缩中路、定位球和反击制造一球以内的保护空间。",
+    "weather_notes": "美国迈阿密加登斯，中立场。湿热环境可能降低高强度压迫持续性。",
+    "referee_notes": "待确认",
+    "upset_triggers": {
+      "strong_fatigue": {"enabled": true, "strength": 0.55},
+      "underdog_low_block": true,
+      "underdog_set_piece": true,
+      "weather_pitch_against_technical": {"enabled": true, "strength": 0.45}
+    },
+    "open_game_triggers": {
+      "favorite_multi_finishers": {"enabled": true, "strength": 0.65}
+    }
+  },
+  {
+    "match_id": "IRN_NZL_20260616",
+    "home_team": "伊朗",
+    "away_team": "新西兰",
+    "home_aliases": ["Iran"],
+    "away_aliases": ["New Zealand"],
+    "kickoff": "2026-06-16T09:00:00+08:00",
+    "stage": "周一016",
+    "neutral": true,
+    "home_elo": 1815,
+    "away_elo": 1585,
+    "manual_odds": {"home": 1.59, "draw": 3.28, "away": 5.10},
+    "manual_odds_drift": {"home": -0.002, "draw": 0.002, "away": 0.004},
+    "sporttery_handicap": -1,
+    "expected_goals": {"home": 1.55, "away": 0.7},
+    "lineup_status": "unknown",
+    "injury_notes": "临场首发待确认。伊朗若受外部因素干扰或心态保守，穿盘稳定性下降。",
+    "tactical_notes": "伊朗身体、经验和中前场效率占优；新西兰主要依赖防守纪律、空中球和定位球。",
+    "weather_notes": "美国英格尔伍德，中立场。场地条件需临场复核。",
+    "referee_notes": "待确认",
+    "upset_triggers": {
+      "strong_low_block_problem": true,
+      "underdog_low_block": true,
+      "underdog_set_piece": {"enabled": true, "strength": 0.7},
+      "early_event_risk": true
+    }
+  }
+]

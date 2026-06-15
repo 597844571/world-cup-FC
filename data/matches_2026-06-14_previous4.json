@@ -1,0 +1,171 @@
+[
+  {
+    "match_id": "BRA_MAR_SAMPLE",
+    "home_team": "巴西",
+    "away_team": "摩洛哥",
+    "home_aliases": [
+      "Brazil",
+      "Brasil"
+    ],
+    "away_aliases": [
+      "Morocco",
+      "Maroc"
+    ],
+    "kickoff": "2026-06-13T06:00:00+08:00",
+    "stage": "小组赛",
+    "neutral": true,
+    "home_elo": 2140,
+    "away_elo": 1960,
+    "manual_odds": {
+      "home": 1.72,
+      "draw": 3.85,
+      "away": 5.2
+    },
+    "manual_odds_drift": {
+      "home": -0.01,
+      "draw": 0.01,
+      "away": 0.015
+    },
+    "expected_goals": {
+      "home": 1.75,
+      "away": 0.95
+    },
+    "lineup_status": "unknown",
+    "injury_notes": "未确认最新伤停",
+    "tactical_notes": "巴西个人能力和边路爆点占优，摩洛哥具备低位防守和反击路径。",
+    "weather_notes": "待确认",
+    "referee_notes": "待确认",
+    "upset_triggers": {
+      "strong_low_block_problem": true,
+      "underdog_low_block": true,
+      "underdog_counter_speed": true,
+      "underdog_set_piece": true
+    }
+  },
+  {
+    "match_id": "QAT_SUI_SAMPLE",
+    "home_team": "卡塔尔",
+    "away_team": "瑞士",
+    "home_aliases": [
+      "Qatar"
+    ],
+    "away_aliases": [
+      "Switzerland",
+      "Swiss"
+    ],
+    "kickoff": "2026-06-13T03:00:00+08:00",
+    "stage": "小组赛",
+    "neutral": true,
+    "home_elo": 1700,
+    "away_elo": 1905,
+    "manual_odds": {
+      "home": 5.6,
+      "draw": 3.95,
+      "away": 1.64
+    },
+    "manual_odds_drift": {
+      "home": 0.012,
+      "draw": 0.004,
+      "away": -0.01
+    },
+    "expected_goals": {
+      "home": 0.75,
+      "away": 1.65
+    },
+    "lineup_status": "unknown",
+    "injury_notes": "未确认最新伤停",
+    "tactical_notes": "瑞士整体和中轴线更稳定，卡塔尔需要依靠低位防守与转换。",
+    "weather_notes": "待确认",
+    "referee_notes": "待确认",
+    "upset_triggers": {
+      "underdog_low_block": true,
+      "underdog_set_piece": true
+    }
+  },
+  {
+    "match_id": "HAI_SCO_SAMPLE",
+    "home_team": "海地",
+    "away_team": "苏格兰",
+    "home_aliases": [
+      "Haiti"
+    ],
+    "away_aliases": [
+      "Scotland"
+    ],
+    "kickoff": "2026-06-13T09:00:00+08:00",
+    "stage": "小组赛",
+    "neutral": true,
+    "home_elo": 1650,
+    "away_elo": 1860,
+    "manual_odds": {
+      "home": 6.4,
+      "draw": 4.1,
+      "away": 1.55
+    },
+    "sporttery_handicap": 1,
+    "manual_odds_drift": {
+      "home": 0.01,
+      "draw": 0.005,
+      "away": -0.008
+    },
+    "expected_goals": {
+      "home": 0.7,
+      "away": 1.7
+    },
+    "lineup_status": "unknown",
+    "injury_notes": "未确认最新伤停",
+    "tactical_notes": "苏格兰身体对抗、中场和定位球占优；海地主要依靠速度和转换制造冷门路径。",
+    "weather_notes": "待确认",
+    "referee_notes": "待确认",
+    "upset_triggers": {
+      "underdog_counter_speed": true,
+      "underdog_physicality": true,
+      "early_event_risk": true
+    }
+  },
+  {
+    "match_id": "AUS_TUR_SAMPLE",
+    "home_team": "澳大利亚",
+    "away_team": "土耳其",
+    "home_aliases": [
+      "Australia",
+      "Socceroos"
+    ],
+    "away_aliases": [
+      "Turkey",
+      "Türkiye",
+      "Turkiye"
+    ],
+    "kickoff": "2026-06-14T00:00:00+08:00",
+    "stage": "小组赛",
+    "neutral": true,
+    "home_elo": 1815,
+    "away_elo": 1875,
+    "manual_odds": {
+      "home": 3.3,
+      "draw": 3.25,
+      "away": 2.18
+    },
+    "sporttery_handicap": 1,
+    "manual_odds_drift": {
+      "home": 0.006,
+      "draw": -0.002,
+      "away": -0.006
+    },
+    "expected_goals": {
+      "home": 1.05,
+      "away": 1.35
+    },
+    "lineup_status": "unknown",
+    "injury_notes": "未确认最新伤停",
+    "tactical_notes": "土耳其技术和创造力小优，澳大利亚身体对抗、防守纪律和定位球会压低穿盘概率。",
+    "weather_notes": "待确认",
+    "referee_notes": "待确认",
+    "upset_triggers": {
+      "underdog_low_block": true,
+      "underdog_set_piece": true,
+      "underdog_physicality": true,
+      "strong_low_block_problem": true
+    }
+  }
+]

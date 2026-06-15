@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+data/odds_snapshots.sqlite
+data/source_health.json
+data/group_standings.json
+outputs/
+node_modules/
+work/node_modules/
+.env
+.env.*
