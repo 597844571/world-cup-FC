@@ -39,7 +39,8 @@ UPSET_RULES = {
 
 
 DIMENSIONS = [
-    ("strength", "基础实力 / Elo / 市场概率", 20),
+    ("strength", "基础实力 / Elo / 市场概率", 18),
+    ("fifa_ranking", "FIFA 世界排名差", 6),
     ("formal_competition_strength", "世界杯预选赛 / 洲际杯正式赛", 10),
     ("process", "xG / xGA / 射门质量", 16),
     ("authority_side_strength", "权威侧面实力评分", 8),
@@ -178,6 +179,11 @@ def estimate_expected_goals(match: dict[str, Any], probs: dict[str, float], mode
         formal_effect = clamp(formal_strength / 2.5, -1, 1)
         home_xg *= 1 + 0.055 * formal_effect
         away_xg *= 1 - 0.045 * formal_effect
+    fifa_strength = fifa_ranking_score(match)
+    if abs(fifa_strength) >= 0.15:
+        rank_effect = clamp(fifa_strength / 2, -1, 1)
+        home_xg *= 1 + 0.030 * rank_effect
+        away_xg *= 1 - 0.025 * rank_effect
 
     open_profile = open_game_profile(match, probs, {"home": home_xg, "away": away_xg})
     open_effect = clamp(open_profile["score"] / 5, 0, 1)
@@ -235,6 +241,7 @@ def lambda_adjustment_profile(match: dict[str, Any], probs: dict[str, float], xg
     )
     return {
         "formal_competition_strength": round(formal, 3),
+        "fifa_ranking": round(fifa_ranking_score(match), 3),
         "lineup": round(lineup, 3),
         "schedule": round(schedule, 3),
         "tactics": round(tactics, 3),
@@ -997,6 +1004,37 @@ def authority_side_strength_score(match: dict[str, Any]) -> float:
     return 0.0
 
 
+def fifa_rank_value(match: dict[str, Any], side: str) -> float | None:
+    data = match.get("fifa_ranking") or match.get("fifa_rank")
+    if isinstance(data, dict):
+        value = data.get(side) or data.get(f"{side}_rank")
+        if value is not None:
+            return float(value)
+    key = "home_fifa_rank" if side == "home" else "away_fifa_rank"
+    if match.get(key) is not None:
+        return float(match[key])
+    return None
+
+
+def fifa_ranking_score(match: dict[str, Any]) -> float:
+    configured = match.get("fifa_ranking_strength")
+    if isinstance(configured, (int, float)):
+        return clamp(float(configured), -2, 2)
+    home_rank = fifa_rank_value(match, "home")
+    away_rank = fifa_rank_value(match, "away")
+    if home_rank is None or away_rank is None or home_rank <= 0 or away_rank <= 0:
+        return 0.0
+    confidence = 1.0
+    data = match.get("fifa_ranking") or match.get("fifa_rank")
+    if isinstance(data, dict):
+        confidence = float(data.get("confidence", confidence))
+    # Lower rank is stronger. Use a log ratio so rank 2 vs 70 matters,
+    # while rank 8 vs 20 does not overwhelm market and Elo.
+    ratio_score = math.log(away_rank / home_rank) / math.log(4)
+    gap_score = (away_rank - home_rank) / 55
+    return clamp((ratio_score * 0.62 + gap_score * 0.38) * confidence, -2, 2)
+
+
 def formal_component_score(data: dict[str, Any], component: str) -> float:
     if not isinstance(data, dict):
         return 0.0
@@ -1129,6 +1167,7 @@ def feature_deltas(match: dict[str, Any], market_signal: dict[str, Any], upset: 
         return clamp(float(configured.get(name, dimensions.get(name, fallback))), -2, 2)
 
     strength = score("strength", (float(match.get("home_elo", 1800)) - float(match.get("away_elo", 1800))) / 180)
+    fifa_rank = score("fifa_ranking", fifa_ranking_score(match))
     formal = score("formal_competition_strength", formal_competition_strength_score(match))
     process = score("process")
     lineup = score("lineup")
@@ -1160,6 +1199,7 @@ def feature_deltas(match: dict[str, Any], market_signal: dict[str, Any], upset: 
 
     home_core = (
         strength * 0.040
+        + fifa_rank * 0.022
         + formal * 0.034
         + process * 0.030
         + authority * 0.026
@@ -1186,6 +1226,7 @@ def feature_deltas(match: dict[str, Any], market_signal: dict[str, Any], upset: 
         + balance * 0.030
         + upset_strength * 0.025
         - abs(strength) * 0.020
+        - abs(fifa_rank) * 0.008
         - abs(formal) * 0.012
     )
     return {"home": round(home_core, 4), "draw": round(draw_delta, 4), "away": round(away_core, 4)}
@@ -1916,7 +1957,8 @@ def data_completeness(match: dict[str, Any], odds_history: list[dict[str, Any]])
     has_aicai = any(str(row.get("source", "")).startswith("aicai_") for row in odds_history)
     checks = [
         ("赛程匹配", bool(match.get("match_id") and match.get("kickoff")), 10),
-        ("Elo / FIFA", bool(match.get("home_elo") and match.get("away_elo")), 12),
+        ("Elo", bool(match.get("home_elo") and match.get("away_elo")), 10),
+        ("FIFA世界排名", fifa_rank_value(match, "home") is not None and fifa_rank_value(match, "away") is not None, 7),
         ("预选赛/洲际杯正式赛", bool(match.get("formal_competition_strength")), 10),
         ("近期/过程数据", bool(match.get("expected_goals") or match.get("process_notes")), 10),
         ("权威侧面源", bool(match.get("authority_side_strength")), 7),
@@ -1946,6 +1988,8 @@ def dimension_scores(match: dict[str, Any], market_signal: dict[str, Any], upset
         if score is None:
             if key == "strength":
                 score = clamp((match.get("home_elo", 1800) - match.get("away_elo", 1800)) / 160, -3, 3)
+            elif key == "fifa_ranking":
+                score = fifa_ranking_score(match)
             elif key == "formal_competition_strength":
                 score = formal_competition_strength_score(match)
             elif key == "authority_side_strength":
@@ -2124,6 +2168,7 @@ def build_prediction(match: dict[str, Any], odds_history: list[dict[str, Any]]) 
         "value_model": {
             "market_probs": {key: round(value, 4) for key, value in market_base.items()},
             "deltas": value_deltas,
+            "fifa_ranking_score": round(fifa_ranking_score(match), 3),
             "formal_competition_strength": round(formal_competition_strength_score(match), 3),
             "lambda_adjustments": lambda_adjustment_profile(match, value_probs, value_xg),
             "probabilities": {key: round(value, 4) for key, value in value_probs.items()},
