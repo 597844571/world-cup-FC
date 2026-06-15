@@ -294,7 +294,8 @@ def build_sporttery_combos(details: list[dict]) -> list[dict]:
             ev = probability * sp - 1
             max_risk = max(item["leg"]["risk_score"] for item in combo)
             risk_penalty = 8 if size >= 3 else 0
-            risk_score = min(100, max_risk + risk_penalty)
+            exposure = combo_exposure_profile(combo)
+            risk_score = min(100, max_risk + risk_penalty + exposure["penalty"])
             has_negative_leg = any(item["leg"]["ev"] <= 0 for item in combo)
             if has_negative_leg:
                 decision = "禁止串关"
@@ -304,10 +305,10 @@ def build_sporttery_combos(details: list[dict]) -> list[dict]:
                 reason = "组合EV不足5%"
             elif risk_score > 75:
                 decision = "高风险观察"
-                reason = "组合风险偏高"
+                reason = exposure["reason"] or "组合风险偏高"
             else:
                 decision = "可小注"
-                reason = "单腿正EV且组合EV达标"
+                reason = exposure["reason"] or "单腿正EV且组合EV达标"
             combos.append(
                 {
                     "combo_id": f"C{size}-{idx}",
@@ -328,11 +329,64 @@ def build_sporttery_combos(details: list[dict]) -> list[dict]:
                     "sp": round(sp, 3),
                     "ev": round(ev, 4),
                     "risk_score": risk_score,
+                    "exposure": exposure,
                     "decision": decision,
                     "reason": reason,
                 }
             )
     return sorted(combos, key=lambda row: (row["decision"] == "可小注", row["ev"]), reverse=True)[:24]
+
+
+def leg_risk_tags(item: dict) -> set[str]:
+    leg = item["leg"]
+    tags = {f"match:{item['match_id']}", f"play:{leg.get('play_type')}"}
+    selection = str(leg.get("selection", ""))
+    play_type = str(leg.get("play_type", ""))
+    if play_type == "让球胜平负":
+        if selection == "让胜":
+            tags.add("theme:favorite_cover")
+        elif selection == "让平":
+            tags.add("theme:one_goal_margin")
+        elif selection == "让负":
+            tags.add("theme:favorite_not_cover")
+    if play_type == "胜平负":
+        if selection in {"胜", "负"}:
+            tags.add("theme:winner")
+        elif selection == "平":
+            tags.add("theme:draw")
+    if leg.get("risk_score", 0) >= 60:
+        tags.add("risk:high_leg")
+    return tags
+
+
+def combo_exposure_profile(combo: tuple[dict, ...]) -> dict:
+    tag_counts: dict[str, int] = {}
+    for item in combo:
+        for tag in leg_risk_tags(item):
+            tag_counts[tag] = tag_counts.get(tag, 0) + 1
+    repeated_themes = {
+        tag: count
+        for tag, count in tag_counts.items()
+        if tag.startswith("theme:") and count >= 2
+    }
+    high_legs = sum(1 for item in combo if item["leg"].get("risk_score", 0) >= 60)
+    penalty = 0
+    if repeated_themes:
+        penalty += min(16, sum((count - 1) * 5 for count in repeated_themes.values()))
+    if high_legs >= 2:
+        penalty += 8
+    reason = ""
+    if repeated_themes:
+        names = ", ".join(tag.split(":", 1)[1] for tag in repeated_themes)
+        reason = f"串关共用风险主题：{names}"
+    elif high_legs >= 2:
+        reason = "组合含多个高风险腿"
+    return {
+        "penalty": penalty,
+        "repeated_themes": repeated_themes,
+        "high_risk_legs": high_legs,
+        "reason": reason,
+    }
 
 
 def merge_fixtures(primary: list[dict], secondary: list[dict]) -> list[dict]:

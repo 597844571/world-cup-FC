@@ -209,6 +209,43 @@ def estimate_expected_goals(match: dict[str, Any], probs: dict[str, float], mode
     return {"home": round(clamp(home_xg, 0.2, 4.2), 3), "away": round(clamp(away_xg, 0.15, 3.8), 3)}
 
 
+def lambda_adjustment_profile(match: dict[str, Any], probs: dict[str, float], xg: dict[str, float]) -> dict[str, Any]:
+    dimensions = match.get("dimension_scores", {})
+    configured = match.get("value_feature_scores", {})
+
+    def score(name: str, fallback: float = 0.0) -> float:
+        return clamp(float(configured.get(name, dimensions.get(name, fallback))), -2, 2)
+
+    formal = formal_competition_strength_score(match)
+    lineup = score("lineup")
+    schedule = score("schedule")
+    tactics = score("tactics")
+    set_piece = score("set_piece_keeper")
+    motivation = score("motivation")
+    tempo = clamp(float(match.get("tempo_score", 0)), -3, 3)
+    favorite = "home" if probs.get("home", 0) >= probs.get("away", 0) else "away"
+    variance = variance_profile(match, probs, xg)
+    one_goal_delta = one_goal_bias_delta(
+        {
+            "handicap": match.get("sporttery_handicap"),
+            "model_probs": probs,
+            "xg": xg,
+            "favorite_side": favorite,
+        }
+    )
+    return {
+        "formal_competition_strength": round(formal, 3),
+        "lineup": round(lineup, 3),
+        "schedule": round(schedule, 3),
+        "tactics": round(tactics, 3),
+        "set_piece_keeper": round(set_piece, 3),
+        "motivation": round(motivation, 3),
+        "tempo": round(tempo, 3),
+        "variance_profile": variance,
+        "one_goal_bias_delta": round(one_goal_delta, 3),
+    }
+
+
 def trigger_weight(value: Any, base_weight: float) -> tuple[bool, float, float]:
     confidence = 1.0
     if isinstance(value, dict):
@@ -266,6 +303,20 @@ def poisson(k: int, lam: float) -> float:
     return math.exp(-lam) * lam**k / math.factorial(k)
 
 
+def negative_binomial(k: int, mean: float, dispersion: float) -> float:
+    if dispersion <= 0:
+        return poisson(k, mean)
+    r = max(0.8, 1 / dispersion)
+    p = r / (r + max(mean, 0.001))
+    return math.exp(
+        math.lgamma(k + r)
+        - math.lgamma(r)
+        - math.lgamma(k + 1)
+        + r * math.log(p)
+        + k * math.log(1 - p)
+    )
+
+
 def dixon_coles_multiplier(home_goals: int, away_goals: int, home_xg: float, away_xg: float, mode: str) -> float:
     rho_by_mode = {
         "baseline": -0.035,
@@ -287,6 +338,106 @@ def dixon_coles_multiplier(home_goals: int, away_goals: int, home_xg: float, awa
     return 1.0
 
 
+def variance_profile(match: dict[str, Any], probs: dict[str, float], xg: dict[str, float]) -> dict[str, Any]:
+    open_profile = open_game_profile(match, probs, xg)
+    upset = upset_profile(match)
+    tempo = clamp(float(match.get("tempo_score", 0)), -3, 3)
+    total = float(xg.get("home", 0)) + float(xg.get("away", 0))
+    prob_gap = abs(float(probs.get("home", 0)) - float(probs.get("away", 0)))
+
+    overdispersion = 0.0
+    low_score_shrink = 0.0
+    reasons = []
+    if open_profile["score"] >= 2.5:
+        overdispersion += 0.10 + open_profile["score"] * 0.018
+        reasons.append("开放节奏提高比分尾部")
+    if upset["score"] >= 4:
+        overdispersion += 0.08
+        reasons.append("爆冷触发器提高方差")
+    if total >= 3.15 and prob_gap >= 0.45:
+        overdispersion += 0.08
+        reasons.append("强弱深盘保留大比分尾部")
+    if tempo < -0.8 or total <= 2.2:
+        low_score_shrink += 0.08 + min(0.08, abs(tempo) * 0.025)
+        reasons.append("低节奏/低总进球压缩方差")
+
+    return {
+        "overdispersion": round(clamp(overdispersion, 0, 0.34), 3),
+        "low_score_shrink": round(clamp(low_score_shrink, 0, 0.20), 3),
+        "reasons": reasons,
+    }
+
+
+def one_goal_bias_delta(context: dict[str, Any] | None) -> float:
+    if not context:
+        return 0.0
+    handicap = context.get("handicap")
+    probs = context.get("model_probs") or {}
+    xg = context.get("xg") or {}
+    if handicap is None or abs(int(handicap)) != 1:
+        return 0.0
+    favorite = context.get("favorite_side")
+    prob_gap = abs(float(probs.get("home", 0)) - float(probs.get("away", 0)))
+    xg_gap = abs(float(xg.get("home", 0)) - float(xg.get("away", 0)))
+    total = float(xg.get("home", 0)) + float(xg.get("away", 0))
+    if prob_gap < 0.18 or xg_gap > 1.35 or total > 3.05:
+        return 0.0
+    if favorite in {"home", "away"}:
+        return 0.08 if total >= 2.15 else 0.12
+    return 0.0
+
+
+def deep_favorite_context(match: dict[str, Any], probs: dict[str, float], xg: dict[str, float], handicap: int | None) -> dict[str, Any]:
+    elo_gap = abs(float(match.get("home_elo", 1800)) - float(match.get("away_elo", 1800)))
+    prob_gap = abs(float(probs.get("home", 0)) - float(probs.get("away", 0)))
+    xg_gap = abs(float(xg.get("home", 0)) - float(xg.get("away", 0)))
+    favorite_side = "home" if probs.get("home", 0) >= probs.get("away", 0) else "away"
+    deep = (
+        handicap is not None
+        and abs(int(handicap)) >= 2
+        and (
+            elo_gap >= 300
+            or prob_gap >= 0.50
+            or xg_gap >= 1.75
+        )
+    )
+    return {"deep_favorite_profile": deep, "favorite_side": favorite_side}
+
+
+def apply_goal_distribution_adjustments(rows: list[dict[str, Any]], context: dict[str, Any] | None) -> None:
+    if not context:
+        return
+    variance = context.get("variance_profile") or {}
+    overdispersion = float(variance.get("overdispersion", 0) or 0)
+    low_score_shrink = float(variance.get("low_score_shrink", 0) or 0)
+    favorite = context.get("favorite_side")
+    delta = one_goal_bias_delta(context)
+
+    for row in rows:
+        h = int(row["home_goals"])
+        a = int(row["away_goals"])
+        total_goals = h + a
+        margin = h - a
+        abs_margin = abs(margin)
+
+        if overdispersion > 0 and (total_goals >= 4 or abs_margin >= 3):
+            row["probability"] *= 1 + overdispersion * (0.65 + 0.12 * max(0, total_goals - 4))
+        if low_score_shrink > 0 and total_goals >= 4:
+            row["probability"] *= 1 - low_score_shrink
+        if low_score_shrink > 0 and total_goals <= 1:
+            row["probability"] *= 1 + low_score_shrink * 0.55
+
+        if delta > 0:
+            favorite_one_goal = (
+                favorite == "home"
+                and margin == 1
+                or favorite == "away"
+                and margin == -1
+            )
+            if favorite_one_goal:
+                row["probability"] *= 1 + delta
+
+
 def score_matrix(
     home_xg: float,
     away_xg: float,
@@ -296,11 +447,19 @@ def score_matrix(
 ) -> list[dict[str, Any]]:
     open_profile = (context or {}).get("open_game_profile") or {}
     open_effect = clamp(float(open_profile.get("score", 0)) / 5, 0, 1)
+    variance = (context or {}).get("variance_profile") or {}
+    overdispersion = float(variance.get("overdispersion", 0) or 0)
     favorite = open_profile.get("favorite_side")
     rows = []
     for h in range(max_goals + 1):
         for a in range(max_goals + 1):
-            probability = poisson(h, home_xg) * poisson(a, away_xg)
+            poisson_probability = poisson(h, home_xg) * poisson(a, away_xg)
+            if overdispersion > 0:
+                nb_probability = negative_binomial(h, home_xg, overdispersion) * negative_binomial(a, away_xg, overdispersion)
+                mix = clamp(overdispersion * 1.45, 0, 0.42)
+                probability = poisson_probability * (1 - mix) + nb_probability * mix
+            else:
+                probability = poisson_probability
             probability *= dixon_coles_multiplier(h, a, home_xg, away_xg, mode)
             total_goals = h + a
             if mode == "conservative":
@@ -337,6 +496,7 @@ def score_matrix(
                     "probability": probability,
                 }
             )
+    apply_goal_distribution_adjustments(rows, context)
     total = sum(r["probability"] for r in rows)
     for row in rows:
         row["probability"] = row["probability"] / total if total else 0
@@ -438,6 +598,14 @@ def ranked_scorelines(
     output = []
     for row in rows:
         meta = scoreline_meta(row["score"], row["probability"])
+        total_goals = row["home_goals"] + row["away_goals"]
+        margin = abs(row["home_goals"] - row["away_goals"])
+        if context and context.get("deep_favorite_profile") and total_goals >= 3 and margin >= 3:
+            meta = {
+                "score_group": "深盘大胜比分",
+                "score_priority": 3,
+                "score_note": "和深盘让胜方向一致，适合小额比分池，不宜重仓单压",
+            }
         output.append(
             {
                 "score": row["score"],
@@ -1840,6 +2008,9 @@ def build_prediction(match: dict[str, Any], odds_history: list[dict[str, Any]]) 
 
     h2h_odds = latest_h2h_odds(odds_history, match)
     market_sp = latest_sporttery_sp_map(odds_history)
+    effective_handicap = latest_sporttery_handicap(odds_history)
+    if effective_handicap is None:
+        effective_handicap = match.get("sporttery_handicap")
     market_base = market.get("latest_probs") or implied_probabilities(h2h_odds or {}) or base
     value_deltas = feature_deltas(match, market, upset)
     value_probs = softmax_market_model(market_base, value_deltas)
@@ -1863,9 +2034,15 @@ def build_prediction(match: dict[str, Any], odds_history: list[dict[str, Any]]) 
 
     for key, probs in scenario_probs.items():
         xg = estimate_expected_goals(match, probs, key)
+        deep_context = deep_favorite_context(match, probs, xg, effective_handicap)
         scenario_context = {
             "open_game_profile": open_game_profile(match, probs, xg),
-            "favorite_side": "home" if probs["home"] >= probs["away"] else "away",
+            "variance_profile": variance_profile(match, probs, xg),
+            "favorite_side": deep_context["favorite_side"],
+            "deep_favorite_profile": deep_context["deep_favorite_profile"],
+            "model_probs": probs,
+            "xg": xg,
+            "handicap": effective_handicap,
         }
         matrix = score_matrix(xg["home"], xg["away"], mode=key, context=scenario_context)
         top_scores = ranked_scorelines(matrix, limit=8, context=scenario_context)
@@ -1927,9 +2104,15 @@ def build_prediction(match: dict[str, Any], odds_history: list[dict[str, Any]]) 
 
     baseline = next(item for item in scenarios if item.scenario == "baseline")
     value_xg = estimate_expected_goals(match, value_probs, "market")
+    value_deep_context = deep_favorite_context(match, value_probs, value_xg, effective_handicap)
     value_context = {
         "open_game_profile": open_game_profile(match, value_probs, value_xg),
-        "favorite_side": "home" if value_probs["home"] >= value_probs["away"] else "away",
+        "variance_profile": variance_profile(match, value_probs, value_xg),
+        "favorite_side": value_deep_context["favorite_side"],
+        "deep_favorite_profile": value_deep_context["deep_favorite_profile"],
+        "model_probs": value_probs,
+        "xg": value_xg,
+        "handicap": effective_handicap,
     }
     value_matrix = score_matrix(value_xg["home"], value_xg["away"], mode="market", context=value_context)
     sporttery = build_sporttery_outputs(match, value_probs, value_matrix, value_xg, upset, market, h2h_odds, market_sp)
@@ -1942,6 +2125,7 @@ def build_prediction(match: dict[str, Any], odds_history: list[dict[str, Any]]) 
             "market_probs": {key: round(value, 4) for key, value in market_base.items()},
             "deltas": value_deltas,
             "formal_competition_strength": round(formal_competition_strength_score(match), 3),
+            "lambda_adjustments": lambda_adjustment_profile(match, value_probs, value_xg),
             "probabilities": {key: round(value, 4) for key, value in value_probs.items()},
             "expected_goals": value_xg,
             "top_scores": [
