@@ -1,6 +1,6 @@
 ---
 name: world-cup-match-prediction
-description: Use this skill to analyze and predict FIFA World Cup football matches with a frozen market-value framework and 9-dimension football model, including market de-vig probabilities, softmax probability correction, EV, Kelly/risk, Sporttery/中国体彩玩法 mapping, score ranges, upset triggers, tactical matchup, and confidence. Use especially when the user asks in Chinese about 世界杯预测, 胜平负, 比分, 爆冷, 盘口思路, 体彩下注建议, 串关, 总进球, 大小球, 回测, 小组赛形势, 淘汰赛预测, or match-by-match football forecasting.
+description: Use this skill to analyze and predict FIFA World Cup football matches with a frozen market-value framework and 10-dimension football model, including market de-vig probabilities, World Cup qualifier/continental cup formal-match strength, softmax probability correction, EV, Kelly/risk, Sporttery/中国体彩玩法 mapping, score ranges, upset triggers, tactical matchup, and confidence. Use especially when the user asks in Chinese about 世界杯预测, 胜平负, 比分, 爆冷, 盘口思路, 体彩下注建议, 串关, 总进球, 大小球, 回测, 小组赛形势, 淘汰赛预测, or match-by-match football forecasting.
 ---
 
 # 世界杯比赛预测 Skill
@@ -105,15 +105,16 @@ Kelly = (当前SP × 模型概率 - 1) / (当前SP - 1)
 
 | 序号 | 预测维度 | 权重 | 作用 |
 |---:|---|---:|---|
-| 1 | 基础实力 / Elo / 市场概率 | 22% | 定基础胜率底盘 |
-| 2 | xG、xGA、射门质量等过程数据 | 18% | 判断真实攻防质量 |
-| 3 | 阵容伤停与首发质量 | 14% | 判断当场可用实力 |
-| 4 | 战术相克与比赛形态 | 14% | 判断谁能控制比赛节奏 |
-| 5 | 赛程、体能、旅行、气候 | 9% | 判断恢复、消耗和环境影响 |
-| 6 | 定位球与门将 | 8% | 判断单场变数和低比分风险 |
-| 7 | 爆冷触发器 | 7% | 判断弱队不败或偷胜路径 |
-| 8 | 小组积分形势 / 比赛动机 | 5% | 判断必须赢、可接受平局、轮换 |
-| 9 | 裁判尺度 / 红牌点球变量 | 3% | 判断极端事件影响 |
+| 1 | 基础实力 / Elo / 市场概率 | 20% | 定基础胜率底盘 |
+| 2 | 世界杯预选赛 / 洲际杯正式赛 | 10% | 判断正式比赛含金量 |
+| 3 | xG、xGA、射门质量等过程数据 | 16% | 判断真实攻防质量 |
+| 4 | 权威侧面实力评分 | 8% | 用 FIFA/UEFA/Opta/StatsBomb/CIES/专业媒体侧面校验 |
+| 5 | 赛中/赛后过程表现 | 8% | 用已完赛统计回测球队真实状态 |
+| 6 | 阵容伤停与首发质量 | 12% | 判断当场可用实力 |
+| 7 | 战术相克与比赛形态 | 12% | 判断谁能控制比赛节奏 |
+| 8 | 赛程、体能、旅行、气候 | 7% | 判断恢复、消耗和环境影响 |
+| 9 | 定位球与门将 | 8% | 判断单场变数和低比分风险 |
+| 10 | 爆冷/动机/裁判变量 | 13% | 判断弱队不败、积分形势和极端事件 |
 
 ---
 
@@ -122,6 +123,25 @@ Kelly = (当前SP × 模型概率 - 1) / (当前SP - 1)
 ## 第一步：建立初始胜平负
 
 使用基础实力、Elo、FIFA 排名、市场概率、球员质量、球队稳定性建立初始概率。
+
+必须加入正式比赛强度层：
+
+```markdown
+世界杯预选赛 > 各大洲杯赛 > 最近正式比赛 > 友谊赛。
+预选赛和洲际杯只修正底盘，不直接替代体彩盘口、首发和临场伤停。
+同样的 5胜1平，打强队和打弱队的含金量必须不同。
+```
+
+正式比赛评分字段：
+
+```markdown
+formal_competition_strength.home / away
+qualifiers：预选赛积分、净胜球、客场表现、对手强度、是否直接晋级
+continental：欧洲杯/美洲杯/亚洲杯/非洲杯/金杯赛阶段、淘汰赛表现、对手强度
+recent_official：最近正式比赛状态，友谊赛不进入主评分
+cross_confed：跨洲正式/高质量样本
+confederation：UEFA、CONMEBOL、CAF、CONCACAF、AFC、OFC 赛区基准强度
+```
 
 输出示例：
 

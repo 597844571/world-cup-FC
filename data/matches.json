@@ -14,6 +14,11 @@
     "manual_odds_drift": {"home": -0.006, "draw": 0.01, "away": 0.02},
     "sporttery_handicap": -2,
     "expected_goals": {"home": 2.85, "away": 0.55},
+    "formal_competition_strength": {
+      "confidence": 0.82,
+      "home": {"score": 1.85, "confederation": "UEFA", "notes": "欧洲预选赛和欧洲杯正式赛含金量高，强队稳定性强"},
+      "away": {"score": 0.28, "confederation": "CAF", "notes": "非洲区正式赛有竞争力，但跨洲强强样本少"}
+    },
     "lineup_status": "unknown",
     "injury_notes": "临场首发待确认。强队深盘重点看轮换、领先后的节奏管理和替补强度。",
     "tactical_notes": "西班牙控球、压迫和禁区前沿连续传切优势明显；佛得角主要依靠低位防守、门将发挥和定位球消耗时间。",
@@ -45,6 +50,11 @@
     "manual_odds_drift": {"home": -0.004, "draw": 0.004, "away": 0.006},
     "sporttery_handicap": -1,
     "expected_goals": {"home": 1.8, "away": 0.85},
+    "formal_competition_strength": {
+      "confidence": 0.76,
+      "home": {"score": 1.12, "confederation": "UEFA", "notes": "欧洲正式赛对手强度高，但近年大赛稳定性较巅峰期下降"},
+      "away": {"score": 0.62, "confederation": "CAF", "notes": "非洲杯和非洲预选赛硬度较高，防守和反击不能低估"}
+    },
     "lineup_status": "unknown",
     "injury_notes": "临场首发待确认。比利时若前场轮换，穿盘稳定性下降；埃及反击核心状态影响爆冷路径。",
     "tactical_notes": "比利时整体推进和前场个人能力更强；埃及适合低位压缩空间后打反击，比分可能被压在一球差。",
@@ -72,6 +82,11 @@
     "manual_odds_drift": {"home": 0.006, "draw": 0.004, "away": -0.004},
     "sporttery_handicap": 1,
     "expected_goals": {"home": 0.75, "away": 1.85},
+    "formal_competition_strength": {
+      "confidence": 0.84,
+      "home": {"score": 0.30, "confederation": "AFC", "notes": "亚洲区正式赛有韧性，但面对南美强队样本含金量不足"},
+      "away": {"score": 1.58, "confederation": "CONMEBOL", "notes": "南美预选赛强度高，强强对抗和客场抗压能力更有含金量"}
+    },
     "lineup_status": "unknown",
     "injury_notes": "临场首发待确认。乌拉圭赛前长途旅行和恢复质量会影响大胜概率。",
     "tactical_notes": "乌拉圭对抗、转换和禁区终结更强；沙特需要通过压缩中路、定位球和反击制造一球以内的保护空间。",
@@ -102,6 +117,11 @@
     "manual_odds_drift": {"home": -0.002, "draw": 0.002, "away": 0.004},
     "sporttery_handicap": -1,
     "expected_goals": {"home": 1.55, "away": 0.7},
+    "formal_competition_strength": {
+      "confidence": 0.70,
+      "home": {"score": 0.78, "confederation": "AFC", "notes": "亚洲正式赛稳定，但跨洲对抗和临场盘口走弱需要扣分"},
+      "away": {"score": -0.10, "confederation": "OFC", "notes": "大洋洲正式赛对手强度偏低，跨洲硬仗样本少"}
+    },
     "lineup_status": "unknown",
     "injury_notes": "临场首发待确认。伊朗若受外部因素干扰或心态保守，穿盘稳定性下降。",
     "tactical_notes": "伊朗身体、经验和中前场效率占优；新西兰主要依赖防守纪律、空中球和定位球。",

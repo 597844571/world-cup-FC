@@ -40,6 +40,7 @@ UPSET_RULES = {
 
 DIMENSIONS = [
     ("strength", "基础实力 / Elo / 市场概率", 20),
+    ("formal_competition_strength", "世界杯预选赛 / 洲际杯正式赛", 10),
     ("process", "xG / xGA / 射门质量", 16),
     ("authority_side_strength", "权威侧面实力评分", 8),
     ("match_process_rating", "赛中/赛后过程表现", 8),
@@ -70,6 +71,27 @@ AUTHORITY_SOURCE_WEIGHTS = {
     "zhan_jun": 0.52,
     "cctv": 0.60,
     "football_news_cn": 0.55,
+}
+
+
+CONFEDERATION_BASE_STRENGTH = {
+    "UEFA": 0.45,
+    "CONMEBOL": 0.42,
+    "CAF": 0.16,
+    "CONCACAF": 0.10,
+    "AFC": 0.08,
+    "OFC": -0.28,
+}
+
+
+FORMAL_STAGE_BONUS = {
+    "winner": 0.85,
+    "champion": 0.85,
+    "finalist": 0.70,
+    "semifinal": 0.52,
+    "quarterfinal": 0.34,
+    "round16": 0.18,
+    "group": 0.0,
 }
 
 
@@ -151,6 +173,12 @@ def estimate_expected_goals(match: dict[str, Any], probs: dict[str, float], mode
         home_xg = clamp(total / 2 + edge * 1.15, 0.35, 3.4)
         away_xg = clamp(total - home_xg, 0.25, 3.1)
 
+    formal_strength = formal_competition_strength_score(match)
+    if abs(formal_strength) >= 0.15:
+        formal_effect = clamp(formal_strength / 2.5, -1, 1)
+        home_xg *= 1 + 0.055 * formal_effect
+        away_xg *= 1 - 0.045 * formal_effect
+
     open_profile = open_game_profile(match, probs, {"home": home_xg, "away": away_xg})
     open_effect = clamp(open_profile["score"] / 5, 0, 1)
     if open_effect > 0:
@@ -178,7 +206,7 @@ def estimate_expected_goals(match: dict[str, Any], probs: dict[str, float], mode
             away_xg *= 0.82
             home_xg *= 1.12
 
-    return {"home": round(home_xg, 3), "away": round(away_xg, 3)}
+    return {"home": round(clamp(home_xg, 0.2, 4.2), 3), "away": round(clamp(away_xg, 0.15, 3.8), 3)}
 
 
 def trigger_weight(value: Any, base_weight: float) -> tuple[bool, float, float]:
@@ -801,6 +829,67 @@ def authority_side_strength_score(match: dict[str, Any]) -> float:
     return 0.0
 
 
+def formal_component_score(data: dict[str, Any], component: str) -> float:
+    if not isinstance(data, dict):
+        return 0.0
+    value = data.get(component)
+    if isinstance(value, (int, float)):
+        return clamp(float(value), -2, 2)
+    if not isinstance(value, dict):
+        return 0.0
+
+    score = 0.0
+    if "score" in value:
+        score += float(value["score"])
+    if "points_per_game" in value:
+        score += (float(value["points_per_game"]) - 1.55) * 0.70
+    if "goal_diff_per_game" in value:
+        score += float(value["goal_diff_per_game"]) * 0.38
+    if "opponent_strength" in value:
+        score += float(value["opponent_strength"]) * 0.45
+    if "away_points_per_game" in value:
+        score += (float(value["away_points_per_game"]) - 1.25) * 0.35
+    if value.get("qualified_direct"):
+        score += 0.28
+    if "stage" in value:
+        score += FORMAL_STAGE_BONUS.get(str(value["stage"]).lower(), 0.0)
+    if "sample_size" in value:
+        sample = clamp(float(value["sample_size"]) / 10, 0.45, 1.0)
+        score *= sample
+    return clamp(score, -2, 2)
+
+
+def formal_side_score(data: Any) -> float:
+    if isinstance(data, (int, float)):
+        return clamp(float(data), -2.5, 2.5)
+    if not isinstance(data, dict):
+        return 0.0
+    if "score" in data:
+        return clamp(float(data["score"]), -2.5, 2.5)
+
+    qualifier = formal_component_score(data, "qualifiers")
+    continental = formal_component_score(data, "continental")
+    recent = formal_component_score(data, "recent_official")
+    cross = formal_component_score(data, "cross_confed")
+    confed = CONFEDERATION_BASE_STRENGTH.get(str(data.get("confederation", "")).upper(), 0.0)
+    score = qualifier * 0.38 + continental * 0.27 + recent * 0.22 + cross * 0.08 + confed * 0.05
+    return clamp(score, -2.5, 2.5)
+
+
+def formal_competition_strength_score(match: dict[str, Any]) -> float:
+    configured = match.get("formal_competition_strength")
+    if isinstance(configured, (int, float)):
+        return clamp(float(configured), -2.5, 2.5)
+    if isinstance(configured, dict):
+        if "score" in configured:
+            return clamp(float(configured["score"]), -2.5, 2.5)
+        home = formal_side_score(configured.get("home"))
+        away = formal_side_score(configured.get("away"))
+        confidence = float(configured.get("confidence", 1.0))
+        return clamp((home - away) * confidence, -2.5, 2.5)
+    return 0.0
+
+
 def match_process_rating_score(match: dict[str, Any]) -> float:
     configured = match.get("match_process_rating")
     if isinstance(configured, (int, float)):
@@ -872,6 +961,7 @@ def feature_deltas(match: dict[str, Any], market_signal: dict[str, Any], upset: 
         return clamp(float(configured.get(name, dimensions.get(name, fallback))), -2, 2)
 
     strength = score("strength", (float(match.get("home_elo", 1800)) - float(match.get("away_elo", 1800))) / 180)
+    formal = score("formal_competition_strength", formal_competition_strength_score(match))
     process = score("process")
     lineup = score("lineup")
     tactics = score("tactics")
@@ -902,6 +992,7 @@ def feature_deltas(match: dict[str, Any], market_signal: dict[str, Any], upset: 
 
     home_core = (
         strength * 0.040
+        + formal * 0.034
         + process * 0.030
         + authority * 0.026
         + process_rating * 0.030
@@ -927,6 +1018,7 @@ def feature_deltas(match: dict[str, Any], market_signal: dict[str, Any], upset: 
         + balance * 0.030
         + upset_strength * 0.025
         - abs(strength) * 0.020
+        - abs(formal) * 0.012
     )
     return {"home": round(home_core, 4), "draw": round(draw_delta, 4), "away": round(away_core, 4)}
 
@@ -1657,6 +1749,7 @@ def data_completeness(match: dict[str, Any], odds_history: list[dict[str, Any]])
     checks = [
         ("赛程匹配", bool(match.get("match_id") and match.get("kickoff")), 10),
         ("Elo / FIFA", bool(match.get("home_elo") and match.get("away_elo")), 12),
+        ("预选赛/洲际杯正式赛", bool(match.get("formal_competition_strength")), 10),
         ("近期/过程数据", bool(match.get("expected_goals") or match.get("process_notes")), 10),
         ("权威侧面源", bool(match.get("authority_side_strength")), 7),
         ("赛中/赛后过程统计", bool(match.get("match_process_rating") or match.get("match_process_stats") or match.get("live_match_stats")), 7),
@@ -1685,6 +1778,8 @@ def dimension_scores(match: dict[str, Any], market_signal: dict[str, Any], upset
         if score is None:
             if key == "strength":
                 score = clamp((match.get("home_elo", 1800) - match.get("away_elo", 1800)) / 160, -3, 3)
+            elif key == "formal_competition_strength":
+                score = formal_competition_strength_score(match)
             elif key == "authority_side_strength":
                 score = authority_side_strength_score(match)
             elif key == "match_process_rating":
@@ -1846,6 +1941,7 @@ def build_prediction(match: dict[str, Any], odds_history: list[dict[str, Any]]) 
         "value_model": {
             "market_probs": {key: round(value, 4) for key, value in market_base.items()},
             "deltas": value_deltas,
+            "formal_competition_strength": round(formal_competition_strength_score(match), 3),
             "probabilities": {key: round(value, 4) for key, value in value_probs.items()},
             "expected_goals": value_xg,
             "top_scores": [
