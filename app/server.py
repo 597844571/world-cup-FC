@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import mimetypes
+import hashlib
+import re
 from itertools import combinations
 from math import prod
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -51,6 +53,9 @@ class DashboardServer(BaseHTTPRequestHandler):
             return
         if parsed.path == "/api/schedule/query":
             self.handle_schedule_query()
+            return
+        if parsed.path == "/api/matches/select":
+            self.handle_select_matches()
             return
         if parsed.path == "/api/predictions/archive":
             self.handle_archive_predictions()
@@ -117,6 +122,41 @@ class DashboardServer(BaseHTTPRequestHandler):
                 "scheduled": split["scheduled"],
                 "finished": split["finished"],
                 "standings": standings,
+                "state": self.build_state(),
+            }
+        )
+
+    def handle_select_matches(self) -> None:
+        length = int(self.headers.get("Content-Length", 0))
+        payload = json.loads(self.rfile.read(length).decode("utf-8") or "{}") if length else {}
+        mode = payload.get("mode") or "single"
+        fixtures, _meta = fetch_public_schedule()
+        sporttery_fixtures, _sporttery_meta = fetch_sporttery_fixtures()
+        aicai_context = safe_fetch_aicai_context(load_matches())
+        fixtures = merge_fixtures(fixtures, [*sporttery_fixtures, *aicai_context.get("fixtures", [])])
+        for fixture in fixtures:
+            self.store.upsert_fixture(fixture)
+        selected_fixture = find_fixture_for_payload(fixtures, payload)
+        selected = select_fixture_window(fixtures, selected_fixture, limit=4 if mode == "next4" else 1)
+        if not selected:
+            self.send_json({"ok": False, "error": "未找到可加入预测的赛程，请先刷新赛程。", "state": self.build_state()}, status=404)
+            return
+        matches = [match_from_fixture(fixture) for fixture in selected]
+        save_matches(matches)
+        sync_matches(self.store, matches)
+        fresh_aicai_context = safe_fetch_aicai_context(matches)
+        refreshed = []
+        for match in matches:
+            snapshots = fetch_odds(match)
+            snapshots.extend(snapshots_for_match(match, fresh_aicai_context.get("match_contexts", {}).get(match["match_id"])))
+            inserted = self.store.insert_snapshots(match["match_id"], snapshots)
+            refreshed.append({"match_id": match["match_id"], "inserted": inserted})
+        self.send_json(
+            {
+                "ok": True,
+                "selected": [match["match_id"] for match in matches],
+                "refreshed": refreshed,
+                "message": "已更新预测比赛并刷新数据",
                 "state": self.build_state(),
             }
         )
@@ -310,6 +350,197 @@ def fixture_key(fixture: dict) -> str:
         str(fixture.get(key) or "").strip().lower()
         for key in ("home_team", "away_team", "kickoff")
     )
+
+
+def fixture_lookup_key(fixture: dict) -> str:
+    kickoff = str(fixture.get("kickoff") or "")
+    date = kickoff[:10] if kickoff else ""
+    return "|".join(
+        str(fixture.get(key) or "").strip().lower().replace(" ", "")
+        for key in ("home_team", "away_team")
+    ) + f"|{date}"
+
+
+def find_fixture_for_payload(fixtures: list[dict], payload: dict) -> dict | None:
+    match_id = payload.get("match_id")
+    fixture_key_value = payload.get("fixture_key")
+    if match_id:
+        exact = next((fixture for fixture in fixtures if fixture.get("match_id") == match_id), None)
+        if exact:
+            return exact
+    if fixture_key_value:
+        exact = next((fixture for fixture in fixtures if fixture_lookup_key(fixture) == fixture_key_value), None)
+        if exact:
+            return exact
+    fixture = payload.get("fixture") or {}
+    if fixture:
+        key = fixture_lookup_key(fixture)
+        return next((item for item in fixtures if fixture_lookup_key(item) == key), None)
+    return None
+
+
+def fixture_quality(fixture: dict) -> int:
+    source = str(fixture.get("source") or "")
+    if source.startswith("爱彩") or fixture.get("aicai_match_id"):
+        return 5
+    if source.startswith("中国体彩") or fixture.get("selling_pools") or fixture.get("sporttery_match_num"):
+        return 4
+    if any(option.get("play") == "胜平负" for option in fixture.get("odds_summary", []) or []):
+        return 3
+    if re.search(r"T(0[1-9]|1\d|2[0-3]):", str(fixture.get("kickoff") or "")):
+        return 2
+    return 1
+
+
+def select_fixture_window(fixtures: list[dict], selected_fixture: dict | None, limit: int) -> list[dict]:
+    scheduled = [fixture for fixture in fixtures if fixture.get("status") != "finished"]
+    scheduled = [fixture for fixture in scheduled if fixture.get("home_team") and fixture.get("away_team") and fixture.get("kickoff")]
+    scheduled.sort(key=lambda fixture: (str(fixture.get("kickoff") or ""), -fixture_quality(fixture)))
+    if not selected_fixture:
+        selected_fixture = next((fixture for fixture in scheduled if fixture_quality(fixture) >= 3), scheduled[0] if scheduled else None)
+    if not selected_fixture:
+        return []
+    start = str(selected_fixture.get("kickoff") or "")
+    candidates = [fixture for fixture in scheduled if str(fixture.get("kickoff") or "") >= start]
+    candidates.sort(key=lambda fixture: (str(fixture.get("kickoff") or ""), -fixture_quality(fixture)))
+    selected: list[dict] = []
+    seen: set[str] = set()
+    for fixture in candidates:
+        if fixture_quality(fixture) < 3 and len(selected) < limit:
+            continue
+        key = fixture_lookup_key(fixture)
+        if key in seen:
+            continue
+        selected.append(fixture)
+        seen.add(key)
+        if len(selected) >= limit:
+            return selected
+    for fixture in candidates:
+        key = fixture_lookup_key(fixture)
+        if key in seen:
+            continue
+        selected.append(fixture)
+        seen.add(key)
+        if len(selected) >= limit:
+            break
+    return selected
+
+
+def parse_handicap_from_fixture(fixture: dict) -> int | None:
+    for row in fixture.get("odds_summary", []) or []:
+        play = str(row.get("play") or "")
+        match = re.search(r"让球\(([+-]?\d+(?:\.\d+)?)\)", play)
+        if match:
+            try:
+                return int(float(match.group(1)))
+            except ValueError:
+                return None
+    return None
+
+
+def parse_total_line_from_fixture(fixture: dict) -> float | None:
+    for row in fixture.get("aicai_odds_summary", []) or []:
+        play = str(row.get("play") or "")
+        match = re.search(r"大小球\((\d+(?:\.\d+)?)\)", play)
+        if match:
+            try:
+                return float(match.group(1))
+            except ValueError:
+                return None
+    return None
+
+
+def parse_h2h_odds_from_fixture(fixture: dict) -> dict | None:
+    for source_key in ("odds_summary", "aicai_odds_summary"):
+        for row in fixture.get(source_key, []) or []:
+            play = str(row.get("play") or "")
+            if play not in {"胜平负", "爱彩欧赔"}:
+                continue
+            values = {}
+            for option in row.get("options", []) or []:
+                name = str(option.get("name") or "")
+                key = {"胜": "home", "平": "draw", "负": "away"}.get(name)
+                if not key:
+                    continue
+                try:
+                    values[key] = float(option.get("sp"))
+                except (TypeError, ValueError):
+                    pass
+            if {"home", "draw", "away"} <= set(values):
+                return values
+    return None
+
+
+def elo_from_rank(rank: str | int | None) -> int:
+    try:
+        value = int(rank)
+    except (TypeError, ValueError):
+        return 1800
+    return max(1450, min(2120, 2070 - value * 5))
+
+
+def implied_probs(odds: dict | None) -> dict | None:
+    if not odds:
+        return None
+    inv = {key: 1 / value for key, value in odds.items() if value and value > 1}
+    total = sum(inv.values())
+    if total <= 0:
+        return None
+    return {key: value / total for key, value in inv.items()}
+
+
+def expected_goals_from_fixture(fixture: dict, odds: dict | None) -> dict:
+    total = parse_total_line_from_fixture(fixture) or 2.4
+    probs = implied_probs(odds) or {"home": 0.38, "draw": 0.28, "away": 0.34}
+    edge = probs.get("home", 0.38) - probs.get("away", 0.34)
+    home_share = max(0.25, min(0.75, 0.5 + edge * 0.55))
+    home = max(0.35, total * home_share)
+    away = max(0.35, total - home)
+    return {"home": round(home, 2), "away": round(away, 2)}
+
+
+def auto_match_id(fixture: dict) -> str:
+    source_id = str(fixture.get("match_id") or "")
+    if source_id and source_id.startswith("AICAI_"):
+        return source_id
+    seed = fixture_lookup_key(fixture) or fixture_key(fixture) or source_id
+    return "AUTO_" + hashlib.sha1(seed.encode("utf-8")).hexdigest()[:10].upper()
+
+
+def match_from_fixture(fixture: dict) -> dict:
+    odds = parse_h2h_odds_from_fixture(fixture)
+    ranks = fixture.get("aicai_rank") or {}
+    home_team = fixture.get("home_team") or "主队"
+    away_team = fixture.get("away_team") or "客队"
+    match = {
+        "match_id": auto_match_id(fixture),
+        "home_team": home_team,
+        "away_team": away_team,
+        "home_aliases": [home_team],
+        "away_aliases": [away_team],
+        "kickoff": fixture.get("kickoff"),
+        "stage": fixture.get("sporttery_match_num") or fixture.get("stage") or "世界杯",
+        "neutral": True,
+        "home_elo": elo_from_rank(ranks.get("home")),
+        "away_elo": elo_from_rank(ranks.get("away")),
+        "expected_goals": expected_goals_from_fixture(fixture, odds),
+        "lineup_status": "unknown",
+        "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
+        "tactical_notes": "自动建模：先使用市场倍率、球队排名和盘口作为底盘；战术细节需后续补充。",
+        "weather_notes": "待确认",
+        "referee_notes": "待确认",
+        "upset_triggers": {
+            "underdog_low_block": True,
+            "underdog_set_piece": True,
+            "early_event_risk": True,
+        },
+    }
+    if odds:
+        match["manual_odds"] = odds
+    handicap = parse_handicap_from_fixture(fixture)
+    if handicap is not None:
+        match["sporttery_handicap"] = handicap
+    return match
 
 
 def safe_fetch_aicai_context(matches: list[dict]) -> dict:

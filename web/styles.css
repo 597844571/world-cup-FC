@@ -229,6 +229,22 @@ main {
   border-bottom: 1px solid var(--line);
 }
 
+.calendar-fixture.clickable,
+.schedule-card.clickable {
+  cursor: pointer;
+}
+
+.calendar-fixture.clickable:hover,
+.schedule-card.clickable:hover {
+  border-color: #0e7490;
+  box-shadow: 0 10px 24px rgba(14, 116, 144, 0.16);
+}
+
+.calendar-fixture.clickable:hover .calendar-match strong,
+.schedule-card.clickable:hover h3 {
+  color: #0e7490;
+}
+
 .calendar-fixture:last-child {
   border-bottom: 0;
 }

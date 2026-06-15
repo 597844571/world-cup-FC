@@ -72,9 +72,32 @@ async function postAction(url, message) {
   }
 }
 
+async function selectFixture(fixtureKey, mode = "single") {
+  setBusy(true);
+  try {
+    const response = await fetch("/api/matches/select", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fixture_key: fixtureKey, mode }),
+    });
+    const payload = await response.json();
+    if (!response.ok || payload.ok === false) {
+      showToast(payload.error || "加入预测失败");
+      return;
+    }
+    state.data = payload.state;
+    const first = payload.selected?.[0];
+    state.active = first || "overview";
+    showToast(payload.message || "已加入预测并刷新");
+    render();
+  } finally {
+    setBusy(false);
+  }
+}
+
 function setBusy(isBusy) {
   document.querySelectorAll("button").forEach((button) => {
-    if (button.id === "refreshAll" || button.id === "reloadState" || button.dataset.refresh) {
+    if (button.id === "refreshAll" || button.id === "reloadState" || button.dataset.refresh || button.dataset.selectFixture) {
       button.disabled = isBusy;
     }
   });
@@ -738,8 +761,9 @@ function renderCalendarFixture(row) {
   const prediction = row.prediction?.prediction;
   const source = String(fixture.source || "");
   const isSporttery = source.includes("中国体彩");
+  const key = matchKey(fixture.home_team, fixture.away_team, fixture.kickoff);
   return `
-    <article class="calendar-fixture ${prediction ? "has-prediction" : ""}">
+    <article class="calendar-fixture ${prediction ? "has-prediction clickable" : ""}" ${prediction ? `data-open-card="${esc(row.prediction.match_id)}"` : ""}>
       <div class="calendar-time">${esc(calendarKickoff(fixture))}</div>
       <div class="calendar-match">
         <strong>${esc(fixture.home_team)} vs ${esc(fixture.away_team)}</strong>
@@ -755,9 +779,14 @@ function renderCalendarFixture(row) {
         <div class="card-actions">
           <button data-open-match="${esc(row.prediction.match_id)}">查看预测详情</button>
           <button class="secondary" data-open-betting="${esc(row.prediction.match_id)}">下注建议测算</button>
+          <button class="secondary" data-refresh="${esc(row.prediction.match_id)}">刷新预测</button>
         </div>
       ` : `
         <div class="empty-mini">仅赛程信息，暂未建立预测模型。</div>
+        <div class="card-actions">
+          <button data-select-fixture="${esc(key)}" data-select-mode="single">加入此场预测</button>
+          <button class="secondary" data-select-fixture="${esc(key)}" data-select-mode="next4">从这场起预测4场</button>
+        </div>
       `}
     </article>
   `;
@@ -804,7 +833,7 @@ function renderScheduleCard(row) {
   const market = prediction?.scenarios?.find((s) => s.scenario === "market");
   const picks = prediction ? topPicks(prediction.sporttery, 3) : [];
   return `
-    <article class="schedule-card ${finished ? "finished" : ""}">
+    <article class="schedule-card ${finished ? "finished" : ""} ${row.prediction ? "clickable" : ""}" ${row.prediction ? `data-open-card="${esc(row.prediction.match_id)}"` : ""}>
       <div class="schedule-card-top">
         <div>
           <div class="schedule-time">${esc(fullKickoff(fixture.kickoff))}</div>
@@ -826,11 +855,16 @@ function renderScheduleCard(row) {
 
 function renderUpcomingBlock(row, market, picks) {
   const prediction = row.prediction?.prediction;
+  const key = matchKey(row.fixture.home_team, row.fixture.away_team, row.fixture.kickoff);
   if (!prediction) {
     return `
       ${renderOddsQuickView(row.fixture, null)}
       <div class="empty-mini">
-        这场已经进入赛程，但还没有加入本地预测配置。后续可从赛程一键生成预测模板。
+        这场已经进入赛程，但还没有加入本地预测配置。可以直接生成预测并刷新赔率。
+      </div>
+      <div class="card-actions">
+        <button data-select-fixture="${esc(key)}" data-select-mode="single">加入此场预测</button>
+        <button class="secondary" data-select-fixture="${esc(key)}" data-select-mode="next4">从这场起预测4场</button>
       </div>
     `;
   }
@@ -850,6 +884,7 @@ function renderUpcomingBlock(row, market, picks) {
     <div class="card-actions">
       <button data-open-match="${esc(row.prediction.match_id)}">查看预测详情</button>
       <button class="secondary" data-open-betting="${esc(row.prediction.match_id)}">下注建议测算</button>
+      <button class="secondary" data-refresh="${esc(row.prediction.match_id)}">刷新预测</button>
     </div>
   `;
 }
@@ -2050,30 +2085,56 @@ document.getElementById("refreshAll").addEventListener("click", () => refresh())
 document.getElementById("reloadState").addEventListener("click", () => loadState());
 document.addEventListener("click", (event) => {
   const target = event.target.closest("button[data-refresh]");
-  if (target) refresh(target.dataset.refresh);
+  if (target) {
+    event.stopPropagation();
+    refresh(target.dataset.refresh);
+    return;
+  }
   const postTarget = event.target.closest("button[data-post]");
-  if (postTarget) postAction(postTarget.dataset.post, postTarget.dataset.message || "操作完成");
+  if (postTarget) {
+    event.stopPropagation();
+    postAction(postTarget.dataset.post, postTarget.dataset.message || "操作完成");
+    return;
+  }
+  const selectTarget = event.target.closest("button[data-select-fixture]");
+  if (selectTarget) {
+    event.stopPropagation();
+    selectFixture(selectTarget.dataset.selectFixture, selectTarget.dataset.selectMode || "single");
+    return;
+  }
   const tabTarget = event.target.closest("button[data-tab]");
   if (tabTarget && !tabTarget.closest("#tabs")) {
     state.active = tabTarget.dataset.tab;
     render();
+    return;
   }
   const openMatch = event.target.closest("button[data-open-match]");
   if (openMatch) {
+    event.stopPropagation();
     state.active = openMatch.dataset.openMatch;
     render();
+    return;
   }
   const openBetting = event.target.closest("button[data-open-betting]");
   if (openBetting) {
+    event.stopPropagation();
     state.active = openBetting.dataset.openBetting;
     render();
     requestAnimationFrame(() => document.getElementById("bettingPlanner")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    return;
   }
   const stakeMode = event.target.closest("button[data-stake-mode]");
   if (stakeMode) {
+    event.stopPropagation();
     state.bettingMode = stakeMode.dataset.stakeMode;
     render();
     requestAnimationFrame(() => document.getElementById("bettingPlanner")?.scrollIntoView({ block: "start" }));
+    return;
+  }
+  const cardTarget = event.target.closest("[data-open-card]");
+  if (cardTarget) {
+    state.active = cardTarget.dataset.openCard;
+    render();
   }
 });
 
