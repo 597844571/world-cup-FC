@@ -792,6 +792,16 @@ th {
   color: #334155;
 }
 
+.pick-warning {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: #fff7ed;
+  color: #9a3412;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
 .share-panel {
   padding: 14px;
   background: #f8fafc;

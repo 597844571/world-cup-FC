@@ -394,7 +394,7 @@ function shortBasisText(item, prediction) {
   const probs = scenario?.probabilities || {};
   const sporttery = prediction?.sporttery || {};
   const hText = handicapText(sporttery.handicap ?? item.sporttery_handicap);
-  return `${conclusionText(item, prediction)}；${hText}；胜平负 ${pct(probs.home, 0)}/${pct(probs.draw, 0)}/${pct(probs.away, 0)}；比分 ${topScoreText(prediction)}。`;
+  return `${conclusionText(item, prediction)}；${hText}；胜平负 ${pct(probs.home, 0)}/${pct(probs.draw, 0)}/${pct(probs.away, 0)}；${scoreContextText(prediction, topPicks(sporttery, 2, prediction))}。`;
 }
 
 function formatSp(value) {
@@ -521,7 +521,7 @@ function predictionBasisItems(item, prediction) {
   const sporttery = prediction?.sporttery || {};
   const totalGoals = scenario?.total_goals;
   const hText = handicapText(sporttery.handicap ?? item.sporttery_handicap);
-  const bestPicks = topPicks(sporttery, 3).map(readablePick).join("；") || "暂无达到下注门槛的官方SP选项";
+  const bestPicks = topPicks(sporttery, 3, prediction).map((row) => readablePickWithContext(row, prediction)).join("；") || "暂无达到下注门槛的官方SP选项";
   const upset = prediction.upset?.active?.slice(0, 4).map((row) => row.label).join("；") || "没有明显爆冷触发项";
   const expectedGoals = item.expected_goals ? `${Number(item.expected_goals.home || 0).toFixed(2)} - ${Number(item.expected_goals.away || 0).toFixed(2)}` : "未配置";
   return [
@@ -531,7 +531,7 @@ function predictionBasisItems(item, prediction) {
     },
     {
       title: "体彩盘口",
-      text: `${hText}。当前优先看的官方可买项：${bestPicks}。盘口只作为可下注约束，不等同于必买。`,
+      text: `${hText}。当前官方可买项：${bestPicks}。盘口只作为可下注约束；若和比分主线相反，只能当防穿盘观察。`,
     },
     {
       title: "战术对位",
@@ -547,7 +547,7 @@ function predictionBasisItems(item, prediction) {
     },
     {
       title: "比分与进球",
-      text: `比分池优先看 ${topScoreText(prediction)}；总进球参考 ${totalGoals?.best_range ? `${totalGoals.best_range}球` : "暂无"}。比分只能小仓位覆盖，不作为重仓核心。`,
+      text: `${scoreContextText(prediction, topPicks(sporttery, 3, prediction))}；总进球参考 ${totalGoals?.best_range ? `${totalGoals.best_range}球` : "暂无"}。比分只能小仓位覆盖，不作为重仓核心。`,
     },
   ];
 }
@@ -570,7 +570,7 @@ function renderPredictionBasis(item, prediction) {
   `;
 }
 
-function topPicks(sporttery, limit = 4) {
+function topPicks(sporttery, limit = 4, prediction = null) {
   const usable = (row) => {
     const notes = `${row.reason || ""} ${(row.rule_notes || []).join(" ")}`;
     if (!["可小注", "观察", "高风险观察"].includes(row.decision)) return false;
@@ -582,16 +582,96 @@ function topPicks(sporttery, limit = 4) {
   const candidates = sporttery?.candidate_pool || [];
   const preferred = candidates
     .filter(usable)
-    .sort((a, b) => (b.decision === "可小注") - (a.decision === "可小注") || (b.risk_adjusted_score || 0) - (a.risk_adjusted_score || 0));
+    .sort((a, b) => topPickSort(a, b, prediction));
   const fallback = (sporttery?.options || [])
     .filter(usable)
-    .sort(calculatorOptionSort);
-  return [...preferred, ...fallback].filter((row, index, rows) => rows.findIndex((x) => x.play_type === row.play_type && x.selection === row.selection) === index).slice(0, limit);
+    .sort((a, b) => topPickSort(a, b, prediction) || calculatorOptionSort(a, b));
+  return [...preferred, ...fallback]
+    .filter((row, index, rows) => rows.findIndex((x) => x.play_type === row.play_type && x.selection === row.selection) === index)
+    .slice(0, limit);
+}
+
+function topPickSort(a, b, prediction) {
+  const aConflict = handicapPickConflict(a, prediction);
+  const bConflict = handicapPickConflict(b, prediction);
+  if (aConflict.conflict !== bConflict.conflict) return aConflict.conflict ? 1 : -1;
+  const decisionDiff = (b.decision === "可小注") - (a.decision === "可小注");
+  if (decisionDiff) return decisionDiff;
+  return (b.risk_adjusted_score || 0) - (a.risk_adjusted_score || 0);
 }
 
 function topScoreText(prediction) {
   const scores = prediction?.sporttery?.score_reference || prediction?.value_model?.top_scores || [];
   return scores.slice(0, 3).map((row) => row.score).join(" / ") || "-";
+}
+
+function parseScore(score) {
+  const parts = String(score || "").replace(":", "-").split("-").map((x) => Number.parseInt(x, 10));
+  if (parts.length !== 2 || parts.some((x) => Number.isNaN(x))) return null;
+  return { home: parts[0], away: parts[1] };
+}
+
+function handicapSelectionForScore(score, handicap) {
+  const parsed = parseScore(score);
+  const h = Number(handicap);
+  if (!parsed || Number.isNaN(h)) return null;
+  const adjusted = parsed.home + h - parsed.away;
+  if (adjusted > 0) return "让胜";
+  if (adjusted === 0) return "让平";
+  return "让负";
+}
+
+function scorePoolHandicapLean(prediction) {
+  const sporttery = prediction?.sporttery || {};
+  const handicap = sporttery.handicap;
+  if (handicap === null || handicap === undefined || Number.isNaN(Number(handicap))) return null;
+  const scenario = marketScenario(prediction);
+  const grid = sporttery.score_reference?.length
+    ? sporttery.score_reference
+    : scenario?.score_grid?.length
+      ? scenario.score_grid
+      : prediction?.value_model?.top_scores || scenario?.top_scores || [];
+  const buckets = { "让胜": 0, "让平": 0, "让负": 0 };
+  let total = 0;
+  grid.forEach((row, index) => {
+    const selection = handicapSelectionForScore(row.score, handicap);
+    if (!selection) return;
+    const weight = Number(row.probability ?? row.model_prob ?? 0) || (1 / (index + 1));
+    buckets[selection] += weight;
+    total += weight;
+  });
+  if (!total) return null;
+  const selection = Object.entries(buckets).sort((a, b) => b[1] - a[1])[0][0];
+  return { selection, probability: buckets[selection] / total, buckets };
+}
+
+function handicapPickConflict(row, prediction) {
+  if (!row || row.play_type !== "让球胜平负" || !prediction) return { conflict: false };
+  const lean = scorePoolHandicapLean(prediction);
+  if (!lean) return { conflict: false };
+  const conflict = row.selection !== lean.selection && lean.probability >= 0.42;
+  return { conflict, lean };
+}
+
+function readablePickWithContext(row, prediction) {
+  const base = readablePick(row);
+  const check = handicapPickConflict(row, prediction);
+  if (!check.conflict) return base;
+  return `${base}（反比分主线，防穿盘观察）`;
+}
+
+function pickContextNote(row, prediction) {
+  const check = handicapPickConflict(row, prediction);
+  if (!check.conflict) return "";
+  return `注意：比分主线更像${check.lean.selection}（${topScoreText(prediction)}），这项是反主线的防穿盘/赔率价值观察，不适合重仓，也不要和大胜比分当成同一方向去串。`;
+}
+
+function scoreContextText(prediction, picks = []) {
+  const scoreText = topScoreText(prediction);
+  const conflicted = picks.find((row) => handicapPickConflict(row, prediction).conflict);
+  if (!conflicted) return `比分主线：${scoreText}`;
+  const check = handicapPickConflict(conflicted, prediction);
+  return `比分主线：${scoreText}，让球主线更像${check.lean.selection}；${readablePick(conflicted)}属于防穿盘价值观察，不是比分主线`;
 }
 
 function riskText(prediction) {
@@ -603,17 +683,19 @@ function riskText(prediction) {
   return "风险正常，仍需看临场SP";
 }
 
-function renderPickCard(row, matchLabel = "") {
+function renderPickCard(row, matchLabel = "", prediction = null) {
   if (!row) {
     return `<div class="pick-card watch"><div class="pick-title">暂无正向候选</div><div class="pick-reason">当前没有同时满足官方SP、模型价值和风险约束的选项。</div></div>`;
   }
-  const tone = decisionTone(row);
+  const conflict = handicapPickConflict(row, prediction).conflict;
+  const tone = conflict ? "watch" : decisionTone(row);
   const action = row.sp == null ? "等SP" : row.decision;
+  const note = pickContextNote(row, prediction);
   return `
     <div class="pick-card ${tone}">
       <div class="pick-title">
         <span>${matchLabel ? `${esc(matchLabel)}｜` : ""}${esc(readablePick(row))}</span>
-        ${badge(action, tone === "primary" ? "green" : tone === "risky" ? "red" : "amber")}
+        ${badge(conflict ? "防穿盘观察" : action, tone === "primary" ? "green" : tone === "risky" ? "red" : "amber")}
       </div>
       <div class="pick-meta">
         <span>模型 ${pct(row.model_prob)}</span>
@@ -621,12 +703,13 @@ function renderPickCard(row, matchLabel = "") {
         <span>风险 ${row.risk_score ?? "-"}</span>
       </div>
       <div class="pick-reason">${esc((row.rule_notes || []).join("；") || row.reason || row.score_note || "按官方玩法和模型价值筛选")}</div>
+      ${note ? `<div class="pick-warning">${esc(note)}</div>` : ""}
     </div>
   `;
 }
 
 function renderSharePanel(item, prediction, marketScenario) {
-  const picks = topPicks(prediction.sporttery, 2);
+  const picks = topPicks(prediction.sporttery, 2, prediction);
   const prob = marketScenario?.probabilities || prediction.value_model?.probabilities || {};
   return `
     <div class="share-panel">
@@ -639,12 +722,12 @@ function renderSharePanel(item, prediction, marketScenario) {
         <div class="share-value">主 ${pct(prob.home)} ｜ 平 ${pct(prob.draw)} ｜ 客 ${pct(prob.away)}</div>
       </div>
       <div class="share-line">
-        <div class="share-label">比分参考</div>
-        <div class="share-value">${esc(topScoreText(prediction))}</div>
+        <div class="share-label">比分主线</div>
+        <div class="share-value">${esc(scoreContextText(prediction, picks))}</div>
       </div>
       <div class="share-line">
-        <div class="share-label">可优先看的买法</div>
-        <div class="share-value">${esc(picks.map(readablePick).join("；") || "暂无正向候选")}</div>
+        <div class="share-label">价值/观察项</div>
+        <div class="share-value">${esc(picks.map((row) => readablePickWithContext(row, prediction)).join("；") || "暂无正向候选")}</div>
       </div>
       <div class="share-line">
         <div class="share-label">风险提示</div>
@@ -680,7 +763,7 @@ function renderOverviewCard(item) {
   const prediction = item.prediction;
   const summary = prediction.summary;
   const market = prediction.scenarios.find((s) => s.scenario === "market");
-  const picks = topPicks(prediction.sporttery, 2);
+  const picks = topPicks(prediction.sporttery, 2, prediction);
   return `
     <div class="match-card">
       <div class="match-card-top">
@@ -703,10 +786,10 @@ function renderOverviewCard(item) {
       </div>
       ${renderOddsQuickView(item, prediction)}
       <div class="card-picks" style="margin-top: 12px;">
-        ${picks.length ? picks.map((row) => renderPickCard(row)).join("") : renderPickCard(null)}
+        ${picks.length ? picks.map((row) => renderPickCard(row, "", prediction)).join("") : renderPickCard(null)}
       </div>
       <div class="basis-brief">${esc(shortBasisText(item, prediction))}</div>
-      <div class="pick-reason">比分参考：${esc(topScoreText(prediction))}。${esc(riskText(prediction))}。</div>
+      <div class="pick-reason">${esc(scoreContextText(prediction, picks))}。${esc(riskText(prediction))}。</div>
       <div class="card-actions">
         <button data-open-match="${esc(item.match_id)}">查看预测详情</button>
         <button class="secondary" data-open-betting="${esc(item.match_id)}">下注建议测算</button>
@@ -831,7 +914,7 @@ function renderScheduleCard(row) {
   const status = fixtureStatus(fixture);
   const finished = status === "finished";
   const market = prediction?.scenarios?.find((s) => s.scenario === "market");
-  const picks = prediction ? topPicks(prediction.sporttery, 3) : [];
+  const picks = prediction ? topPicks(prediction.sporttery, 3, prediction) : [];
   return `
     <article class="schedule-card ${finished ? "finished" : ""} ${row.prediction ? "clickable" : ""}" ${row.prediction ? `data-open-card="${esc(row.prediction.match_id)}"` : ""}>
       <div class="schedule-card-top">
@@ -877,10 +960,10 @@ function renderUpcomingBlock(row, market, picks) {
     ${renderOddsQuickView(row.fixture, prediction)}
     <div class="schedule-conclusion">${esc(conclusionText(row.prediction, prediction))}</div>
     <div class="schedule-picks">
-      ${picks.length ? picks.map((pick) => renderPickCard(pick)).join("") : renderPickCard(null)}
+      ${picks.length ? picks.map((pick) => renderPickCard(pick, "", prediction)).join("") : renderPickCard(null)}
     </div>
     <div class="basis-brief">${esc(shortBasisText(row.prediction, prediction))}</div>
-    <div class="plain-note">比分参考：${esc(topScoreText(prediction))}。${esc(riskText(prediction))}。</div>
+    <div class="plain-note">${esc(scoreContextText(prediction, picks))}。${esc(riskText(prediction))}。</div>
     <div class="card-actions">
       <button data-open-match="${esc(row.prediction.match_id)}">查看预测详情</button>
       <button class="secondary" data-open-betting="${esc(row.prediction.match_id)}">下注建议测算</button>
@@ -1187,7 +1270,7 @@ function renderMatch(item) {
   const summary = prediction.summary;
   const baseline = prediction.scenarios.find((s) => s.scenario === "baseline");
   const market = prediction.scenarios.find((s) => s.scenario === "market");
-  const picks = topPicks(prediction.sporttery, 4);
+  const picks = topPicks(prediction.sporttery, 4, prediction);
   content.innerHTML = `
     <section class="decision-board">
       <div class="match-hero">
@@ -1230,9 +1313,9 @@ function renderMatch(item) {
     <section class="section">
       <h3>优先看的下注项</h3>
       <div class="grid cols-2">
-        ${picks.length ? picks.map((row) => renderPickCard(row, `${item.home_team} vs ${item.away_team}`)).join("") : renderPickCard(null)}
+        ${picks.length ? picks.map((row) => renderPickCard(row, `${item.home_team} vs ${item.away_team}`, prediction)).join("") : renderPickCard(null)}
       </div>
-      <div class="pick-reason">原则：先看官方体彩是否开售，再看模型概率是否高过官方SP隐含概率。没有SP或分歧过大时，只做观察。</div>
+      <div class="pick-reason">原则：先看官方体彩是否开售，再看模型概率是否高过官方SP隐含概率。让球玩法必须和比分主线分开解释；反主线选项只作为防穿盘观察。</div>
     </section>
 
     <section class="section" id="bettingPlanner">
@@ -1253,7 +1336,7 @@ function renderMatch(item) {
 
     <section class="section">
       <h3>体彩单项建议池</h3>
-      ${sportteryCandidateTable(prediction.sporttery)}
+      ${sportteryCandidateTable(prediction.sporttery, prediction)}
     </section>
 
     <section class="grid cols-2">
@@ -1550,7 +1633,7 @@ function valueModelTable(valueModel) {
   `;
 }
 
-function sportteryCandidateTable(sporttery) {
+function sportteryCandidateTable(sporttery, prediction = null) {
   const rows = sporttery?.candidate_pool || [];
   if (!rows.length) {
     return `<p class="muted">暂无正向候选。若缺少体彩SP，请先录入对应玩法SP；只有胜平负可能使用市场赔率代理。</p>`;
@@ -1569,7 +1652,7 @@ function sportteryCandidateTable(sporttery) {
             <td>${row.fair_sp == null ? "-" : row.fair_sp.toFixed(2)}</td>
             <td>${row.ev == null ? "-" : pct(row.ev)}</td>
             <td>${row.risk_score}<br>${badge(row.risk_level)}</td>
-            <td>${esc(row.decision)}<br><span class="muted">${esc(row.reason)}</span></td>
+            <td>${esc(row.decision)}<br><span class="muted">${esc([row.reason, pickContextNote(row, prediction)].filter(Boolean).join("；"))}</span></td>
           </tr>
         `).join("")}
       </tbody>
