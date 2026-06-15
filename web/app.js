@@ -48,7 +48,7 @@ async function refresh(matchId = null) {
     });
     const payload = await response.json();
     state.data = payload.state;
-    showToast(matchId ? "当前比赛已刷新" : "全部比赛已刷新");
+    showToast(payload.message || (matchId ? "当前比赛已刷新" : "全部比赛已刷新"));
     render();
   } finally {
     setBusy(false);
@@ -65,7 +65,7 @@ async function postAction(url, message) {
     });
     const payload = await response.json();
     state.data = payload.state || state.data;
-    showToast(message);
+    showToast(payload.message || message);
     render();
   } finally {
     setBusy(false);

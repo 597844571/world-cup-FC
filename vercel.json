@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/**/*.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "web/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/schedule/query",
+      "dest": "/api/schedule/query.py"
+    },
+    {
+      "src": "/api/predictions/archive",
+      "dest": "/api/predictions/archive.py"
+    },
+    {
+      "src": "/api/backtest/run",
+      "dest": "/api/backtest/run.py"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1.py"
+    },
+    {
+      "src": "/(.*\\.(?:js|css|png|jpg|jpeg|gif|svg|ico|webp|json))",
+      "dest": "/web/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/web/index.html"
+    }
+  ]
+}
