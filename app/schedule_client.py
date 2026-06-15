@@ -82,10 +82,34 @@ def fetch_sporttery_fixtures() -> tuple[list[dict[str, Any]], dict[str, Any]]:
                     "venue": item.get("remark"),
                     "sporttery_match_num": match_num,
                     "selling_pools": pools,
+                    "odds_summary": sporttery_odds_summary(item),
                     "raw_json": item,
                 }
             )
     return fixtures, {"source": SPORTTERY_MATCH_LIST_API, "count": len(fixtures), "error": None}
+
+
+def sporttery_odds_summary(item: dict[str, Any]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for odds in item.get("oddsList", []) or []:
+        code = str(odds.get("poolCode") or "").upper()
+        goal_line = odds.get("goalLine") or odds.get("goalLineF") or odds.get("goalLineValue")
+        if code == "HAD":
+            label = "胜平负"
+            values = [("胜", odds.get("h")), ("平", odds.get("d")), ("负", odds.get("a"))]
+        elif code == "HHAD":
+            label = f"让球({goal_line})" if goal_line not in (None, "") else "让球胜平负"
+            values = [("让胜", odds.get("h")), ("让平", odds.get("d")), ("让负", odds.get("a"))]
+        elif code == "TTG":
+            label = "总进球"
+            values = [(str(i), odds.get(f"s{i}")) for i in range(7)] + [("7+", odds.get("s7"))]
+        else:
+            continue
+
+        options = [{"name": name, "sp": str(value)} for name, value in values if str(value or "").strip()]
+        if options:
+            rows.append({"play": label, "options": options[:8]})
+    return rows[:4]
 
 
 def sporttery_kickoff(match_date: Any, match_time: Any) -> str | None:

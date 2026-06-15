@@ -357,6 +357,58 @@ main {
   color: #334155;
 }
 
+.odds-panel {
+  margin-top: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 10px;
+}
+
+.odds-title {
+  margin-bottom: 7px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.odds-groups {
+  display: grid;
+  gap: 8px;
+}
+
+.odds-group {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.odds-group strong {
+  color: var(--ink);
+}
+
+.odds-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #1e3a8a;
+  padding: 3px 8px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.odds-chip b {
+  color: #111827;
+}
+
+.muted-panel {
+  color: var(--muted);
+  background: #f8fafc;
+}
+
 .basis-brief {
   margin-top: 10px;
   border-left: 4px solid var(--cyan);

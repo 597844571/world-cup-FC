@@ -374,6 +374,70 @@ function shortBasisText(item, prediction) {
   return `${conclusionText(item, prediction)}；${hText}；胜平负 ${pct(probs.home, 0)}/${pct(probs.draw, 0)}/${pct(probs.away, 0)}；比分 ${topScoreText(prediction)}。`;
 }
 
+function formatSp(value) {
+  const num = Number(value);
+  if (Number.isNaN(num)) return esc(value);
+  return num.toFixed(2);
+}
+
+function oddsSelectionRank(selection) {
+  const order = ["胜", "平", "负", "让胜", "让平", "让负", "0", "1", "2", "3", "4", "5", "6", "7+"];
+  const index = order.indexOf(String(selection));
+  return index === -1 ? 99 : index;
+}
+
+function predictionOddsRows(prediction) {
+  const sporttery = prediction?.sporttery || {};
+  const rows = uniqueBetRows([...(sporttery.options || []), ...(sporttery.candidate_pool || [])])
+    .filter((row) => row?.sp != null && isOfficialSportteryBet(row));
+  const playOrder = ["胜平负", "让球胜平负", "总进球", "比分", "半全场"];
+  return playOrder
+    .map((play) => {
+      const playRows = rows
+        .filter((row) => row.play_type === play)
+        .sort((a, b) => oddsSelectionRank(a.selection) - oddsSelectionRank(b.selection))
+        .slice(0, 6);
+      let label = play;
+      if (play === "让球胜平负" && sporttery.handicap !== null && sporttery.handicap !== undefined && sporttery.handicap !== "") {
+        label = `让球(${sporttery.handicap})`;
+      }
+      return {
+        play: label,
+        options: playRows.map((row) => ({ name: row.selection, sp: row.sp })),
+      };
+    })
+    .filter((row) => row.options.length)
+    .slice(0, 4);
+}
+
+function oddsQuickRows(fixture, prediction) {
+  const fromPrediction = predictionOddsRows(prediction);
+  if (fromPrediction.length) return fromPrediction;
+  return Array.isArray(fixture?.odds_summary) ? fixture.odds_summary.slice(0, 4) : [];
+}
+
+function renderOddsQuickView(fixture, prediction) {
+  const rows = oddsQuickRows(fixture, prediction);
+  if (!rows.length) {
+    return `<div class="odds-panel muted-panel">暂无官方SP。公开赛程只提供比赛时间，等中国体彩开售后刷新会自动补充赔率。</div>`;
+  }
+  return `
+    <div class="odds-panel">
+      <div class="odds-title">官方SP</div>
+      <div class="odds-groups">
+        ${rows.map((row) => `
+          <div class="odds-group">
+            <strong>${esc(row.play)}</strong>
+            ${(row.options || []).slice(0, 8).map((option) => `
+              <span class="odds-chip">${esc(option.name)} <b>${formatSp(option.sp)}</b></span>
+            `).join("")}
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
+
 function predictionBasisItems(item, prediction) {
   const scenario = marketScenario(prediction);
   const probs = scenario?.probabilities || {};
@@ -560,6 +624,7 @@ function renderOverviewCard(item) {
         <div class="prob-pill draw"><span>平局</span><strong>${pct(market?.probabilities.draw)}</strong></div>
         <div class="prob-pill away"><span>客胜</span><strong>${pct(market?.probabilities.away)}</strong></div>
       </div>
+      ${renderOddsQuickView(item, prediction)}
       <div class="card-picks" style="margin-top: 12px;">
         ${picks.length ? picks.map((row) => renderPickCard(row)).join("") : renderPickCard(null)}
       </div>
@@ -630,6 +695,7 @@ function renderCalendarFixture(row) {
           ${fixture.venue ? `<span>${esc(fixture.venue)}</span>` : ""}
         </div>
       </div>
+      ${renderOddsQuickView(fixture, prediction)}
       ${prediction ? `
         <div class="basis-brief">${esc(shortBasisText(row.prediction, prediction))}</div>
         <div class="card-actions">
@@ -708,6 +774,7 @@ function renderUpcomingBlock(row, market, picks) {
   const prediction = row.prediction?.prediction;
   if (!prediction) {
     return `
+      ${renderOddsQuickView(row.fixture, null)}
       <div class="empty-mini">
         这场已经进入赛程，但还没有加入本地预测配置。后续可从赛程一键生成预测模板。
       </div>
@@ -719,6 +786,7 @@ function renderUpcomingBlock(row, market, picks) {
       <div><span>平局</span><strong>${pct(market?.probabilities?.draw)}</strong></div>
       <div><span>客胜</span><strong>${pct(market?.probabilities?.away)}</strong></div>
     </div>
+    ${renderOddsQuickView(row.fixture, prediction)}
     <div class="schedule-conclusion">${esc(conclusionText(row.prediction, prediction))}</div>
     <div class="schedule-picks">
       ${picks.length ? picks.map((pick) => renderPickCard(pick)).join("") : renderPickCard(null)}

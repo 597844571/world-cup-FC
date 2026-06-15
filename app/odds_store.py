@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
@@ -194,8 +195,6 @@ class OddsStore:
         return row["captured_at"] if row and row["captured_at"] else None
 
     def upsert_fixture(self, fixture: dict[str, Any]) -> None:
-        import json
-
         with self.connect() as conn:
             conn.execute(
                 """
@@ -235,7 +234,7 @@ class OddsStore:
     def fixtures(self, status: str | None = None) -> list[dict[str, Any]]:
         sql = """
             SELECT match_id, source, competition, stage, home_team, away_team, kickoff, status,
-                   home_score, away_score, venue
+                   home_score, away_score, venue, raw_json
             FROM fixtures
         """
         params: tuple[Any, ...] = ()
@@ -245,7 +244,20 @@ class OddsStore:
         sql += " ORDER BY kickoff IS NULL, kickoff ASC"
         with self.connect() as conn:
             rows = conn.execute(sql, params).fetchall()
-        return [dict(row) for row in rows]
+        fixtures = []
+        for row in rows:
+            fixture = dict(row)
+            raw_text = fixture.pop("raw_json", None)
+            if raw_text:
+                try:
+                    raw = json.loads(raw_text)
+                except json.JSONDecodeError:
+                    raw = {}
+                for key in ("sporttery_match_num", "selling_pools", "odds_summary"):
+                    if key in raw:
+                        fixture[key] = raw[key]
+            fixtures.append(fixture)
+        return fixtures
 
     def archive_prediction(self, match_id: str, prediction: dict[str, Any]) -> int:
         rows = []
