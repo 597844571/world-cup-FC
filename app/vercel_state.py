@@ -8,7 +8,7 @@ from typing import Any
 
 from .match_registry import load_matches
 from .prediction_engine import build_prediction
-from .schedule_client import fetch_sporttery_fixtures
+from .schedule_client import fetch_public_schedule, fetch_sporttery_fixtures
 from .source_registry import load_sources
 from .standings_client import load_standings
 
@@ -124,12 +124,14 @@ def append_odd(
 
 def build_serverless_state() -> dict[str, Any]:
     matches = load_matches()
-    fixtures, sporttery_meta = fetch_sporttery_fixtures()
+    public_fixtures, public_meta = fetch_public_schedule()
+    sporttery_fixtures, sporttery_meta = fetch_sporttery_fixtures()
+    fixtures = merge_fixtures(public_fixtures, sporttery_fixtures)
     details = []
     errors = []
     for match in matches:
         try:
-            history = sporttery_history(match, fixtures)
+            history = sporttery_history(match, sporttery_fixtures)
             prediction = build_prediction(match, history)
         except Exception as exc:
             history = []
@@ -181,11 +183,30 @@ def build_serverless_state() -> dict[str, Any]:
             "tuning_suggestions": ["Vercel 云端为只读模式；赛前归档和赛后回测请在本地运行。"],
         },
         "deployment": {
-            "mode": "vercel_readonly",
-            "sporttery_meta": sporttery_meta,
-            "errors": errors,
-        },
+                "mode": "vercel_readonly",
+                "public_schedule_meta": public_meta,
+                "sporttery_meta": sporttery_meta,
+                "errors": errors,
+            },
     }
+
+
+def merge_fixtures(primary: list[dict[str, Any]], secondary: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    merged: dict[str, dict[str, Any]] = {}
+    for fixture in [*primary, *secondary]:
+        key = fixture_key(fixture)
+        if key in merged:
+            merged[key].update({k: v for k, v in fixture.items() if v not in (None, "", [])})
+        else:
+            merged[key] = dict(fixture)
+    return sorted(merged.values(), key=lambda row: row.get("kickoff") or "")
+
+
+def fixture_key(fixture: dict[str, Any]) -> str:
+    return "|".join(
+        str(fixture.get(key) or "").strip().lower()
+        for key in ("home_team", "away_team", "kickoff")
+    )
 
 
 def write_json(handler: BaseHTTPRequestHandler, payload: dict[str, Any], status: int = 200) -> None:

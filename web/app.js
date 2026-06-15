@@ -95,6 +95,10 @@ function render() {
     renderOverview();
     return;
   }
+  if (state.active === "calendar") {
+    renderCalendar();
+    return;
+  }
   if (state.active.startsWith("day:")) {
     renderScheduleDay(state.active);
     return;
@@ -117,6 +121,7 @@ function renderTabs() {
   const scheduleTabs = buildScheduleTabs();
   const buttons = [
     `<button class="tab ${state.active === "overview" ? "active" : ""}" data-tab="overview">总览</button>`,
+    `<button class="tab ${state.active === "calendar" ? "active" : ""}" data-tab="calendar">赛程挂历</button>`,
     ...scheduleTabs.map((tab) => {
       const active = state.active === tab.id ? "active" : "";
       return `<button class="tab schedule-tab ${active}" data-tab="${esc(tab.id)}">${esc(tab.label)}<span>${tab.count}</span></button>`;
@@ -177,6 +182,21 @@ function fullKickoff(value) {
   const hh = String(date.getHours()).padStart(2, "0");
   const mi = String(date.getMinutes()).padStart(2, "0");
   return `${mm}月${dd}日 ${hh}:${mi} 北京时间`;
+}
+
+function calendarKickoff(fixture) {
+  if (!fixture?.kickoff) return "时间待定";
+  const source = String(fixture.source || "");
+  const kickoff = String(fixture.kickoff || "");
+  const isDateOnlyPublic = !source.includes("中国体彩") && /T00:00(?::00)?(?:$|[+-])/.test(kickoff);
+  if (isDateOnlyPublic) {
+    const date = new Date(fixture.kickoff);
+    if (Number.isNaN(date.getTime())) return `${kickoff.slice(0, 10)} 时间待核对`;
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+    return `${mm}月${dd}日 当日时间待核对`;
+  }
+  return fullKickoff(fixture.kickoff);
 }
 
 function normalizeName(value) {
@@ -295,6 +315,19 @@ function buildScheduleTabs() {
       ...group,
       label: `${dayLabel(group.dateKey)} ${group.status === "finished" ? "完赛" : "赛程"}`,
     }));
+}
+
+function calendarGroups() {
+  const rows = scheduleRows()
+    .filter((row) => fixtureStatus(row.fixture) === "scheduled")
+    .sort((a, b) => String(a.fixture.kickoff || "").localeCompare(String(b.fixture.kickoff || "")));
+  const groups = new Map();
+  rows.forEach((row) => {
+    const dateKey = bjtDateKey(row.fixture.kickoff);
+    if (!groups.has(dateKey)) groups.set(dateKey, []);
+    groups.get(dateKey).push(row);
+  });
+  return [...groups.entries()].map(([dateKey, items]) => ({ dateKey, items }));
 }
 
 function decisionTone(row) {
@@ -537,6 +570,76 @@ function renderOverviewCard(item) {
         <button class="secondary" data-open-betting="${esc(item.match_id)}">下注建议测算</button>
       </div>
     </div>
+  `;
+}
+
+function renderCalendar() {
+  const content = document.getElementById("content");
+  const groups = calendarGroups();
+  const total = groups.reduce((sum, group) => sum + group.items.length, 0);
+  const predicted = groups.reduce((sum, group) => sum + group.items.filter((row) => row.prediction).length, 0);
+  const sportteryCount = groups.reduce((sum, group) => sum + group.items.filter((row) => String(row.fixture.source || "").includes("中国体彩")).length, 0);
+  content.innerHTML = `
+    <section class="schedule-head">
+      <div>
+        <h2>世界杯赛程挂历</h2>
+        <p>按中国北京时间分组展示未开赛赛程。体彩官方可售场次会显示编号；公开赛程源若只有日期，会标注“当日时间待核对”。</p>
+      </div>
+      <div class="actions">
+        <button data-post="/api/schedule/query" data-message="赛程查询完成">刷新赛程</button>
+      </div>
+    </section>
+    <section class="grid cols-3">
+      <div class="metric"><div class="label">未开赛场次</div><div class="value">${total}</div><div class="sub">公开赛程 + 体彩可售</div></div>
+      <div class="metric"><div class="label">已有预测</div><div class="value">${predicted}</div><div class="sub">可查看预测详情</div></div>
+      <div class="metric"><div class="label">体彩可售</div><div class="value">${sportteryCount}</div><div class="sub">可对齐竞彩下单</div></div>
+    </section>
+    <section class="calendar-board">
+      ${groups.length ? groups.slice(0, 40).map(renderCalendarDay).join("") : `<div class="empty-state">暂无未开赛赛程。</div>`}
+    </section>
+  `;
+}
+
+function renderCalendarDay(group) {
+  return `
+    <div class="calendar-day">
+      <div class="calendar-day-head">
+        <h3>${esc(dayLabel(group.dateKey))}</h3>
+        <span>${group.items.length}场</span>
+      </div>
+      <div class="calendar-fixtures">
+        ${group.items.map(renderCalendarFixture).join("")}
+      </div>
+    </div>
+  `;
+}
+
+function renderCalendarFixture(row) {
+  const fixture = row.fixture;
+  const prediction = row.prediction?.prediction;
+  const source = String(fixture.source || "");
+  const isSporttery = source.includes("中国体彩");
+  return `
+    <article class="calendar-fixture ${prediction ? "has-prediction" : ""}">
+      <div class="calendar-time">${esc(calendarKickoff(fixture))}</div>
+      <div class="calendar-match">
+        <strong>${esc(fixture.home_team)} vs ${esc(fixture.away_team)}</strong>
+        <div class="schedule-meta">
+          ${fixture.stage ? badge(fixture.stage, isSporttery ? "blue" : "amber") : ""}
+          ${isSporttery ? badge("体彩可售", "green") : badge("公开赛程", "amber")}
+          ${fixture.venue ? `<span>${esc(fixture.venue)}</span>` : ""}
+        </div>
+      </div>
+      ${prediction ? `
+        <div class="basis-brief">${esc(shortBasisText(row.prediction, prediction))}</div>
+        <div class="card-actions">
+          <button data-open-match="${esc(row.prediction.match_id)}">查看预测详情</button>
+          <button class="secondary" data-open-betting="${esc(row.prediction.match_id)}">下注建议测算</button>
+        </div>
+      ` : `
+        <div class="empty-mini">仅赛程信息，暂未建立预测模型。</div>
+      `}
+    </article>
   `;
 }
 
