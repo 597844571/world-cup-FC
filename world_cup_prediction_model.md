@@ -1810,3 +1810,4 @@ https://cn.bing.com/sportsdetails?...league=Soccer_InternationalWorldCup&intent=
 - 完赛后必须记录赛前SP、收盘SP、预测概率、实际比分、Brier、Log Loss、ROI，用于回测，不得赛后倒填赛前预测。
 - 让球胜平负必须和比分池做语义一致性检查。若主队让2球且比分主线为 `3-0/4-0/4-1`，它对应的是让胜方向；如果模型同时发现“让负”有小正 EV，只能标记为反主线防穿盘/赔率价值观察，不能作为主推或和大胜比分同串。
 - 所有页面、Excel 和下注单必须区分“比分主线”“主线买法”“价值观察/防线”，避免普通用户把相反方向理解成同一套推荐。
+- 模型层必须输出 `handicap_scoreline_lean` 和 `recommendation_role`。反比分主线项标记 `anti_scoreline_value`，降低排序与仓位，并禁止进入自动串关池。

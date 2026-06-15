@@ -265,6 +265,7 @@ def build_sporttery_combos(details: list[dict]) -> list[dict]:
             and row.get("play_type") not in {"比分", "半全场"}
             and row.get("decision") in {"可小注", "观察", "高风险观察"}
             and row.get("allup_allowed", True)
+            and row.get("recommendation_role") != "anti_scoreline_value"
         ]
         if usable:
             best = sorted(

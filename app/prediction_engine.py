@@ -431,6 +431,51 @@ def score_grid(matrix: list[dict[str, Any]], max_goals: int = 4) -> list[dict[st
     ]
 
 
+def handicap_result_for_score(row: dict[str, Any], handicap: int | None) -> str | None:
+    if handicap is None:
+        return None
+    if "home_goals" in row and "away_goals" in row:
+        home_goals = int(row["home_goals"])
+        away_goals = int(row["away_goals"])
+    else:
+        parts = str(row.get("score", "")).replace(":", "-").split("-")
+        if len(parts) != 2:
+            return None
+        try:
+            home_goals = int(parts[0])
+            away_goals = int(parts[1])
+        except ValueError:
+            return None
+    diff = home_goals + int(handicap) - away_goals
+    if diff > 0:
+        return "让胜"
+    if diff == 0:
+        return "让平"
+    return "让负"
+
+
+def handicap_scoreline_lean(top_scores: list[dict[str, Any]], handicap: int | None) -> dict[str, Any] | None:
+    if handicap is None:
+        return None
+    buckets = {"让胜": 0.0, "让平": 0.0, "让负": 0.0}
+    for index, row in enumerate(top_scores):
+        selection = handicap_result_for_score(row, handicap)
+        if not selection:
+            continue
+        # 概率相近时仍然让前排比分有更高解释权，避免高赔项反向覆盖主叙事。
+        rank_weight = 1.0 / (index + 1)
+        buckets[selection] += float(row.get("probability") or 0) + rank_weight * 0.015
+    total = sum(buckets.values())
+    if total <= 0:
+        return None
+    selection, weight = max(buckets.items(), key=lambda item: item[1])
+    return {
+        "selection": selection,
+        "share": round(weight / total, 4),
+        "buckets": {key: round(value / total, 4) for key, value in buckets.items()},
+    }
+
+
 def recommendation_context(
     match: dict[str, Any],
     model_probs: dict[str, float],
@@ -462,6 +507,9 @@ def recommendation_context(
     open_profile = open_game_profile(match, model_probs, xg)
     context_seed["open_game_profile"] = open_profile
     top_scores = ranked_scorelines(matrix, limit=6, context=context_seed)
+    scoreline_lean = handicap_scoreline_lean(top_scores, handicap)
+    matrix_handicap_probs = rqspf_probs(matrix, handicap) if handicap is not None else None
+    matrix_lean = max(matrix_handicap_probs.items(), key=lambda item: item[1])[0] if matrix_handicap_probs else None
     top_score_set = {row["score"] for row in top_scores[:4]}
     one_goal_core = bool({"0-1", "1-0"} & top_score_set)
     low_draw_core = bool({"0-0", "1-1"} & top_score_set)
@@ -478,6 +526,9 @@ def recommendation_context(
         "open_game_profile": open_profile,
         "xg_gap": round(xg_gap, 3),
         "top_score_set": sorted(top_score_set),
+        "handicap_matrix_probs": {key: round(value, 4) for key, value in matrix_handicap_probs.items()} if matrix_handicap_probs else None,
+        "handicap_matrix_lean": matrix_lean,
+        "handicap_scoreline_lean": scoreline_lean,
     }
 
 
@@ -537,6 +588,29 @@ def apply_recommendation_rules(options: list[dict[str, Any]], context: dict[str,
             elif handicap == -1 and selection == "让负":
                 notes.append("让1方向防强队不穿盘")
                 item["mapping_priority"] = 2
+
+        if play_type == "让球胜平负" and context.get("handicap_scoreline_lean"):
+            scoreline_lean = context["handicap_scoreline_lean"]
+            lean_selection = scoreline_lean.get("selection")
+            lean_share = float(scoreline_lean.get("share") or 0)
+            if lean_selection and selection != lean_selection and lean_share >= 0.42:
+                notes.append(f"与比分主线{lean_selection}不一致，只能作防穿盘/反主线价值观察")
+                item["recommendation_role"] = "anti_scoreline_value"
+                item["mapping_priority"] = min(int(item.get("mapping_priority") or 0), 1)
+                item["risk_score"] = min(100, max(58, int(item.get("risk_score") or 50) + 10))
+                item["risk_level"] = risk_level(item["risk_score"])
+                item["risk_adjusted_score"] = round(float(item.get("risk_adjusted_score", -1)) - 0.35, 4)
+                item["stake_pct"] = round(min(float(item.get("stake_pct") or 0), 0.002), 4)
+                if item.get("decision") == "可小注":
+                    item["decision"] = "观察"
+                    item["reason"] = "让球选择与比分主线冲突，只能防穿盘观察"
+                elif item.get("decision") == "观察":
+                    item["reason"] = "反比分主线的赔率价值，只适合小额防线"
+            elif lean_selection and selection == lean_selection:
+                notes.append("让球选择与比分主线一致")
+                item["recommendation_role"] = "main_scoreline_aligned"
+                item["mapping_priority"] = max(int(item.get("mapping_priority") or 0), 2)
+                item["risk_adjusted_score"] = round(float(item.get("risk_adjusted_score", -1)) + 0.12, 4)
 
         if play_type == "总进球" and context.get("deep_favorite_profile") and selection in {"5", "6", "7+"}:
             notes.append("深盘强弱悬殊场，总进球高位需作为尾部风险")
