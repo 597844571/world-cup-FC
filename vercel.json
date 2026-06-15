@@ -2,7 +2,23 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/**/*.py",
+      "src": "api/state.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/refresh.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/schedule/query.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/predictions/archive.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/backtest/run.py",
       "use": "@vercel/python"
     },
     {

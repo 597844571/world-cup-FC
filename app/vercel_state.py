@@ -2,22 +2,15 @@ from __future__ import annotations
 
 import json
 import re
-import sys
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler
-from pathlib import Path
 from typing import Any
 
-ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-
-from app.config import load_json
-from app.match_registry import load_matches
-from app.prediction_engine import build_prediction
-from app.schedule_client import fetch_sporttery_fixtures
-from app.source_registry import load_sources
-from app.standings_client import load_standings
+from .match_registry import load_matches
+from .prediction_engine import build_prediction
+from .schedule_client import fetch_sporttery_fixtures
+from .source_registry import load_sources
+from .standings_client import load_standings
 
 
 def utc_now() -> str:
@@ -169,14 +162,7 @@ def build_serverless_state() -> dict[str, Any]:
         "sources": load_sources(),
         "source_health": {},
         "fixtures": {
-            "scheduled": [
-                {
-                    key: value
-                    for key, value in fixture.items()
-                    if key != "raw_json"
-                }
-                for fixture in fixtures
-            ],
+            "scheduled": [{key: value for key, value in fixture.items() if key != "raw_json"} for fixture in fixtures],
             "finished": [],
         },
         "standings": load_standings(),
@@ -226,4 +212,3 @@ class JsonHandler(BaseHTTPRequestHandler):
                 "state": build_serverless_state(),
             },
         )
-

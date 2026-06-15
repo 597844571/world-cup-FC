@@ -1,6 +1,5 @@
-from api._common import JsonHandler
+from app.vercel_state import JsonHandler
 
 
 class handler(JsonHandler):
     pass
-
