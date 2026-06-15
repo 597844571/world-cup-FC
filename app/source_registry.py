@@ -73,6 +73,19 @@ DEFAULT_SOURCES = [
         "notes": "公开积分榜来源，只用于小组积分、净胜球、已赛状态、赛后验证和动机修正；不作为赔率或下注价格来源。",
     },
     {
+        "source_id": "aicai_worldcup_stats",
+        "name": "新浪爱彩世界杯数据统计",
+        "type": "aicai_worldcup_stats",
+        "enabled": True,
+        "priority": 16,
+        "url": "https://live.aicai.com/league/index.htm?leagueId=1999&tab=4",
+        "api_url": "https://sport.ttyingqiu.com/sportdata/f",
+        "requires_browser": False,
+        "reliability": "public_aggregator",
+        "polite_delay_seconds": 0.8,
+        "notes": "公开世界杯数据统计源，提供赛程赛果、欧赔初赔/即时赔、亚盘、大小球、半全场和常见比分统计；用于市场倍率、盘口变化、回测和算法修正，不作为中国体彩可下单选项。",
+    },
+    {
         "source_id": "msn_worldcup_process",
         "name": "MSN世界杯赛中/赛后过程统计",
         "type": "msn_match_process",
@@ -108,6 +121,12 @@ def load_sources() -> list[dict[str, Any]]:
     if sources is None:
         save_json(SOURCES_PATH, DEFAULT_SOURCES)
         sources = DEFAULT_SOURCES
+    else:
+        existing = {source.get("source_id") for source in sources}
+        missing = [source for source in DEFAULT_SOURCES if source.get("source_id") not in existing]
+        if missing:
+            sources = [*sources, *missing]
+            save_json(SOURCES_PATH, sources)
     return sources
 
 

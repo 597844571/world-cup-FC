@@ -873,6 +873,68 @@ def latest_h2h_odds(history: list[dict[str, Any]], match: dict[str, Any]) -> dic
     return None
 
 
+def aicai_market_context(history: list[dict[str, Any]]) -> dict[str, Any]:
+    aicai_rows = [row for row in history if str(row.get("source", "")).startswith("aicai_")]
+    h2h_rows = [row for row in aicai_rows if row.get("market") == "h2h" and row.get("selection") in {"home", "draw", "away"}]
+
+    def complete_by_time(rows: list[dict[str, Any]]) -> list[tuple[str, dict[str, float]]]:
+        grouped: dict[str, dict[str, list[float]]] = defaultdict(lambda: defaultdict(list))
+        for row in rows:
+            grouped[row["captured_at"]][row["selection"]].append(float(row["odds_decimal"]))
+        output = []
+        for ts in sorted(grouped):
+            sample = grouped[ts]
+            if {"home", "draw", "away"} <= set(sample):
+                output.append((ts, {key: sum(sample[key]) / len(sample[key]) for key in ("home", "draw", "away")}))
+        return output
+
+    europe = None
+    series = complete_by_time(h2h_rows)
+    if series:
+        first_ts, first = series[0]
+        latest_ts, latest = series[-1]
+        europe = {
+            "first_ts": first_ts,
+            "latest_ts": latest_ts,
+            "first": {key: round(value, 3) for key, value in first.items()},
+            "latest": {key: round(value, 3) for key, value in latest.items()},
+            "movement": {key: round(latest[key] - first[key], 3) for key in ("home", "draw", "away")},
+            "latest_probs": implied_probabilities(latest),
+        }
+
+    def line_context(market: str) -> dict[str, Any] | None:
+        rows = [row for row in aicai_rows if row.get("market") == market and row.get("selection") == "line"]
+        if not rows:
+            return None
+        rows = sorted(rows, key=lambda row: row["captured_at"])
+        first = float(rows[0]["odds_decimal"])
+        latest = float(rows[-1]["odds_decimal"])
+        return {"first": round(first, 3), "latest": round(latest, 3), "movement": round(latest - first, 3)}
+
+    def latest_value(market: str, selection: str) -> float | None:
+        rows = [row for row in aicai_rows if row.get("market") == market and row.get("selection") == selection]
+        if not rows:
+            return None
+        return round(float(sorted(rows, key=lambda row: row["captured_at"])[-1]["odds_decimal"]), 3)
+
+    asia = line_context("aicai_asia_line")
+    if asia:
+        asia["home_water"] = latest_value("aicai_asia_home_water", "home")
+        asia["away_water"] = latest_value("aicai_asia_away_water", "away")
+    total = line_context("aicai_total_line")
+    if total:
+        total["over_water"] = latest_value("aicai_total_over_water", "over")
+        total["under_water"] = latest_value("aicai_total_under_water", "under")
+
+    return {
+        "source": "aicai_worldcup_stats" if aicai_rows else None,
+        "europe": europe,
+        "asia": asia,
+        "total_goals": total,
+        "snapshots": len({row["captured_at"] for row in aicai_rows}),
+    }
+
+
 def fair_odds(probability: float) -> float | None:
     return round(1 / probability, 3) if probability > 0 else None
 
@@ -1517,14 +1579,16 @@ def level_from_probability(value: float) -> str:
 
 def data_completeness(match: dict[str, Any], odds_history: list[dict[str, Any]]) -> dict[str, Any]:
     group_context = find_group_context(match)
+    has_aicai = any(str(row.get("source", "")).startswith("aicai_") for row in odds_history)
     checks = [
         ("赛程匹配", bool(match.get("match_id") and match.get("kickoff")), 10),
         ("Elo / FIFA", bool(match.get("home_elo") and match.get("away_elo")), 12),
         ("近期/过程数据", bool(match.get("expected_goals") or match.get("process_notes")), 10),
         ("权威侧面源", bool(match.get("authority_side_strength")), 7),
         ("赛中/赛后过程统计", bool(match.get("match_process_rating") or match.get("match_process_stats") or match.get("live_match_stats")), 7),
-        ("赔率", bool(odds_history), 17),
-        ("赔率历史", len({r["captured_at"] for r in odds_history}) >= 2, 10),
+        ("赔率", bool(odds_history), 14),
+        ("赔率历史", len({r["captured_at"] for r in odds_history}) >= 2, 8),
+        ("爱彩盘口/赛果统计", has_aicai, 8),
         ("伤停", bool(match.get("injury_notes")), 11),
         ("首发", bool(match.get("lineup_status") == "confirmed"), 11),
         ("小组积分榜", bool(group_context), 8),
@@ -1596,6 +1660,7 @@ def probability_gap(model_probs: dict[str, float], market_probs: dict[str, float
 
 def build_prediction(match: dict[str, Any], odds_history: list[dict[str, Any]]) -> dict[str, Any]:
     market = derive_market_signal(odds_history)
+    market_context = aicai_market_context(odds_history)
     upset = upset_profile(match)
     completeness = data_completeness(match, odds_history)
     group_context = find_group_context(match)
@@ -1703,6 +1768,7 @@ def build_prediction(match: dict[str, Any], odds_history: list[dict[str, Any]]) 
     return {
         "match": match,
         "market_signal": market,
+        "market_context": market_context,
         "value_model": {
             "market_probs": {key: round(value, 4) for key, value in market_base.items()},
             "deltas": value_deltas,

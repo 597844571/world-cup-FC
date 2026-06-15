@@ -6,9 +6,10 @@ from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler
 from typing import Any
 
+from .aicai_client import fetch_aicai_worldcup_context, snapshots_for_match
 from .match_registry import load_matches
 from .prediction_engine import build_prediction
-from .schedule_client import fetch_public_schedule, fetch_sporttery_fixtures
+from .schedule_client import fetch_public_schedule, fetch_sporttery_fixtures, split_fixtures
 from .source_registry import load_sources
 from .standings_client import load_standings
 
@@ -126,12 +127,18 @@ def build_serverless_state() -> dict[str, Any]:
     matches = load_matches()
     public_fixtures, public_meta = fetch_public_schedule()
     sporttery_fixtures, sporttery_meta = fetch_sporttery_fixtures()
-    fixtures = merge_fixtures(public_fixtures, sporttery_fixtures)
+    try:
+        aicai_context = fetch_aicai_worldcup_context(matches)
+    except Exception as exc:
+        aicai_context = {"source": "https://live.aicai.com/league/index.htm?leagueId=1999&tab=4", "fixtures": [], "match_contexts": {}, "count": 0, "error": str(exc)}
+    fixtures = merge_fixtures(public_fixtures, [*sporttery_fixtures, *aicai_context.get("fixtures", [])])
+    fixture_groups = split_fixtures(fixtures)
     details = []
     errors = []
     for match in matches:
         try:
             history = sporttery_history(match, sporttery_fixtures)
+            history.extend(snapshots_for_match(match, aicai_context.get("match_contexts", {}).get(match["match_id"])))
             prediction = build_prediction(match, history)
         except Exception as exc:
             history = []
@@ -164,8 +171,8 @@ def build_serverless_state() -> dict[str, Any]:
         "sources": load_sources(),
         "source_health": {},
         "fixtures": {
-            "scheduled": [{key: value for key, value in fixture.items() if key != "raw_json"} for fixture in fixtures],
-            "finished": [],
+            "scheduled": [{key: value for key, value in fixture.items() if key != "raw_json"} for fixture in fixture_groups["scheduled"]],
+            "finished": [{key: value for key, value in fixture.items() if key != "raw_json"} for fixture in fixture_groups["finished"]],
         },
         "standings": load_standings(),
         "prediction_snapshots": [],
@@ -186,6 +193,11 @@ def build_serverless_state() -> dict[str, Any]:
                 "mode": "vercel_readonly",
                 "public_schedule_meta": public_meta,
                 "sporttery_meta": sporttery_meta,
+                "aicai_meta": {
+                    "source": aicai_context.get("source"),
+                    "count": aicai_context.get("count", 0),
+                    "error": aicai_context.get("error"),
+                },
                 "errors": errors,
             },
     }

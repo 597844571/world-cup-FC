@@ -9,6 +9,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 from .config import WEB_DIR, ensure_dirs
+from .aicai_client import fetch_aicai_worldcup_context, snapshots_for_match
 from .backtest import evaluate_fixture, summarize_backtests
 from .match_registry import find_match, load_matches, save_matches, sync_matches
 from .odds_client import fetch_odds
@@ -68,10 +69,12 @@ class DashboardServer(BaseHTTPRequestHandler):
         target_id = payload.get("match_id")
         refreshed = []
         process_changed = False
+        aicai_context = safe_fetch_aicai_context(matches)
         for match in matches:
             if target_id and match["match_id"] != target_id:
                 continue
             snapshots = fetch_odds(match)
+            snapshots.extend(snapshots_for_match(match, aicai_context.get("match_contexts", {}).get(match["match_id"])))
             inserted = self.store.insert_snapshots(match["match_id"], snapshots)
             process_payload = fetch_match_process(match)
             enriched, changed = merge_match_process(match, process_payload)
@@ -93,7 +96,9 @@ class DashboardServer(BaseHTTPRequestHandler):
     def handle_schedule_query(self) -> None:
         fixtures, meta = fetch_public_schedule()
         sporttery_fixtures, sporttery_meta = fetch_sporttery_fixtures()
-        fixtures = merge_fixtures(fixtures, sporttery_fixtures)
+        aicai_context = safe_fetch_aicai_context(load_matches())
+        aicai_fixtures = aicai_context.get("fixtures", [])
+        fixtures = merge_fixtures(fixtures, [*sporttery_fixtures, *aicai_fixtures])
         for fixture in fixtures:
             self.store.upsert_fixture(fixture)
         split = split_fixtures(fixtures)
@@ -103,6 +108,11 @@ class DashboardServer(BaseHTTPRequestHandler):
                 "ok": True,
                 "meta": meta,
                 "sporttery_meta": sporttery_meta,
+                "aicai_meta": {
+                    "source": aicai_context.get("source"),
+                    "count": aicai_context.get("count", 0),
+                    "error": aicai_context.get("error"),
+                },
                 "standings_meta": standings_meta,
                 "scheduled": split["scheduled"],
                 "finished": split["finished"],
@@ -287,7 +297,7 @@ def build_sporttery_combos(details: list[dict]) -> list[dict]:
 def merge_fixtures(primary: list[dict], secondary: list[dict]) -> list[dict]:
     merged: dict[str, dict] = {}
     for fixture in [*primary, *secondary]:
-        key = fixture.get("match_id") or fixture_key(fixture)
+        key = fixture_key(fixture) or fixture.get("match_id")
         if key in merged:
             merged[key].update({k: v for k, v in fixture.items() if v not in (None, "", [])})
         else:
@@ -300,6 +310,13 @@ def fixture_key(fixture: dict) -> str:
         str(fixture.get(key) or "").strip().lower()
         for key in ("home_team", "away_team", "kickoff")
     )
+
+
+def safe_fetch_aicai_context(matches: list[dict]) -> dict:
+    try:
+        return fetch_aicai_worldcup_context(matches)
+    except Exception as exc:
+        return {"source": "https://live.aicai.com/league/index.htm?leagueId=1999&tab=4", "fixtures": [], "match_contexts": {}, "count": 0, "error": str(exc)}
 
 
 def run(host: str = "127.0.0.1", port: int = 8765) -> None:

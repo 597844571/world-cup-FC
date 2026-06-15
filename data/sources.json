@@ -17,7 +17,13 @@
     "url": "https://webapi.sporttery.cn/gateway/uniform/football/getMatchCalculatorV1.qry?channel=m&poolCode=had,hhad,crs,ttg,hafu",
     "referer": "https://m.sporttery.cn/mjc/jsq/zqspf/",
     "bookmaker": "中国体育彩票",
-    "pool_codes": ["had", "hhad", "crs", "ttg", "hafu"],
+    "pool_codes": [
+      "had",
+      "hhad",
+      "crs",
+      "ttg",
+      "hafu"
+    ],
     "requires_browser": false,
     "reliability": "official",
     "polite_delay_seconds": 0.8,
@@ -92,5 +98,18 @@
       "away": ""
     },
     "notes": "由 AI 发现并确认公开 JSON 后再启用。paths 使用点路径，例如 odds.home。"
+  },
+  {
+    "source_id": "aicai_worldcup_stats",
+    "name": "新浪爱彩世界杯数据统计",
+    "type": "aicai_worldcup_stats",
+    "enabled": true,
+    "priority": 16,
+    "url": "https://live.aicai.com/league/index.htm?leagueId=1999&tab=4",
+    "api_url": "https://sport.ttyingqiu.com/sportdata/f",
+    "requires_browser": false,
+    "reliability": "public_aggregator",
+    "polite_delay_seconds": 0.8,
+    "notes": "公开世界杯数据统计源，提供赛程赛果、欧赔初赔/即时赔、亚盘、大小球、半全场和常见比分统计；用于市场倍率、盘口变化、回测和算法修正，不作为中国体彩可下单选项。"
   }
 ]

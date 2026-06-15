@@ -438,6 +438,60 @@ function renderOddsQuickView(fixture, prediction) {
   `;
 }
 
+function marketValue(value, digits = 2) {
+  if (value === null || value === undefined || Number.isNaN(Number(value))) return "-";
+  return Number(value).toFixed(digits);
+}
+
+function marketMoveText(value) {
+  if (value === null || value === undefined || Number.isNaN(Number(value))) return "无变化";
+  const num = Number(value);
+  if (Math.abs(num) < 0.01) return "基本稳定";
+  return num > 0 ? `升 ${num.toFixed(2)}，方向降温` : `降 ${Math.abs(num).toFixed(2)}，方向升温`;
+}
+
+function renderMarketContext(prediction) {
+  const ctx = prediction?.market_context || {};
+  if (!ctx.source) return `<p class="muted">暂无爱彩市场倍率数据。刷新后若爱彩公开接口可用，会自动补充。</p>`;
+  const europe = ctx.europe;
+  const asia = ctx.asia;
+  const total = ctx.total_goals;
+  return `
+    <div class="planner-note">
+      爱彩公开数据用于观察市场倍率、盘口变化和大小球方向；它不是中国体彩可下单项，最终下单仍以体彩计算器为准。
+    </div>
+    <table>
+      <thead><tr><th>数据项</th><th>初始</th><th>当前</th><th>变化/解释</th></tr></thead>
+      <tbody>
+        ${europe ? `
+          <tr>
+            <td>欧赔倍率</td>
+            <td>胜 ${marketValue(europe.first?.home)} / 平 ${marketValue(europe.first?.draw)} / 负 ${marketValue(europe.first?.away)}</td>
+            <td>胜 ${marketValue(europe.latest?.home)} / 平 ${marketValue(europe.latest?.draw)} / 负 ${marketValue(europe.latest?.away)}</td>
+            <td>主 ${esc(marketMoveText(europe.movement?.home))}<br>平 ${esc(marketMoveText(europe.movement?.draw))}<br>客 ${esc(marketMoveText(europe.movement?.away))}</td>
+          </tr>
+        ` : ""}
+        ${asia ? `
+          <tr>
+            <td>亚盘</td>
+            <td>${marketValue(asia.first, 2)}</td>
+            <td>${marketValue(asia.latest, 2)}<br><span class="muted">主水 ${marketValue(asia.home_water)} / 客水 ${marketValue(asia.away_water)}</span></td>
+            <td>${esc(marketMoveText(asia.movement))}</td>
+          </tr>
+        ` : ""}
+        ${total ? `
+          <tr>
+            <td>大小球</td>
+            <td>${marketValue(total.first, 2)}</td>
+            <td>${marketValue(total.latest, 2)}<br><span class="muted">大 ${marketValue(total.over_water)} / 小 ${marketValue(total.under_water)}</span></td>
+            <td>${esc(marketMoveText(total.movement))}</td>
+          </tr>
+        ` : ""}
+      </tbody>
+    </table>
+  `;
+}
+
 function predictionBasisItems(item, prediction) {
   const scenario = marketScenario(prediction);
   const probs = scenario?.probabilities || {};
@@ -593,7 +647,7 @@ function renderOverview() {
     </section>
     <section class="section">
       <h3>混合过关池</h3>
-      <p class="muted">对齐体彩计算器“混合过关”：只从有体彩奖金且价值为正的跨场主玩法生成；缺少奖金的场次不会硬串。</p>
+      <p class="muted">对齐体彩计算器“混合过关”：只从有体彩SP且价值为正的跨场主玩法生成；缺少SP的场次不会硬串。</p>
       ${globalComboTable(state.data?.sporttery_combos ?? [])}
     </section>
   `;
@@ -1134,6 +1188,11 @@ function renderMatch(item) {
     </section>
 
     <section class="section">
+      <h3>多来源市场倍率</h3>
+      ${renderMarketContext(prediction)}
+    </section>
+
+    <section class="section">
       <h3>优先看的下注项</h3>
       <div class="grid cols-2">
         ${picks.length ? picks.map((row) => renderPickCard(row, `${item.home_team} vs ${item.away_team}`)).join("") : renderPickCard(null)}
@@ -1273,7 +1332,7 @@ function renderBettingPlanner(item, prediction) {
       <div class="grid cols-3">
         <div class="metric"><div class="label">实际拆分投入</div><div class="value">${money(totalStake)}</div><div class="sub">按 2 元取整</div></div>
         <div class="metric"><div class="label">单项最高返还</div><div class="value">${money(bestReturn)}</div><div class="sub">命中其中一项时</div></div>
-        <div class="metric"><div class="label">概率加权返还</div><div class="value">${money(weightedReturn)}</div><div class="sub">仅作模型参考</div></div>
+        <div class="metric"><div class="label">期望返还</div><div class="value">${money(weightedReturn)}</div><div class="sub">单项概率加权合计</div></div>
       </div>
       ${packageRows.length ? bettingPackageTable(packageRows, totalStake) : `<div class="empty-mini">当前缺少可用于测算的官方SP，先刷新或等体彩开售对应玩法。</div>`}
       <p class="muted">提示：让球胜平负很多场不支持单关，页面会标注“至少2串1”。实际下单前以体彩计算器最终可选项为准。</p>
@@ -1291,7 +1350,7 @@ function bettingPackageTable(rows, totalStake) {
     <table>
       <thead>
         <tr>
-          <th>仓位</th><th>玩法</th><th>选项</th><th>投入</th><th>SP</th><th>模型概率</th><th>命中返还</th><th>命中盈利</th><th>说明</th>
+          <th>仓位</th><th>玩法</th><th>选项</th><th>投入</th><th>SP/倍率</th><th>模型概率</th><th>命中返还</th><th>命中盈利</th><th>期望返还</th><th>说明</th>
         </tr>
       </thead>
       <tbody>
@@ -1305,6 +1364,7 @@ function bettingPackageTable(rows, totalStake) {
             <td>${pct(row.model_prob)}</td>
             <td>${money(row.returnAmount)}</td>
             <td>${money(row.returnAmount - totalStake)}</td>
+            <td>${money(row.expectedReturn)}</td>
             <td>${esc(row.note)}</td>
           </tr>
         `).join("")}
@@ -1325,6 +1385,7 @@ function buildBettingPackage(prediction, mode, amount) {
       ...row,
       stake,
       returnAmount: row.sp ? stake * row.sp : 0,
+      expectedReturn: row.sp ? stake * row.sp * Math.max(row.model_prob || 0, 0) : 0,
     };
   }).filter((row) => row.stake > 0);
 }
@@ -1552,7 +1613,7 @@ function calculatorOptionTable(rows) {
   if (!rows.length) return `<p class="muted">暂无该玩法选项。</p>`;
   return `
     <table class="compact-table">
-      <thead><tr><th>玩法</th><th>选择</th><th>方式</th><th>奖金</th><th>概率</th><th>合理线</th><th>动作</th></tr></thead>
+      <thead><tr><th>玩法</th><th>选择</th><th>方式</th><th>SP/倍率</th><th>概率</th><th>合理线</th><th>动作</th></tr></thead>
       <tbody>
         ${rows.map((row) => `
           <tr>
