@@ -1,18 +1,19 @@
 :root {
   color-scheme: light;
-  --bg: #eef2f6;
+  --bg: #f4f6f5;
   --panel: #ffffff;
-  --panel-soft: #f7f9fc;
-  --text: #172033;
-  --muted: #667085;
-  --line: #d6dde8;
-  --ink: #0f172a;
-  --blue: #2563eb;
-  --cyan: #0e7490;
-  --amber: #b45309;
-  --red: #dc2626;
-  --green: #15803d;
-  --shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+  --panel-soft: #f8faf9;
+  --text: #1f2933;
+  --muted: #697586;
+  --line: #d9e0e2;
+  --ink: #172026;
+  --blue: #235789;
+  --cyan: #0f766e;
+  --amber: #a16207;
+  --red: #b42318;
+  --green: #16794c;
+  --shadow: 0 10px 24px rgba(23, 32, 38, 0.08);
+  --shadow-soft: 0 4px 14px rgba(23, 32, 38, 0.06);
 }
 
 * {
@@ -21,7 +22,9 @@
 
 body {
   margin: 0;
-  background: var(--bg);
+  background:
+    linear-gradient(180deg, #ffffff 0, #f4f6f5 260px),
+    var(--bg);
   color: var(--text);
   font: 14px/1.48 "Microsoft YaHei", "PingFang SC", "Segoe UI", Arial, sans-serif;
 }
@@ -32,9 +35,21 @@ body {
   justify-content: space-between;
   gap: 24px;
   padding: 18px 28px;
-  background: #0f172a;
-  color: #fff;
-  border-bottom: 4px solid #0e7490;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--ink);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  backdrop-filter: blur(10px);
+}
+
+.topbar-kicker {
+  margin-bottom: 4px;
+  color: var(--cyan);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
 }
 
 h1 {
@@ -46,22 +61,25 @@ h1 {
 
 .topbar p {
   margin: 0;
-  color: #cbd5e1;
+  color: var(--muted);
 }
 
 button {
-  height: 36px;
-  border: 0;
+  min-height: 36px;
+  border: 1px solid transparent;
   border-radius: 6px;
   padding: 0 14px;
-  background: #0e7490;
+  background: var(--cyan);
   color: #fff;
   font-weight: 700;
   cursor: pointer;
+  box-shadow: var(--shadow-soft);
 }
 
 button.secondary {
-  background: #334155;
+  background: #ffffff;
+  color: var(--ink);
+  border-color: var(--line);
 }
 
 button:disabled {
@@ -84,24 +102,30 @@ button:disabled {
 }
 
 main {
-  padding: 18px 24px 36px;
+  padding: 18px 24px 42px;
   max-width: 100%;
   overflow-x: hidden;
 }
 
 .tabs {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   overflow-x: auto;
-  padding-bottom: 10px;
+  padding: 8px;
+  margin-bottom: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: var(--shadow-soft);
 }
 
 .tab {
   flex: 0 0 auto;
-  height: 36px;
+  min-height: 34px;
   border: 1px solid var(--line);
-  background: #fff;
+  background: #f8faf9;
   color: var(--text);
+  box-shadow: none;
 }
 
 .tab.active {
@@ -144,7 +168,7 @@ main {
   border: 1px solid var(--line);
   border-radius: 8px;
   box-shadow: var(--shadow);
-  padding: 16px;
+  padding: 18px;
   min-width: 0;
   max-width: 100%;
   overflow-x: auto;
@@ -160,7 +184,7 @@ main {
   border-left: 5px solid var(--cyan);
   border-radius: 8px;
   box-shadow: var(--shadow);
-  padding: 16px;
+  padding: 18px;
 }
 
 .schedule-head h2 {
@@ -190,7 +214,7 @@ main {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fff;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-soft);
   overflow: hidden;
 }
 
@@ -200,7 +224,7 @@ main {
   justify-content: space-between;
   gap: 10px;
   padding: 12px 14px;
-  background: #0f172a;
+  background: var(--ink);
   color: #fff;
 }
 
@@ -225,7 +249,7 @@ main {
 .calendar-fixture {
   display: grid;
   gap: 8px;
-  padding: 12px;
+  padding: 14px;
   border-bottom: 1px solid var(--line);
 }
 
@@ -250,7 +274,7 @@ main {
 }
 
 .calendar-fixture.has-prediction {
-  background: #f8fafc;
+  background: #fbfcfb;
 }
 
 .calendar-time {
@@ -266,12 +290,19 @@ main {
   font-size: 16px;
 }
 
+.rank-line {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .schedule-card {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--panel);
-  box-shadow: var(--shadow);
-  padding: 15px;
+  box-shadow: var(--shadow-soft);
+  padding: 16px;
   min-width: 0;
   max-width: 100%;
 }
@@ -336,7 +367,7 @@ main {
 .mini-probs div {
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #f8fafc;
+  background: #fbfcfb;
   padding: 9px;
 }
 
@@ -357,8 +388,8 @@ main {
 .schedule-conclusion {
   margin: 10px 0;
   border-radius: 8px;
-  background: #e0f2fe;
-  color: #075985;
+  background: #e7f6f3;
+  color: #0f5f58;
   padding: 10px 12px;
   font-weight: 800;
 }
@@ -377,13 +408,13 @@ main {
   margin-top: 10px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: #fbfcfb;
   padding: 10px;
 }
 
 .odds-title {
   margin-bottom: 7px;
-  color: var(--muted);
+  color: var(--cyan);
   font-size: 12px;
   font-weight: 800;
 }
@@ -409,8 +440,8 @@ main {
   align-items: center;
   gap: 4px;
   border-radius: 999px;
-  background: #eef2ff;
-  color: #1e3a8a;
+  background: #eef7f4;
+  color: #115e59;
   padding: 3px 8px;
   font-size: 12px;
   font-weight: 800;
@@ -429,7 +460,7 @@ main {
   margin-top: 10px;
   border-left: 4px solid var(--cyan);
   border-radius: 6px;
-  background: #f0fdfa;
+  background: #eef8f5;
   color: #115e59;
   padding: 9px 10px;
   font-weight: 700;
@@ -457,7 +488,7 @@ main {
 .basis-item {
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #f8fafc;
+  background: #fbfcfb;
   padding: 12px;
 }
 
@@ -468,6 +499,66 @@ main {
 }
 
 .basis-text {
+  color: #334155;
+}
+
+.side-signal-panel {
+  margin-top: 14px;
+  border: 1px solid #c7ddd8;
+  border-radius: 8px;
+  background: #f7fbf9;
+  padding: 12px;
+}
+
+.side-signal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.side-signal-head strong {
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.side-signal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.side-signal-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 10px;
+}
+
+.side-signal-card span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.side-signal-card strong {
+  display: block;
+  margin-top: 3px;
+  color: var(--ink);
+}
+
+.side-signal-card em {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+}
+
+.side-signal-panel p {
+  margin: 10px 0 0;
   color: #334155;
 }
 
@@ -510,8 +601,10 @@ main {
 }
 
 .planner-tabs button {
-  background: #e2e8f0;
+  background: #f1f5f4;
   color: #334155;
+  border-color: var(--line);
+  box-shadow: none;
 }
 
 .planner-tabs button.active {
@@ -520,10 +613,10 @@ main {
 }
 
 .planner-note {
-  border: 1px solid #bae6fd;
+  border: 1px solid #b8ddd5;
   border-radius: 8px;
-  background: #f0f9ff;
-  color: #075985;
+  background: #eef8f5;
+  color: #115e59;
   padding: 10px 12px;
 }
 
@@ -631,7 +724,7 @@ main {
 
 .decision-board {
   display: grid;
-  grid-template-columns: 1.25fr 0.75fr;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
   gap: 14px;
 }
 
@@ -643,12 +736,14 @@ main {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--panel);
+  box-shadow: var(--shadow-soft);
   min-width: 0;
   max-width: 100%;
 }
 
 .match-hero {
-  padding: 16px;
+  padding: 18px;
+  border-top: 4px solid var(--cyan);
 }
 
 .hero-head {
@@ -676,8 +771,8 @@ main {
   min-height: 36px;
   border-radius: 8px;
   padding: 6px 12px;
-  background: #e0f2fe;
-  color: #075985;
+  background: #eef8f5;
+  color: #115e59;
   font-size: 18px;
   font-weight: 800;
 }
@@ -692,7 +787,7 @@ main {
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 10px;
-  background: #f8fafc;
+  background: #fbfcfb;
 }
 
 .prob-pill strong {
@@ -720,7 +815,14 @@ main {
 }
 
 .match-card {
-  padding: 14px;
+  padding: 16px;
+  border-top: 4px solid #e2e8e4;
+}
+
+.match-card:hover,
+.schedule-card:hover,
+.calendar-day:hover {
+  box-shadow: var(--shadow);
 }
 
 .match-card-top {
@@ -744,6 +846,7 @@ main {
 .pick-card {
   padding: 12px;
   background: #fff;
+  box-shadow: none;
 }
 
 .pick-card.primary {
@@ -1077,6 +1180,7 @@ tr:last-child td {
 
   .prob-strip,
   .mini-probs,
+  .side-signal-grid,
   .review-grid {
     grid-template-columns: 1fr;
   }

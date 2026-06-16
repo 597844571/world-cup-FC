@@ -300,6 +300,9 @@ def build_sporttery_combos(details: list[dict]) -> list[dict]:
             if has_negative_leg:
                 decision = "禁止串关"
                 reason = "组合含负EV腿"
+            elif exposure.get("has_repeated_hot_favorite") and size >= 3:
+                decision = "高风险观察"
+                reason = exposure["reason"] or "多场热门方向重复，不能当核心串关"
             elif ev < 0.05:
                 decision = "观察"
                 reason = "组合EV不足5%"
@@ -352,8 +355,13 @@ def leg_risk_tags(item: dict) -> set[str]:
     if play_type == "胜平负":
         if selection in {"胜", "负"}:
             tags.add("theme:winner")
+            if float(leg.get("model_prob") or 0) >= 0.52:
+                tags.add("theme:popular_winner")
         elif selection == "平":
             tags.add("theme:draw")
+    role = str(leg.get("recommendation_role", ""))
+    if role in {"favorite_tail_hedge", "low_total_protection", "draw_low_score_protection"}:
+        tags.add(f"theme:{role}")
     if leg.get("risk_score", 0) >= 60:
         tags.add("risk:high_leg")
     return tags
@@ -372,8 +380,10 @@ def combo_exposure_profile(combo: tuple[dict, ...]) -> dict:
     high_legs = sum(1 for item in combo if item["leg"].get("risk_score", 0) >= 60)
     penalty = 0
     if repeated_themes:
-        penalty += min(16, sum((count - 1) * 5 for count in repeated_themes.values()))
+        penalty += min(26, sum((count - 1) * 7 for count in repeated_themes.values()))
     if high_legs >= 2:
+        penalty += 8
+    if any(tag in repeated_themes for tag in {"theme:favorite_cover", "theme:popular_winner"}):
         penalty += 8
     reason = ""
     if repeated_themes:
@@ -384,6 +394,7 @@ def combo_exposure_profile(combo: tuple[dict, ...]) -> dict:
     return {
         "penalty": penalty,
         "repeated_themes": repeated_themes,
+        "has_repeated_hot_favorite": any(tag in repeated_themes for tag in {"theme:favorite_cover", "theme:popular_winner"}),
         "high_risk_legs": high_legs,
         "reason": reason,
     }
@@ -460,9 +471,17 @@ def select_fixture_window(fixtures: list[dict], selected_fixture: dict | None, l
     candidates.sort(key=lambda fixture: (str(fixture.get("kickoff") or ""), -fixture_quality(fixture)))
     selected: list[dict] = []
     seen: set[str] = set()
+
+    # The user clicked this exact fixture. Keep it even when it is only a
+    # public schedule row without official SP; otherwise the UI appears to do
+    # nothing or jumps to the next high-quality fixture.
+    selected_key = fixture_lookup_key(selected_fixture)
+    selected.append(selected_fixture)
+    seen.add(selected_key)
+    if len(selected) >= limit:
+        return selected
+
     for fixture in candidates:
-        if fixture_quality(fixture) < 3 and len(selected) < limit:
-            continue
         key = fixture_lookup_key(fixture)
         if key in seen:
             continue

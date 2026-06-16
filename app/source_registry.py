@@ -83,7 +83,7 @@ DEFAULT_SOURCES = [
         "requires_browser": False,
         "reliability": "public_aggregator",
         "polite_delay_seconds": 0.8,
-        "notes": "公开世界杯数据统计源，提供赛程赛果、欧赔初赔/即时赔、亚盘、大小球、半全场和常见比分统计；用于市场倍率、盘口变化、回测和算法修正，不作为中国体彩可下单选项。",
+        "notes": "公开世界杯数据统计源，提供赛程赛果、欧赔初赔/即时赔、让球市场参考、总进球市场参考、半全场和常见比分统计；用于市场倍率变化、回测和算法修正，不作为中国体彩可下单选项。",
     },
     {
         "source_id": "msn_worldcup_process",

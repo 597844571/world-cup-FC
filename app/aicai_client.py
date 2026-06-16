@@ -215,7 +215,7 @@ def compact_market_summary(item: dict[str, Any]) -> list[dict[str, Any]]:
         rows.append({"play": "爱彩欧赔", "options": [{"name": "胜", "sp": home}, {"name": "平", "sp": draw}, {"name": "负", "sp": away}]})
     home_water, line, away_water, _ = parse_triplet(item.get("oddsAsia"))
     if line:
-        rows.append({"play": f"亚盘({line})", "options": [{"name": "主水", "sp": home_water}, {"name": "客水", "sp": away_water}]})
+        rows.append({"play": f"让球市场参考({line})", "options": [{"name": "主方向", "sp": home_water}, {"name": "客方向", "sp": away_water}]})
     over_water, total_line, under_water, _ = parse_triplet(item.get("bigsmall"))
     if total_line:
         rows.append({"play": f"大小球({total_line})", "options": [{"name": "大", "sp": over_water}, {"name": "小", "sp": under_water}]})
@@ -291,7 +291,7 @@ def normalize_asia(fixture: dict[str, Any], detail: dict[str, Any] | None) -> di
     if not line:
         return None
     return {
-        "provider": (detail or {}).get("providerName") or "爱彩亚盘",
+        "provider": (detail or {}).get("providerName") or "爱彩让球市场参考",
         "first_line": first_line,
         "latest_line": line,
         "home_water": latest_home,
@@ -348,12 +348,12 @@ def snapshots_for_match(match: dict[str, Any], context: dict[str, Any] | None, c
     asia = context.get("asia") or {}
     if asia.get("latest_line"):
         if asia.get("first_line"):
-            rows.append(market_row(match, opening_ts, "aicai_worldcup_opening", "爱彩亚盘", "aicai_asia_line", "line", asia["first_line"]))
-        rows.append(market_row(match, current_ts, "aicai_worldcup_latest", "爱彩亚盘", "aicai_asia_line", "line", asia["latest_line"]))
+            rows.append(market_row(match, opening_ts, "aicai_worldcup_opening", "爱彩让球市场参考", "aicai_asia_line", "line", asia["first_line"]))
+        rows.append(market_row(match, current_ts, "aicai_worldcup_latest", "爱彩让球市场参考", "aicai_asia_line", "line", asia["latest_line"]))
     if asia.get("home_water"):
-        rows.append(market_row(match, current_ts, "aicai_worldcup_latest", "爱彩亚盘", "aicai_asia_home_water", "home", asia["home_water"]))
+            rows.append(market_row(match, current_ts, "aicai_worldcup_latest", "爱彩让球市场参考", "aicai_asia_home_water", "home", asia["home_water"]))
     if asia.get("away_water"):
-        rows.append(market_row(match, current_ts, "aicai_worldcup_latest", "爱彩亚盘", "aicai_asia_away_water", "away", asia["away_water"]))
+            rows.append(market_row(match, current_ts, "aicai_worldcup_latest", "爱彩让球市场参考", "aicai_asia_away_water", "away", asia["away_water"]))
     bigsmall = context.get("bigsmall") or {}
     if bigsmall.get("latest_line"):
         if bigsmall.get("first_line"):

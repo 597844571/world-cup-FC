@@ -345,9 +345,12 @@ def dixon_coles_multiplier(home_goals: int, away_goals: int, home_xg: float, awa
     return 1.0
 
 
-def variance_profile(match: dict[str, Any], probs: dict[str, float], xg: dict[str, float]) -> dict[str, Any]:
+def variance_profile(match: dict[str, Any], probs: dict[str, float], xg: dict[str, float], handicap: int | None = None) -> dict[str, Any]:
     open_profile = open_game_profile(match, probs, xg)
     upset = upset_profile(match)
+    if handicap is None:
+        handicap = match.get("sporttery_handicap")
+    stall_profile = favorite_stall_profile(match, probs, xg, handicap)
     tempo = clamp(float(match.get("tempo_score", 0)), -3, 3)
     total = float(xg.get("home", 0)) + float(xg.get("away", 0))
     prob_gap = abs(float(probs.get("home", 0)) - float(probs.get("away", 0)))
@@ -367,10 +370,18 @@ def variance_profile(match: dict[str, Any], probs: dict[str, float], xg: dict[st
     if tempo < -0.8 or total <= 2.2:
         low_score_shrink += 0.08 + min(0.08, abs(tempo) * 0.025)
         reasons.append("低节奏/低总进球压缩方差")
+    if stall_profile["score"] >= 0.45:
+        stall_effect = stall_profile["score"]
+        low_score_shrink += 0.06 + stall_effect * 0.06
+        overdispersion *= 1 - min(0.35, stall_effect * 0.35)
+        reasons.append("热门降温触发，增加平局/小比分保护")
 
     return {
         "overdispersion": round(clamp(overdispersion, 0, 0.34), 3),
         "low_score_shrink": round(clamp(low_score_shrink, 0, 0.20), 3),
+        "draw_low_score_boost": round(clamp(stall_profile["score"] * 0.16, 0, 0.16), 3),
+        "favorite_cover_cooldown": round(clamp(stall_profile["score"] * 0.18, 0, 0.18), 3),
+        "favorite_stall_profile": stall_profile,
         "reasons": reasons,
     }
 
@@ -411,12 +422,236 @@ def deep_favorite_context(match: dict[str, Any], probs: dict[str, float], xg: di
     return {"deep_favorite_profile": deep, "favorite_side": favorite_side}
 
 
+def favorite_stall_profile(match: dict[str, Any], probs: dict[str, float], xg: dict[str, float], handicap: int | None = None) -> dict[str, Any]:
+    """Prematch trigger for favorite-cooldown, low draw, and score protection."""
+    favorite_side = "home" if probs.get("home", 0) >= probs.get("away", 0) else "away"
+    prob_gap = abs(float(probs.get("home", 0)) - float(probs.get("away", 0)))
+    xg_gap = abs(float(xg.get("home", 0)) - float(xg.get("away", 0)))
+    total_xg = float(xg.get("home", 0)) + float(xg.get("away", 0))
+    triggers = match.get("upset_triggers", {}) or {}
+    opening_round = bool(match.get("opening_round") or match.get("group_first_match") or match.get("round") in {"1", 1, "首轮"})
+
+    low_block_keys = {
+        "strong_low_block_problem",
+        "underdog_low_block",
+        "underdog_goalkeeper",
+        "strong_low_motivation",
+        "early_event_risk",
+        "favorite_finishing_risk",
+    }
+    active_keys: list[str] = []
+    trigger_score = 0.0
+    for key in low_block_keys:
+        value = triggers.get(key)
+        if isinstance(value, dict):
+            enabled = bool(value.get("enabled", True))
+            strength = float(value.get("strength", 1.0))
+            confidence = float(value.get("confidence", 1.0))
+            amount = strength * confidence
+        elif isinstance(value, (int, float)):
+            enabled = value > 0
+            amount = float(value)
+        else:
+            enabled = bool(value)
+            amount = 1.0 if enabled else 0.0
+        if enabled:
+            active_keys.append(key)
+            trigger_score += amount
+
+    deep_market = handicap is not None and abs(int(handicap)) >= 2
+    favorite_heavy = prob_gap >= 0.34 or xg_gap >= 1.05 or deep_market
+    low_total = total_xg <= 2.85
+    score = 0.0
+    if favorite_heavy:
+        score += 0.22
+    if deep_market:
+        score += 0.18
+    if low_total:
+        score += 0.18
+    if opening_round:
+        score += 0.10
+    score += min(0.28, trigger_score * 0.07)
+
+    reasons = []
+    if favorite_heavy:
+        reasons.append("热门方向过热，不能只按强队大胜处理")
+    if deep_market:
+        reasons.append("让球较深，需要防不穿盘")
+    if low_total:
+        reasons.append("总进球预期不高，需保护0:0/1:1/小胜")
+    if opening_round:
+        reasons.append("小组首轮/早段赛事，强队更容易先求稳")
+    if active_keys:
+        reasons.append("存在低位防守、门将、战意或临场波动触发器")
+
+    return {
+        "score": round(clamp(score, 0, 1), 3),
+        "favorite_side": favorite_side,
+        "active_keys": active_keys,
+        "opening_round": opening_round,
+        "favorite_heavy": favorite_heavy,
+        "low_total": low_total,
+        "reasons": reasons,
+    }
+
+
+SIDE_SIGNAL_FIELDS = (
+    ("folk_signal", "八卦/周易"),
+    ("zhouyi_signal", "周易"),
+    ("bagua_signal", "八卦"),
+    ("qimen_signal", "奇门遁甲"),
+    ("ziwei_signal", "紫微斗数"),
+)
+
+
+def side_signal_raw_items(match: dict[str, Any]) -> list[tuple[str, Any]]:
+    items: list[tuple[str, Any]] = []
+    raw_list = match.get("side_signals")
+    if isinstance(raw_list, list):
+        for raw in raw_list:
+            track = "支线"
+            if isinstance(raw, dict):
+                track = str(raw.get("track") or raw.get("type") or track)
+            items.append((track, raw))
+    for field, track in SIDE_SIGNAL_FIELDS:
+        if match.get(field):
+            items.append((track, match[field]))
+    return items
+
+
+def side_signal_effect(label: str, note: str) -> tuple[str, str]:
+    text = f"{label} {note}"
+    if any(word in text for word in ("防平", "平局", "不稳", "不胜")):
+        return "draw_protection", "提示防平/强队不稳"
+    if any(word in text for word in ("爆冷", "防冷", "冷门", "受克", "弱队")):
+        return "upset_protection", "提示可能爆冷"
+    if any(word in text for word in ("小球", "低比分", "少球")):
+        return "low_total", "提示小球/低比分"
+    if any(word in text for word in ("大球", "多球", "进球多")):
+        return "high_total", "提示大球/进球多"
+    if any(word in text for word in ("大胜", "穿盘", "强队稳", "支持强队")):
+        return "favorite_support", "支持强队方向"
+    if any(word in text for word in ("大负", "溃败", "惨败")):
+        return "favorite_big_margin", "提示可能大比分分差"
+    if any(word in text for word in ("冲突", "相反", "反向")):
+        return "conflict", "与数据模型可能冲突"
+    return "watch_only", "信号不明确，仅作观察"
+
+
+def side_signal_display(effect: str) -> str:
+    return {
+        "draw_protection": "提示防平/强队不稳",
+        "upset_protection": "提示可能爆冷",
+        "low_total": "提示小球/低比分",
+        "high_total": "提示大球/进球多",
+        "favorite_support": "支持强队方向",
+        "favorite_big_margin": "提示可能大比分分差",
+        "conflict": "与数据模型可能冲突",
+        "watch_only": "信号不明确，仅作观察",
+    }.get(effect, "信号不明确，仅作观察")
+
+
+def parse_side_signal(track: str, raw: Any) -> dict[str, Any]:
+    if not raw:
+        return {"enabled": False, "label": "无民间信号", "effect": "none", "confidence": 0.0, "note": ""}
+    if isinstance(raw, str):
+        label = raw
+        confidence = 0.3
+        source = track
+        note = raw
+    else:
+        label = str(raw.get("label") or raw.get("tag") or raw.get("effect") or "民间信号")
+        confidence = float(raw.get("confidence", raw.get("weight", 0.3)) or 0.3)
+        source = str(raw.get("source") or track)
+        note = str(raw.get("note") or raw.get("reason") or label)
+    explicit_effect = str(raw.get("effect", "")) if isinstance(raw, dict) else ""
+    effect, display = side_signal_effect(label, note)
+    if explicit_effect in {
+        "draw_protection",
+        "upset_protection",
+        "low_total",
+        "high_total",
+        "favorite_support",
+        "favorite_big_margin",
+        "conflict",
+        "watch_only",
+    }:
+        effect = explicit_effect
+        display = side_signal_display(effect)
+    return {
+        "enabled": True,
+        "track": track,
+        "source": source,
+        "label": label,
+        "effect": effect,
+        "confidence": round(clamp(confidence, 0, 1), 3),
+        "display": f"{track}{display}",
+        "note": note,
+        "parallel_only": True,
+        "warning": "支线信号是平行分析线，不参与核心概率、EV和Kelly计算",
+    }
+
+
+def side_signal_profiles(match: dict[str, Any]) -> list[dict[str, Any]]:
+    profiles = [parse_side_signal(track, raw) for track, raw in side_signal_raw_items(match)]
+    return [profile for profile in profiles if profile.get("enabled")]
+
+
+def folk_signal_profile(match: dict[str, Any]) -> dict[str, Any]:
+    profiles = side_signal_profiles(match)
+    if profiles:
+        return sorted(profiles, key=lambda item: item.get("confidence", 0), reverse=True)[0]
+    return {"enabled": False, "label": "无民间信号", "effect": "none", "confidence": 0.0, "note": ""}
+
+
+def folk_parallel_summary(match: dict[str, Any], model_probs: dict[str, float] | None = None) -> dict[str, Any]:
+    tracks = side_signal_profiles(match)
+    signal = sorted(tracks, key=lambda item: item.get("confidence", 0), reverse=True)[0] if tracks else folk_signal_profile(match)
+    if not signal.get("enabled"):
+        return {
+            **signal,
+            "tracks": [],
+            "alignment": "未提供",
+            "model_relation": "本场没有录入支线标签",
+            "action_hint": "按数据模型和官方SP判断",
+        }
+    effects = {item.get("effect") for item in tracks} or {signal.get("effect")}
+    leader = None
+    if model_probs:
+        leader = max(model_probs, key=lambda key: model_probs[key])
+    if "conflict" in effects:
+        alignment = "冲突观察"
+        action_hint = "不改变主推，只在风险区检查防平、防冷和低比分"
+    elif "favorite_support" in effects and effects <= {"favorite_support"}:
+        alignment = "可能一致" if leader in {"home", "away"} else "与模型不完全一致"
+        action_hint = "只增强信心提示，不增加仓位"
+    elif effects & {"draw_protection", "upset_protection", "low_total"}:
+        alignment = "风险提醒"
+        action_hint = "用于检查防平、防冷、防不穿盘或低比分保护"
+    elif effects & {"high_total", "favorite_big_margin"}:
+        alignment = "节奏提醒"
+        action_hint = "用于检查总进球和大比分尾部，仍需盘口支持"
+    else:
+        alignment = "无明确方向"
+        action_hint = "只保留备注，不参与推荐"
+    track_text = "；".join(f"{item.get('track')}：{item.get('display')}" for item in tracks[:4])
+    return {
+        **signal,
+        "tracks": tracks,
+        "alignment": alignment,
+        "model_relation": f"数据模型主线：{leader or '待定'}；支线：{track_text or signal.get('display')}",
+        "action_hint": action_hint,
+    }
+
+
 def apply_goal_distribution_adjustments(rows: list[dict[str, Any]], context: dict[str, Any] | None) -> None:
     if not context:
         return
     variance = context.get("variance_profile") or {}
     overdispersion = float(variance.get("overdispersion", 0) or 0)
     low_score_shrink = float(variance.get("low_score_shrink", 0) or 0)
+    draw_low_score_boost = float(variance.get("draw_low_score_boost", 0) or 0)
+    favorite_cover_cooldown = float(variance.get("favorite_cover_cooldown", 0) or 0)
     favorite = context.get("favorite_side")
     delta = one_goal_bias_delta(context)
 
@@ -433,6 +668,20 @@ def apply_goal_distribution_adjustments(rows: list[dict[str, Any]], context: dic
             row["probability"] *= 1 - low_score_shrink
         if low_score_shrink > 0 and total_goals <= 1:
             row["probability"] *= 1 + low_score_shrink * 0.55
+        if draw_low_score_boost > 0:
+            if margin == 0 and total_goals <= 2:
+                row["probability"] *= 1 + draw_low_score_boost * (1.35 if total_goals <= 2 else 1.0)
+            elif total_goals <= 2 and abs_margin <= 1:
+                row["probability"] *= 1 + draw_low_score_boost * 0.65
+        if favorite_cover_cooldown > 0:
+            favorite_big_cover = (
+                favorite == "home"
+                and margin >= 3
+                or favorite == "away"
+                and margin <= -3
+            )
+            if favorite_big_cover:
+                row["probability"] *= 1 - favorite_cover_cooldown
 
         if delta > 0:
             favorite_one_goal = (
@@ -563,10 +812,14 @@ def ranked_scorelines(
         deep_favorite = bool(context and context.get("deep_favorite_profile"))
         favorite = context.get("favorite_side") if context else None
         open_profile = (context or {}).get("open_game_profile") or {}
+        stall_profile = (context or {}).get("favorite_stall_profile") or {}
+        stall_effect = clamp(float(stall_profile.get("score", 0) or 0), 0, 1)
         open_effect = clamp(float(open_profile.get("score", 0)) / 5, 0, 1)
         if deep_favorite:
             shape_penalty = 0.006 * max(0, total_goals - 5) + 0.003 * max(0, margin - 4)
-            if favorite == "home" and row["home_goals"] > row["away_goals"] and margin >= 3:
+            if stall_effect >= 0.45 and margin >= 3:
+                shape_penalty += 0.016 + stall_effect * 0.020
+            elif favorite == "home" and row["home_goals"] > row["away_goals"] and margin >= 3:
                 shape_penalty -= 0.025
             elif favorite == "away" and row["away_goals"] > row["home_goals"] and margin >= 3:
                 shape_penalty -= 0.025
@@ -583,7 +836,9 @@ def ranked_scorelines(
                 if favorite_wins and total_goals >= 4 and row["home_goals"] > 0 and row["away_goals"] > 0:
                     shape_penalty -= 0.015 * open_effect
         priority = meta["score_priority"]
-        if deep_favorite and total_goals >= 3 and margin >= 3:
+        if stall_effect >= 0.45 and row["score"] in {"0-0", "1-1", "1-0", "0-1", "2-0", "0-2"}:
+            priority = max(priority, 3.5)
+        elif deep_favorite and total_goals >= 3 and margin >= 3:
             priority = max(priority, 3.4)
         elif open_effect > 0 and total_goals >= 3 and margin <= 3:
             favorite_wins = (
@@ -607,11 +862,18 @@ def ranked_scorelines(
         meta = scoreline_meta(row["score"], row["probability"])
         total_goals = row["home_goals"] + row["away_goals"]
         margin = abs(row["home_goals"] - row["away_goals"])
-        if context and context.get("deep_favorite_profile") and total_goals >= 3 and margin >= 3:
+        stall_effect = clamp(float(((context or {}).get("favorite_stall_profile") or {}).get("score", 0) or 0), 0, 1)
+        if context and context.get("deep_favorite_profile") and total_goals >= 3 and margin >= 3 and stall_effect >= 0.45:
+            meta = {
+                "score_group": "深盘大胜降温",
+                "score_priority": 1,
+                "score_note": "热门过热且有小比分触发，只能当尾部防线，不能当主比分",
+            }
+        elif context and context.get("deep_favorite_profile") and total_goals >= 3 and margin >= 3:
             meta = {
                 "score_group": "深盘大胜比分",
                 "score_priority": 3,
-                "score_note": "和深盘让胜方向一致，适合小额比分池，不宜重仓单压",
+                "score_note": "和深盘让胜方向一致，适合小额比分池，不宜作为主仓单压",
             }
         output.append(
             {
@@ -706,7 +968,14 @@ def recommendation_context(
             or xg_gap >= 1.75
         )
     )
-    context_seed = {"deep_favorite_profile": deep_favorite_profile, "favorite_side": favorite_side}
+    stall_profile = favorite_stall_profile(match, model_probs, xg, handicap)
+    draw_protection_required = float(stall_profile.get("score", 0) or 0) >= 0.45
+    context_seed = {
+        "deep_favorite_profile": deep_favorite_profile,
+        "favorite_side": favorite_side,
+        "favorite_stall_profile": stall_profile,
+        "draw_protection_required": draw_protection_required,
+    }
     open_profile = open_game_profile(match, model_probs, xg)
     context_seed["open_game_profile"] = open_profile
     top_scores = ranked_scorelines(matrix, limit=6, context=context_seed)
@@ -720,9 +989,12 @@ def recommendation_context(
         "elo_gap": round(elo_gap, 1),
         "prob_gap": round(prob_gap, 4),
         "balanced_matchup": balanced,
-        "score_betting_allowed": balanced or (model_probs["draw"] >= 0.27 and low_draw_core),
+        "score_betting_allowed": balanced or (model_probs["draw"] >= 0.27 and low_draw_core) or draw_protection_required,
         "one_goal_core": one_goal_core,
         "low_draw_core": low_draw_core,
+        "draw_protection_required": draw_protection_required,
+        "favorite_stall_profile": stall_profile,
+        "favorite_cover_cooldown": round(clamp(float(stall_profile.get("score", 0) or 0) * 0.18, 0, 0.18), 3),
         "handicap_one_goal_mapping": handicap is not None and abs(handicap) == 1 and one_goal_core,
         "deep_favorite_profile": deep_favorite_profile,
         "favorite_side": favorite_side,
@@ -736,6 +1008,9 @@ def recommendation_context(
 
 
 def apply_recommendation_rules(options: list[dict[str, Any]], context: dict[str, Any], handicap: int | None) -> list[dict[str, Any]]:
+    stall_profile = context.get("favorite_stall_profile") or {}
+    stall_score = float(stall_profile.get("score", 0) or 0)
+    draw_protection_required = bool(context.get("draw_protection_required")) or stall_score >= 0.45
     for item in options:
         play_type = item.get("play_type")
         selection = item.get("selection")
@@ -751,12 +1026,31 @@ def apply_recommendation_rules(options: list[dict[str, Any]], context: dict[str,
                 if high_favorite_score:
                     notes.append("深盘强弱悬殊场，需给大胜尾部留保护")
                     item["tail_hedge"] = True
+                    item["recommendation_role"] = "favorite_tail_hedge"
                     item["risk_score"] = max(75, int(item.get("risk_score") or 75))
                     item["risk_level"] = risk_level(item["risk_score"])
+                    if stall_score >= 0.45:
+                        notes.append("热门过热且有小比分触发，大胜比分降为尾部保护")
+                        item["risk_score"] = max(86, int(item.get("risk_score") or 86))
+                        item["risk_level"] = risk_level(item["risk_score"])
+                        item["risk_adjusted_score"] = round(float(item.get("risk_adjusted_score", -1)) - 0.25, 4)
+                        if item.get("decision") == "可小注":
+                            item["decision"] = "高风险观察"
+                            item["reason"] = "热门降温触发，大胜比分只能小额防尾部"
                     if item.get("decision") in {"放弃", "高风险观察"} and item.get("sp"):
                         item["decision"] = "高风险观察"
                         item["reason"] = "深盘强队存在大胜尾部，只能小额保护"
                     item["risk_adjusted_score"] = round(float(item.get("risk_adjusted_score", -1)) + 0.10, 4)
+            if draw_protection_required and selection in {"0:0", "1:1", "1:0", "0:1"}:
+                notes.append("热门降温/低比分触发，可作为平局或一球小胜保护")
+                item["recommendation_role"] = "draw_low_score_protection"
+                item["score_bet_allowed"] = True
+                item["risk_score"] = max(62, int(item.get("risk_score") or 62))
+                item["risk_level"] = risk_level(item["risk_score"])
+                item["risk_adjusted_score"] = round(float(item.get("risk_adjusted_score", -1)) + 0.12, 4)
+                if item.get("sp") and item.get("decision") == "放弃":
+                    item["decision"] = "观察"
+                    item["reason"] = "热门降温触发，低比分只做保护观察"
             if context["score_betting_allowed"] and item.get("score_priority") == 3 and (item.get("model_prob") or 0) >= 0.055:
                 notes.append("实力接近/平局空间足，比分可小额参考")
                 item["score_bet_allowed"] = True
@@ -767,7 +1061,7 @@ def apply_recommendation_rules(options: list[dict[str, Any]], context: dict[str,
                     item["reason"] = "实力接近场，比分赔率接近模型线，可小额观察"
                 item["risk_adjusted_score"] = round(float(item.get("risk_adjusted_score", -1)) + 0.16, 4)
             else:
-                item["score_bet_allowed"] = False
+                item["score_bet_allowed"] = bool(item.get("score_bet_allowed"))
 
         if play_type == "让球胜平负" and context["handicap_one_goal_mapping"]:
             if handicap == 1 and selection == "让平":
@@ -823,13 +1117,23 @@ def apply_recommendation_rules(options: list[dict[str, Any]], context: dict[str,
                 item["decision"] = "观察"
                 item["reason"] = "深盘场大胜尾部保护，只适合小额"
         elif play_type == "总进球" and context.get("deep_favorite_profile") and selection in {"0", "1", "2"}:
-            notes.append("深盘强弱悬殊场，低总进球高赔不能进入核心推荐")
-            item["risk_adjusted_score"] = round(float(item.get("risk_adjusted_score", -1)) - 0.22, 4)
-            item["risk_score"] = max(70, int(item.get("risk_score") or 70))
-            item["risk_level"] = risk_level(item["risk_score"])
-            if item.get("decision") == "可小注":
-                item["decision"] = "观察"
-                item["reason"] = "深盘场低进球高赔陷阱，只能观察"
+            if draw_protection_required:
+                notes.append("热门降温触发，低总进球可作小额保护")
+                item["recommendation_role"] = "low_total_protection"
+                item["risk_adjusted_score"] = round(float(item.get("risk_adjusted_score", -1)) + 0.08, 4)
+                item["risk_score"] = max(64, int(item.get("risk_score") or 64))
+                item["risk_level"] = risk_level(item["risk_score"])
+                if item.get("decision") == "放弃" and item.get("sp"):
+                    item["decision"] = "观察"
+                    item["reason"] = "热门降温触发，低总进球只做保护"
+            else:
+                notes.append("深盘强弱悬殊场，低总进球高赔不能进入核心推荐")
+                item["risk_adjusted_score"] = round(float(item.get("risk_adjusted_score", -1)) - 0.22, 4)
+                item["risk_score"] = max(70, int(item.get("risk_score") or 70))
+                item["risk_level"] = risk_level(item["risk_score"])
+                if item.get("decision") == "可小注":
+                    item["decision"] = "观察"
+                    item["reason"] = "深盘场低进球高赔陷阱，只能观察"
 
         if notes:
             item["rule_notes"] = notes
@@ -1219,6 +1523,19 @@ def feature_deltas(match: dict[str, Any], market_signal: dict[str, Any], upset: 
         away_core -= upset_strength * 0.040
         home_core += upset_strength * 0.030
 
+    stall_probs = latest or elo_probabilities(float(match.get("home_elo", 1800)), float(match.get("away_elo", 1800)), match.get("neutral", True))
+    stall_xg = estimate_expected_goals(match, stall_probs, "market")
+    stall = favorite_stall_profile(match, stall_probs, stall_xg, match.get("sporttery_handicap"))
+    stall_score = float(stall.get("score", 0) or 0)
+    if stall_score >= 0.45:
+        cooldown = min(0.055, 0.030 + stall_score * 0.035)
+        if favorite == "home":
+            home_core -= cooldown
+            away_core += cooldown * 0.25
+        else:
+            away_core -= cooldown
+            home_core += cooldown * 0.25
+
     balance = clamp(2 - abs(strength), 0, 2)
     low_tempo = clamp(-tempo, 0, 3)
     draw_delta = (
@@ -1229,6 +1546,8 @@ def feature_deltas(match: dict[str, Any], market_signal: dict[str, Any], upset: 
         - abs(fifa_rank) * 0.008
         - abs(formal) * 0.012
     )
+    if stall_score >= 0.45:
+        draw_delta += min(0.070, 0.030 + stall_score * 0.050)
     return {"home": round(home_core, 4), "draw": round(draw_delta, 4), "away": round(away_core, 4)}
 
 
@@ -1779,10 +2098,15 @@ def build_score_combo_pools(options: list[dict[str, Any]], context: dict[str, An
         avg_ev = sum(float(item.get("ev") or -1) for item in rows) / len(rows)
         max_risk = max(int(item.get("risk_score") or 80) for item in rows)
         open_score = float((context.get("open_game_profile") or {}).get("score") or 0)
-        if context.get("deep_favorite_profile") and name == "低比分池":
-            action = "不建议"
+        stall_score = float((context.get("favorite_stall_profile") or {}).get("score") or 0)
+        if context.get("deep_favorite_profile") and name == "低比分池" and stall_score >= 0.45:
+            action = "小额保护"
+        elif context.get("deep_favorite_profile") and name == "低比分池":
+            action = "仅备选"
         elif name == "开放比分池" and open_score >= 3.0 and max_risk < 82:
             action = "可做小复式"
+        elif name == "大胜尾部池" and stall_score >= 0.45:
+            action = "尾部小防"
         elif name == "大胜尾部池" and not context.get("deep_favorite_profile"):
             action = "仅备选"
         elif max_risk >= 82:
@@ -1807,28 +2131,45 @@ def build_score_combo_pools(options: list[dict[str, Any]], context: dict[str, An
 
 
 def staking_policy(context: dict[str, Any]) -> dict[str, Any]:
+    stall_score = float((context.get("favorite_stall_profile") or {}).get("score") or 0)
     if context.get("deep_favorite_profile"):
-        score_cap = 0.06
-        score_combo_cap = 0.03
-        tail_cap = 0.02
+        if stall_score >= 0.45:
+            score_cap = 0.08
+            score_combo_cap = 0.035
+            tail_cap = 0.012
+            favorite_cover_cap = 0.26
+            same_theme_combo_cap = 0.32
+        else:
+            score_cap = 0.06
+            score_combo_cap = 0.03
+            tail_cap = 0.02
+            favorite_cover_cap = 0.34
+            same_theme_combo_cap = 0.40
     elif context.get("balanced_matchup"):
         score_cap = 0.12
         score_combo_cap = 0.06
         tail_cap = 0.0
+        favorite_cover_cap = 0.30
+        same_theme_combo_cap = 0.36
     else:
         score_cap = 0.08
         score_combo_cap = 0.04
         tail_cap = 0.01
+        favorite_cover_cap = 0.32
+        same_theme_combo_cap = 0.38
     return {
         "direction_min": 0.70,
         "score_cap": score_cap,
         "score_combo_cap": score_combo_cap,
         "deep_tail_cap": tail_cap,
+        "favorite_cover_cap": favorite_cover_cap,
+        "same_theme_combo_cap": same_theme_combo_cap,
         "single_score_cap": min(0.04, score_cap / 2),
         "hard_rules": [
             "比分仓不得超过上限",
             "比分串不得高于比分单场仓",
             "深盘尾部保护只允许小额",
+            "同一热门穿盘主题不能在多组串关里反复作为主仓",
             "官方SP与模型分歧大的腿不能做核心",
         ],
     }
@@ -1905,6 +2246,7 @@ def build_sporttery_outputs(
         options.append(evaluate_option(match, "半全场", selection, probability, None, upset, market_signal, market_sp=market_sp))
 
     rec_context = recommendation_context(match, model_probs, xg, matrix, handicap)
+    folk_parallel = folk_parallel_summary(match, model_probs)
     options = apply_recommendation_rules(options, rec_context, handicap)
     play_priority = {"胜平负": 5, "让球胜平负": 4, "总进球": 3, "半全场": 2, "比分": 1}
     ranked = sorted(
@@ -1926,6 +2268,7 @@ def build_sporttery_outputs(
         "handicap": handicap,
         "value_model": "market_de-vig + feature deltas + softmax",
         "recommendation_context": rec_context,
+        "folk_parallel": folk_parallel,
         "options": ranked,
         "score_reference": [
             {
@@ -2081,9 +2424,10 @@ def build_prediction(match: dict[str, Any], odds_history: list[dict[str, Any]]) 
         deep_context = deep_favorite_context(match, probs, xg, effective_handicap)
         scenario_context = {
             "open_game_profile": open_game_profile(match, probs, xg),
-            "variance_profile": variance_profile(match, probs, xg),
+            "variance_profile": variance_profile(match, probs, xg, effective_handicap),
             "favorite_side": deep_context["favorite_side"],
             "deep_favorite_profile": deep_context["deep_favorite_profile"],
+            "favorite_stall_profile": favorite_stall_profile(match, probs, xg, effective_handicap),
             "model_probs": probs,
             "xg": xg,
             "handicap": effective_handicap,
@@ -2151,9 +2495,10 @@ def build_prediction(match: dict[str, Any], odds_history: list[dict[str, Any]]) 
     value_deep_context = deep_favorite_context(match, value_probs, value_xg, effective_handicap)
     value_context = {
         "open_game_profile": open_game_profile(match, value_probs, value_xg),
-        "variance_profile": variance_profile(match, value_probs, value_xg),
+        "variance_profile": variance_profile(match, value_probs, value_xg, effective_handicap),
         "favorite_side": value_deep_context["favorite_side"],
         "deep_favorite_profile": value_deep_context["deep_favorite_profile"],
+        "favorite_stall_profile": favorite_stall_profile(match, value_probs, value_xg, effective_handicap),
         "model_probs": value_probs,
         "xg": value_xg,
         "handicap": effective_handicap,
@@ -2223,6 +2568,7 @@ def build_summary(
         "score_group": best_scores,
         "market_direction": market["direction"],
         "upset_level": upset["level"],
+        "folk_parallel": folk_parallel_summary(match, market_scenario.probabilities),
         "confidence": int(baseline.confidence),
         "data_score": completeness["score"],
         "gap_level": gap["level"],

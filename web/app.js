@@ -17,7 +17,7 @@ const colors = {
   away: "#16a34a",
 };
 
-const RULES_VERSION = "规则 v2.1：官方体彩SP + 实力评分 + 赛前因素 + 比分池/仓位约束";
+const RULES_VERSION = "规则 v2.2：官方体彩SP + 去除抽水概率 + 实力排名 + 支线观察";
 
 function pct(value, digits = 1) {
   if (value === null || value === undefined || Number.isNaN(value)) return "-";
@@ -74,6 +74,7 @@ async function postAction(url, message) {
 
 async function selectFixture(fixtureKey, mode = "single") {
   setBusy(true);
+  showToast(mode === "next4" ? "正在从这场起生成4场预测..." : "正在加入此场预测...");
   try {
     const response = await fetch("/api/matches/select", {
       method: "POST",
@@ -90,6 +91,8 @@ async function selectFixture(fixtureKey, mode = "single") {
     state.active = first || "overview";
     showToast(payload.message || "已加入预测并刷新");
     render();
+  } catch (error) {
+    showToast(`加入预测失败：${error.message || error}`);
   } finally {
     setBusy(false);
   }
@@ -178,6 +181,15 @@ function formatKickoff(value) {
   const hh = String(date.getHours()).padStart(2, "0");
   const mi = String(date.getMinutes()).padStart(2, "0");
   return `${mm}-${dd} ${hh}:${mi} 北京时间`;
+}
+
+function fifaRankText(item) {
+  const source = item?.prediction?.match || item || {};
+  const rank = source?.fifa_ranking || source?.fifa_rank || {};
+  const home = rank.home ?? rank.home_rank ?? item?.home_fifa_rank;
+  const away = rank.away ?? rank.away_rank ?? item?.away_fifa_rank;
+  if (!home && !away) return "FIFA排名待补";
+  return `FIFA排名：${item.home_team || source.home_team || "主队"} 第${home ?? "-"}，${item.away_team || source.away_team || "客队"} 第${away ?? "-"}`;
 }
 
 function bjtDateKey(value) {
@@ -481,7 +493,7 @@ function renderMarketContext(prediction) {
   const total = ctx.total_goals;
   return `
     <div class="planner-note">
-      爱彩公开数据用于观察市场倍率、盘口变化和大小球方向；它不是中国体彩可下单项，最终下单仍以体彩计算器为准。
+      爱彩公开数据只用于观察非体彩市场变化；它不是中国体彩可下单项，最终下单仍以体彩计算器为准。
     </div>
     <table>
       <thead><tr><th>数据项</th><th>初始</th><th>当前</th><th>变化/解释</th></tr></thead>
@@ -496,17 +508,17 @@ function renderMarketContext(prediction) {
         ` : ""}
         ${asia ? `
           <tr>
-            <td>亚盘</td>
+            <td>让球市场参考<br><span class="muted">非体彩</span></td>
             <td>${marketValue(asia.first, 2)}</td>
-            <td>${marketValue(asia.latest, 2)}<br><span class="muted">主水 ${marketValue(asia.home_water)} / 客水 ${marketValue(asia.away_water)}</span></td>
+            <td>${marketValue(asia.latest, 2)}<br><span class="muted">主方向 ${marketValue(asia.home_water)} / 客方向 ${marketValue(asia.away_water)}</span></td>
             <td>${esc(marketMoveText(asia.movement))}</td>
           </tr>
         ` : ""}
         ${total ? `
           <tr>
-            <td>大小球</td>
+            <td>总进球市场参考<br><span class="muted">非体彩</span></td>
             <td>${marketValue(total.first, 2)}</td>
-            <td>${marketValue(total.latest, 2)}<br><span class="muted">大 ${marketValue(total.over_water)} / 小 ${marketValue(total.under_water)}</span></td>
+            <td>${marketValue(total.latest, 2)}<br><span class="muted">偏大 ${marketValue(total.over_water)} / 偏小 ${marketValue(total.under_water)}</span></td>
             <td>${esc(marketMoveText(total.movement))}</td>
           </tr>
         ` : ""}
@@ -519,6 +531,7 @@ function predictionBasisItems(item, prediction) {
   const scenario = marketScenario(prediction);
   const probs = scenario?.probabilities || {};
   const sporttery = prediction?.sporttery || {};
+  const folkText = folkSignalText(prediction);
   const totalGoals = scenario?.total_goals;
   const hText = handicapText(sporttery.handicap ?? item.sporttery_handicap);
   const bestPicks = topPicks(sporttery, 3, prediction).map((row) => readablePickWithContext(row, prediction)).join("；") || "暂无达到下注门槛的官方SP选项";
@@ -530,12 +543,12 @@ function predictionBasisItems(item, prediction) {
       text: `${conclusionText(item, prediction)}。模型胜平负概率为主 ${pct(probs.home)}、平 ${pct(probs.draw)}、客 ${pct(probs.away)}，预期进球 ${expectedGoals}。`,
     },
     {
-      title: "体彩盘口",
-      text: `${hText}。当前官方可买项：${bestPicks}。盘口只作为可下注约束；若和比分主线相反，只能当防穿盘观察。`,
+      title: "官方体彩可买项",
+      text: `${hText}。当前官方可买项：${bestPicks}。让球数只作为可下注约束；若和比分主线相反，只能当防穿盘观察。`,
     },
     {
       title: "战术对位",
-      text: item.tactical_notes || "暂无稳定战术信息，按实力、盘口和比分模型为主。",
+      text: item.tactical_notes || "暂无稳定战术信息，按实力、官方SP和比分模型为主。",
     },
     {
       title: "赛前变量",
@@ -546,10 +559,26 @@ function predictionBasisItems(item, prediction) {
       text: `爆冷等级 ${prediction.summary.upset_level}，模型/市场分歧 ${prediction.summary.gap_level}。主要风险：${upset}。`,
     },
     {
+      title: "支线观察",
+      text: folkText,
+    },
+    {
       title: "比分与进球",
-      text: `${scoreContextText(prediction, topPicks(sporttery, 3, prediction))}；总进球参考 ${totalGoals?.best_range ? `${totalGoals.best_range}球` : "暂无"}。比分只能小仓位覆盖，不作为重仓核心。`,
+      text: `${scoreContextText(prediction, topPicks(sporttery, 3, prediction))}；总进球参考 ${totalGoals?.best_range ? `${totalGoals.best_range}球` : "暂无"}。比分只能小仓位覆盖，不作为主要投入方向。`,
     },
   ];
+}
+
+function folkSignalText(prediction) {
+  const folk = prediction?.sporttery?.folk_parallel || prediction?.summary?.folk_parallel;
+  if (!folk || !folk.enabled) return "未录入支线标签。本场只看数据模型、官方SP和赛前信息。";
+  const display = Array.isArray(folk.tracks) && folk.tracks.length
+    ? folk.tracks.slice(0, 3).map((row) => `${row.track || "支线"}：${row.display || row.label}`).join("；")
+    : (folk.display || folk.label || "支线信号");
+  const relation = folk.alignment ? `关系：${folk.alignment}` : "";
+  const hint = folk.action_hint ? `提示：${folk.action_hint}` : "";
+  const note = folk.note ? `备注：${folk.note}` : "";
+  return `${display}。${[relation, hint, note].filter(Boolean).join("；")}。支线信号不参与核心概率、EV和仓位计算。`;
 }
 
 function renderPredictionBasis(item, prediction) {
@@ -566,6 +595,41 @@ function renderPredictionBasis(item, prediction) {
           <div class="basis-text">${esc(row.text)}</div>
         </div>
       `).join("")}
+    </div>
+    ${renderSideSignalPanel(prediction)}
+  `;
+}
+
+function renderSideSignalPanel(prediction) {
+  const folk = prediction?.sporttery?.folk_parallel || prediction?.summary?.folk_parallel;
+  if (!folk || !folk.enabled) {
+    return `
+      <div class="side-signal-panel muted-panel">
+        <div class="side-signal-head">
+          <strong>支线观察</strong>
+          ${badge("未录入", "amber")}
+        </div>
+        <p>未录入八卦/周易、奇门或紫微标签。本场只按数据模型和官方SP判断。</p>
+      </div>
+    `;
+  }
+  const tracks = Array.isArray(folk.tracks) && folk.tracks.length ? folk.tracks : [folk];
+  return `
+    <div class="side-signal-panel">
+      <div class="side-signal-head">
+        <strong>支线观察</strong>
+        ${badge(folk.alignment || "仅观察", folk.alignment === "可能一致" ? "green" : folk.alignment === "冲突观察" ? "red" : "amber")}
+      </div>
+      <div class="side-signal-grid">
+        ${tracks.slice(0, 4).map((row) => `
+          <div class="side-signal-card">
+            <span>${esc(row.track || "支线")}</span>
+            <strong>${esc(row.display || row.label || "仅观察")}</strong>
+            <em>${esc(row.note || row.source || "")}</em>
+          </div>
+        `).join("")}
+      </div>
+      <p>${esc(folk.action_hint || "只作风险观察")}。支线信号不参与核心概率、EV和仓位计算。</p>
     </div>
   `;
 }
@@ -663,7 +727,7 @@ function readablePickWithContext(row, prediction) {
 function pickContextNote(row, prediction) {
   const check = handicapPickConflict(row, prediction);
   if (!check.conflict) return "";
-  return `注意：比分主线更像${check.lean.selection}（${topScoreText(prediction)}），这项是反主线的防穿盘/赔率价值观察，不适合重仓，也不要和大胜比分当成同一方向去串。`;
+  return `注意：比分主线更像${check.lean.selection}（${topScoreText(prediction)}），这项是反主线的防穿盘/赔率价值观察，不适合作为主要投入方向，也不要和大胜比分当成同一方向去串。`;
 }
 
 function scoreContextText(prediction, picks = []) {
@@ -770,6 +834,7 @@ function renderOverviewCard(item) {
         <div>
           <div class="match-title">${esc(item.home_team)} vs ${esc(item.away_team)}</div>
           <div class="kickoff">${esc(formatKickoff(item.kickoff))}</div>
+          <div class="rank-line">${esc(fifaRankText(item))}</div>
         </div>
         <button data-refresh="${esc(item.match_id)}">刷新</button>
       </div>
@@ -1028,7 +1093,7 @@ function deviationText(test) {
     return "实际打成平局，说明模型可能低估了弱队防守、强队轮换或比赛节奏下降带来的平局概率。";
   }
   if (test.predicted_result === "home" || test.predicted_result === "away") {
-    return "强弱方向判断偏差，复盘时优先检查阵容轮换、赛前新闻、盘口临场变化和早段进球/红黄牌影响。";
+    return "强弱方向判断偏差，复盘时优先检查阵容轮换、赛前新闻、官方SP临场变化和早段进球/红黄牌影响。";
   }
   return "偏差主要来自平局保护不足或胜负方向被临场因素打破，需要结合技术统计和收盘SP继续校准。";
 }
@@ -1278,6 +1343,7 @@ function renderMatch(item) {
           <div>
             <div class="team-line">${esc(item.home_team)} vs ${esc(item.away_team)}</div>
             <div class="kickoff">${esc(formatKickoff(item.kickoff))} · ${esc(item.stage || "世界杯")}</div>
+            <div class="rank-line">${esc(fifaRankText(item))}</div>
           </div>
           <div class="headline">${esc(conclusionText(item, prediction))}</div>
         </div>
@@ -1306,12 +1372,12 @@ function renderMatch(item) {
     </section>
 
     <section class="section">
-      <h3>多来源市场倍率</h3>
+      <h3>非体彩市场参考</h3>
       ${renderMarketContext(prediction)}
     </section>
 
     <section class="section">
-      <h3>优先看的下注项</h3>
+      <h3>官方可买优先项</h3>
       <div class="grid cols-2">
         ${picks.length ? picks.map((row) => renderPickCard(row, `${item.home_team} vs ${item.away_team}`, prediction)).join("") : renderPickCard(null)}
       </div>
@@ -1367,7 +1433,7 @@ function renderMatch(item) {
         ${totalGoalsTable(baseline.total_goals)}
       </div>
       <div class="section">
-        <h3>大小球盘口</h3>
+        <h3>总进球区间参考</h3>
         ${overUnderTable(baseline.over_under_lines)}
       </div>
     </section>
@@ -1420,8 +1486,9 @@ function renderMatch(item) {
 function renderBettingPlanner(item, prediction) {
   const modes = [
     { id: "conservative", label: "保守", desc: "少项、方向优先，回报低但波动较小" },
-    { id: "standard", label: "标准", desc: "方向为主，少量比分/总进球增强收益" },
+    { id: "standard", label: "推荐", desc: "方向为主，少量比分/总进球增强收益" },
     { id: "aggressive", label: "激进高回报", desc: "加入比分和高赔尾部，只适合小仓位" },
+    { id: "longshot", label: "以小博大", desc: "小金额覆盖比分和半全场，不作为主仓" },
   ];
   const amount = Math.max(2, Math.floor(Number(state.stakeAmount || 100) / 2) * 2);
   const mode = modes.find((row) => row.id === state.bettingMode) || modes[1];
@@ -1541,6 +1608,17 @@ function suggestedBetRows(prediction, mode) {
       ...totals.slice(0, 1).map((row) => ({ ...row, bucket: "总进球", weight: 1 })),
     ];
   }
+  if (mode === "longshot") {
+    const halfFull = allRows
+      .filter((row) => row.play_type === "半全场")
+      .sort((a, b) => betSortScore(b) - betSortScore(a));
+    return [
+      ...direction.slice(0, 1).map((row) => ({ ...row, bucket: "方向底仓", weight: 3 })),
+      ...scores.slice(0, 5).map((row) => ({ ...row, bucket: "比分小博", weight: 1 })),
+      ...halfFull.slice(0, 2).map((row) => ({ ...row, bucket: "半全场小博", weight: 1 })),
+      ...totals.slice(0, 1).map((row) => ({ ...row, bucket: "总进球", weight: 1 })),
+    ];
+  }
   return [
     ...direction.slice(0, 2).map((row, index) => ({ ...row, bucket: index === 0 ? "主仓" : "保护", weight: index === 0 ? 6 : 3 })),
     ...scores.slice(0, 2).map((row) => ({ ...row, bucket: "比分小仓", weight: 1 })),
@@ -1613,7 +1691,7 @@ function renderScenario(scenario, item) {
 }
 
 function valueModelTable(valueModel) {
-  if (!valueModel) return `<p class="muted">暂无盘口价值模型。</p>`;
+  if (!valueModel) return `<p class="muted">暂无官方SP价值模型。</p>`;
   const rows = ["home", "draw", "away"].map((key) => `
     <tr>
       <td>${labels[key]}</td>
@@ -1970,7 +2048,7 @@ function overUnderTable(lines) {
   if (!lines?.length) return `<p class="muted">暂无大小球数据。</p>`;
   return `
     <table>
-      <thead><tr><th>盘口</th><th>大球概率</th><th>小球概率</th><th>倾向</th></tr></thead>
+      <thead><tr><th>总进球线</th><th>大球概率</th><th>小球概率</th><th>倾向</th></tr></thead>
       <tbody>
         ${lines.map((row) => `
           <tr>
