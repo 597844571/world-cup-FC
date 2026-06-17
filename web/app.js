@@ -19,6 +19,25 @@ const colors = {
 
 const RULES_VERSION = "规则 v2.2：官方体彩SP + 去除抽水概率 + 实力排名 + 支线观察";
 
+async function readJsonResponse(response, actionName = "请求") {
+  const contentType = response.headers.get("content-type") || "";
+  const text = await response.text();
+  if (!contentType.includes("application/json")) {
+    const preview = text.replace(/\s+/g, " ").slice(0, 90);
+    throw new Error(`${actionName}接口没有返回JSON，可能是部署路由缺失或服务端报错：${preview || response.status}`);
+  }
+  let payload;
+  try {
+    payload = JSON.parse(text);
+  } catch (error) {
+    throw new Error(`${actionName}接口JSON解析失败：${error.message || error}`);
+  }
+  if (!response.ok) {
+    throw new Error(payload.error || `${actionName}失败，HTTP ${response.status}`);
+  }
+  return payload;
+}
+
 function pct(value, digits = 1) {
   if (value === null || value === undefined || Number.isNaN(value)) return "-";
   return `${(value * 100).toFixed(digits)}%`;
@@ -34,7 +53,7 @@ function esc(value) {
 
 async function loadState() {
   const response = await fetch("/api/state");
-  state.data = await response.json();
+  state.data = await readJsonResponse(response, "加载状态");
   render();
 }
 
@@ -46,7 +65,7 @@ async function refresh(matchId = null) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(matchId ? { match_id: matchId } : {}),
     });
-    const payload = await response.json();
+    const payload = await readJsonResponse(response, "刷新预测");
     state.data = payload.state;
     showToast(payload.message || (matchId ? "当前比赛已刷新" : "全部比赛已刷新"));
     render();
@@ -63,7 +82,7 @@ async function postAction(url, message) {
       headers: { "Content-Type": "application/json" },
       body: "{}",
     });
-    const payload = await response.json();
+    const payload = await readJsonResponse(response, message || "操作");
     state.data = payload.state || state.data;
     showToast(payload.message || message);
     render();
@@ -81,8 +100,8 @@ async function selectFixture(fixtureKey, mode = "single") {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ fixture_key: fixtureKey, mode }),
     });
-    const payload = await response.json();
-    if (!response.ok || payload.ok === false) {
+    const payload = await readJsonResponse(response, "加入预测");
+    if (payload.ok === false) {
       showToast(payload.error || "加入预测失败");
       return;
     }

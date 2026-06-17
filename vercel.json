@@ -14,6 +14,10 @@
       "use": "@vercel/python"
     },
     {
+      "src": "api/matches/select.py",
+      "use": "@vercel/python"
+    },
+    {
       "src": "api/predictions/archive.py",
       "use": "@vercel/python"
     },
@@ -30,6 +34,10 @@
     {
       "src": "/api/schedule/query",
       "dest": "/api/schedule/query.py"
+    },
+    {
+      "src": "/api/matches/select",
+      "dest": "/api/matches/select.py"
     },
     {
       "src": "/api/predictions/archive",
