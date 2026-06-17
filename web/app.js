@@ -137,7 +137,7 @@ function showToast(message) {
 function render() {
   renderTabs();
   if (state.active === "overview") {
-    renderOverview();
+    renderOverviewV2();
     return;
   }
   if (state.active === "calendar") {
@@ -788,6 +788,166 @@ function renderPickCard(row, matchLabel = "", prediction = null) {
       <div class="pick-reason">${esc((row.rule_notes || []).join("；") || row.reason || row.score_note || "按官方玩法和模型价值筛选")}</div>
       ${note ? `<div class="pick-warning">${esc(note)}</div>` : ""}
     </div>
+  `;
+}
+
+function overviewFinishedRows(limit = 4) {
+  return scheduleRows()
+    .filter((row) => isPrimaryScheduleRow(row) && fixtureStatus(row.fixture) === "finished")
+    .sort((a, b) => String(b.fixture.kickoff || "").localeCompare(String(a.fixture.kickoff || "")))
+    .slice(0, limit);
+}
+
+function overviewUpcomingRows(limit = 6) {
+  return scheduleRows()
+    .filter((row) => isPrimaryScheduleRow(row) && fixtureStatus(row.fixture) !== "finished")
+    .sort((a, b) => String(a.fixture.kickoff || "").localeCompare(String(b.fixture.kickoff || "")))
+    .slice(0, limit);
+}
+
+function renderOverviewV2() {
+  const content = document.getElementById("content");
+  const matches = state.data?.matches ?? [];
+  const fixtures = state.data?.fixtures || { scheduled: [], finished: [] };
+  const summary = state.data?.backtest_summary || {};
+  const comboCount = state.data?.sporttery_combos?.length || 0;
+  const latestFinished = overviewFinishedRows(4);
+  const upcomingRows = overviewUpcomingRows(6);
+  content.innerHTML = `
+    <section class="schedule-head">
+      <div>
+        <h2>今天先看赛果，再看下一场</h2>
+        <p>首页只放最关键的两件事：刚结束的比赛有没有偏差，马上开始的比赛能不能加入预测并生成下注测算。</p>
+      </div>
+      <div class="actions">
+        <button data-post="/api/schedule/query" data-message="赛程查询完成">刷新赛程</button>
+        <button class="secondary" data-tab="calendar">全部赛程</button>
+        <button class="secondary" data-tab="schedule">完整复盘</button>
+      </div>
+    </section>
+
+    <section class="grid cols-4">
+      <div class="metric"><div class="label">当前预测</div><div class="value">${matches.length}</div><div class="sub">可查看详情和测算</div></div>
+      <div class="metric"><div class="label">待开比赛</div><div class="value">${fixtures.scheduled?.length || 0}</div><div class="sub">首页展示最近 ${upcomingRows.length} 场</div></div>
+      <div class="metric"><div class="label">最新完赛</div><div class="value">${fixtures.finished?.length || 0}</div><div class="sub">首页展示最近 ${latestFinished.length} 场</div></div>
+      <div class="metric"><div class="label">过关组合</div><div class="value">${comboCount}</div><div class="sub">只纳入有SP候选</div></div>
+    </section>
+
+    <section class="grid cols-2">
+      <div class="section">
+        <div class="section-heading-row">
+          <div>
+            <h2>最新完赛复盘</h2>
+            <p class="muted">先看结果和偏差，避免继续用已经暴露问题的判断方式。</p>
+          </div>
+          <button class="secondary" data-tab="schedule">看全部</button>
+        </div>
+        <div class="overview-feed">
+          ${latestFinished.length ? latestFinished.map(renderOverviewFinishedCard).join("") : `<div class="empty-state">暂无完赛结果。刷新赛程后会自动出现在这里。</div>`}
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-heading-row">
+          <div>
+            <h2>待开比赛</h2>
+            <p class="muted">最近要开的比赛直接在这里加入预测，不用翻日期。</p>
+          </div>
+          <button class="secondary" data-tab="calendar">打开挂历</button>
+        </div>
+        <div class="overview-feed">
+          ${upcomingRows.length ? upcomingRows.map(renderOverviewUpcomingCard).join("") : `<div class="empty-state">暂无待开比赛。点击“刷新赛程”重新获取。</div>`}
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>当前已加入预测</h2>
+      <div class="overview-grid">
+        ${matches.length ? matches.map(renderOverviewCard).join("") : `<div class="empty-state">暂无已加入预测的比赛。先在“待开比赛”里加入单场或未来4场。</div>`}
+      </div>
+    </section>
+
+    <section class="section">
+      <h3>回测给下一轮的提醒</h3>
+      ${tuningSuggestionList(summary.tuning_suggestions || [])}
+    </section>
+
+    <section class="section">
+      <h3>混合过关候选</h3>
+      <p class="muted">只从有体彩SP且价值为正的跨场主玩法生成；缺少SP的比赛不会硬串。</p>
+      ${globalComboTable(state.data?.sporttery_combos ?? [])}
+    </section>
+  `;
+}
+
+function renderOverviewFinishedCard(row) {
+  const fixture = row.fixture;
+  const test = latestBacktest(row.backtests);
+  const result = actualResult(fixture);
+  const hit = test ? Boolean(test.top1_hit) : null;
+  const label = hit === null ? "未回测" : hit ? "方向命中" : "方向偏差";
+  const tone = hit === null ? "pending" : hit ? "hit" : "miss";
+  return `
+    <article class="overview-list-card finished ${tone}">
+      <div class="overview-list-main">
+        <div>
+          <div class="overview-list-time">${esc(fullKickoff(fixture.kickoff))}</div>
+          <strong>${esc(fixture.home_team)} vs ${esc(fixture.away_team)}</strong>
+        </div>
+        <div class="overview-score">${fixture.home_score ?? "-"} - ${fixture.away_score ?? "-"}</div>
+      </div>
+      <div class="overview-list-meta">
+        ${badge(label, hit === null ? "amber" : hit ? "green" : "red")}
+        ${badge(`赛果 ${resultName(result)}`, "blue")}
+        ${fixture.stage ? badge(fixture.stage, "amber") : ""}
+      </div>
+      <p>${esc(test ? deviationText(test) : "没有赛前预测归档，不能做正式偏差分析。")}</p>
+      ${row.prediction ? `<div class="card-actions"><button class="secondary" data-open-match="${esc(row.prediction.match_id)}">查看赛前预测</button></div>` : ""}
+    </article>
+  `;
+}
+
+function renderOverviewUpcomingCard(row) {
+  const fixture = row.fixture;
+  const prediction = row.prediction?.prediction;
+  const matchId = row.prediction?.match_id;
+  const key = matchKey(fixture.home_team, fixture.away_team, fixture.kickoff);
+  const market = prediction?.scenarios?.find((s) => s.scenario === "market");
+  const picks = prediction ? topPicks(prediction.sporttery, 2, prediction) : [];
+  return `
+    <article class="overview-list-card upcoming ${prediction ? "has-prediction" : ""}">
+      <div class="overview-list-main">
+        <div>
+          <div class="overview-list-time">${esc(fullKickoff(fixture.kickoff))}</div>
+          <strong>${esc(fixture.home_team)} vs ${esc(fixture.away_team)}</strong>
+        </div>
+        <div class="overview-source">${esc(fixture.stage || "赛程")}</div>
+      </div>
+      ${prediction ? `
+        <div class="mini-probs">
+          <div><span>主胜</span><strong>${pct(market?.probabilities?.home)}</strong></div>
+          <div><span>平局</span><strong>${pct(market?.probabilities?.draw)}</strong></div>
+          <div><span>客胜</span><strong>${pct(market?.probabilities?.away)}</strong></div>
+        </div>
+        <div class="basis-brief">${esc(shortBasisText(row.prediction, prediction))}</div>
+        <div class="overview-list-meta">
+          ${picks.length ? picks.map((pick) => badge(readablePick(pick), pick.decision === "可小注" ? "green" : "amber")).join("") : badge("暂无正向候选", "amber")}
+        </div>
+        <div class="card-actions">
+          <button data-open-match="${esc(matchId)}">看预测详情</button>
+          <button class="secondary" data-open-betting="${esc(matchId)}">下注测算</button>
+          <button class="secondary" data-refresh="${esc(matchId)}">刷新</button>
+        </div>
+      ` : `
+        ${renderOddsQuickView(fixture, null)}
+        <div class="empty-mini">还没加入预测。加入后会自动生成概率、比分池和下注测算。</div>
+        <div class="card-actions">
+          <button data-select-fixture="${esc(key)}" data-select-mode="single">加入此场预测</button>
+          <button class="secondary" data-select-fixture="${esc(key)}" data-select-mode="next4">从这场起预测4场</button>
+        </div>
+      `}
+    </article>
   `;
 }
 

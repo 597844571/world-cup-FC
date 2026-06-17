@@ -272,6 +272,22 @@ main {
   font-size: 15px;
 }
 
+.section-heading-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.section-heading-row h2 {
+  margin: 0 0 5px;
+}
+
+.section-heading-row p {
+  margin: 0;
+}
+
 .grid {
   display: grid;
   gap: 14px;
@@ -294,6 +310,98 @@ main {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
+}
+
+.overview-feed {
+  display: grid;
+  gap: 10px;
+}
+
+.overview-list-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #ffffff;
+  padding: 13px;
+  box-shadow: none;
+}
+
+.overview-list-card.finished {
+  border-left: 4px solid var(--line-strong);
+}
+
+.overview-list-card.finished.hit {
+  border-left-color: var(--green);
+}
+
+.overview-list-card.finished.miss {
+  border-left-color: var(--red);
+}
+
+.overview-list-card.finished.pending {
+  border-left-color: var(--amber);
+}
+
+.overview-list-card.upcoming {
+  border-left: 4px solid var(--cyan);
+}
+
+.overview-list-card.has-prediction {
+  background: #fbfcff;
+}
+
+.overview-list-main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.overview-list-main strong {
+  display: block;
+  margin-top: 3px;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 950;
+  overflow-wrap: anywhere;
+}
+
+.overview-list-time,
+.overview-source {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.overview-source {
+  flex: 0 0 auto;
+  max-width: 120px;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.overview-score {
+  flex: 0 0 auto;
+  min-width: 70px;
+  border-radius: var(--radius);
+  background: var(--nav);
+  color: #ffffff;
+  padding: 8px 10px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 950;
+}
+
+.overview-list-meta {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.overview-list-card p {
+  margin: 9px 0 0;
+  color: #334155;
+  overflow-wrap: anywhere;
 }
 
 .calendar-board {
