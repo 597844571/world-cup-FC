@@ -823,7 +823,27 @@ function renderSharePanel(item, prediction, marketScenario) {
 function renderOverview() {
   const content = document.getElementById("content");
   const matches = state.data?.matches ?? [];
+  const fixtures = state.data?.fixtures || { scheduled: [], finished: [] };
+  const summary = state.data?.backtest_summary || {};
+  const comboCount = state.data?.sporttery_combos?.length || 0;
   content.innerHTML = `
+    <section class="schedule-head">
+      <div>
+        <h2>今天先做哪一步</h2>
+        <p>按实战流程使用：刷新赛程和赔率，加入要看的比赛，进入预测详情和下注测算；完赛后再看回测复盘。</p>
+      </div>
+      <div class="actions">
+        <button data-post="/api/schedule/query" data-message="赛程查询完成">刷新赛程</button>
+        <button class="secondary" data-tab="calendar">打开赛程挂历</button>
+        <button class="secondary" data-tab="schedule">看回测复盘</button>
+      </div>
+    </section>
+    <section class="grid cols-4">
+      <div class="metric"><div class="label">当前预测</div><div class="value">${matches.length}</div><div class="sub">可查看详情和测算</div></div>
+      <div class="metric"><div class="label">未开赛程</div><div class="value">${fixtures.scheduled?.length || 0}</div><div class="sub">从挂历加入预测</div></div>
+      <div class="metric"><div class="label">已完赛果</div><div class="value">${fixtures.finished?.length || 0}</div><div class="sub">用于赛后复盘</div></div>
+      <div class="metric"><div class="label">过关组合</div><div class="value">${comboCount}</div><div class="sub">只纳入有SP候选</div></div>
+    </section>
     <section class="section">
       <h2>今日比赛推荐总览</h2>
       <div class="overview-grid">
