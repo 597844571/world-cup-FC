@@ -105,16 +105,60 @@ def evaluate_fixture(fixture: dict[str, Any], snapshots: list[dict[str, Any]], o
                 "brier_score": brier_score(snapshot, result),
                 "log_loss": log_loss(snapshot, result),
                 "score_hit": score_hit(snapshot, fixture),
-                "notes": f"actual_score={fixture.get('home_score')}-{fixture.get('away_score')}",
+                "notes": post_match_notes(fixture, snapshot, predicted, result),
             }
         )
     return rows
+
+
+def post_match_notes(fixture: dict[str, Any], snapshot: dict[str, Any], predicted: str, result: str) -> str:
+    home_score = int(fixture.get("home_score") or 0)
+    away_score = int(fixture.get("away_score") or 0)
+    total_goals = home_score + away_score
+    margin = abs(home_score - away_score)
+    tags = [f"actual_score={home_score}-{away_score}", f"total_goals={total_goals}", f"margin={margin}"]
+    if predicted != result:
+        if result == "draw":
+            tags.append("偏差=平局保护不足/强队穿盘过热")
+        elif predicted == "draw":
+            tags.append("偏差=平局权重偏高")
+        else:
+            tags.append("偏差=胜负方向错误，优先复查临场阵容、盘口收盘和早段事件")
+    else:
+        tags.append("方向命中")
+    top_score = snapshot.get("top_score")
+    if top_score:
+        tags.append(f"top_score={top_score}")
+        if top_score != f"{home_score}-{away_score}":
+            tags.append("比分偏差=进球分布/方差需校准")
+    if total_goals >= 4:
+        tags.append("赛后特征=大比分/开放节奏")
+    elif total_goals <= 1:
+        tags.append("赛后特征=低比分/强队降速或防守成功")
+    source = fixture.get("source")
+    if source:
+        tags.append(f"result_source={source}")
+    return "；".join(tags)
+
+
+def latest_snapshot_rows(results: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Use the newest archived prediction per match/scenario for headline metrics."""
+    latest: dict[tuple[str, str], dict[str, Any]] = {}
+    for row in results:
+        key = (str(row.get("match_id")), str(row.get("scenario")))
+        current = latest.get(key)
+        current_snapshot = int(current.get("snapshot_id") or 0) if current else -1
+        row_snapshot = int(row.get("snapshot_id") or 0)
+        if current is None or row_snapshot >= current_snapshot:
+            latest[key] = row
+    return list(latest.values())
 
 
 def summarize_backtests(results: list[dict[str, Any]]) -> dict[str, Any]:
     if not results:
         return {
             "count": 0,
+            "raw_count": 0,
             "top1_accuracy": None,
             "top2_accuracy": None,
             "score_accuracy": None,
@@ -125,18 +169,20 @@ def summarize_backtests(results: list[dict[str, Any]]) -> dict[str, Any]:
             "calibration_buckets": [],
             "tuning_suggestions": ["当前没有已完结且已归档的预测样本，暂不建议调参。"],
         }
+    sample_results = latest_snapshot_rows(results)
     by_scenario: dict[str, list[dict[str, Any]]] = {}
-    for row in results:
+    for row in sample_results:
         by_scenario.setdefault(row["scenario"], []).append(row)
     return {
-        "count": len(results),
-        "top1_accuracy": avg(results, "top1_hit"),
-        "top2_accuracy": avg(results, "top2_hit"),
-        "score_accuracy": avg(results, "score_hit"),
-        "avg_brier": avg(results, "brier_score"),
-        "avg_log_loss": avg(results, "log_loss"),
-        "avg_roi": avg([row for row in results if row.get("roi") is not None], "roi") if any(row.get("roi") is not None for row in results) else None,
-        "calibration_buckets": calibration_buckets(results),
+        "count": len(sample_results),
+        "raw_count": len(results),
+        "top1_accuracy": avg(sample_results, "top1_hit"),
+        "top2_accuracy": avg(sample_results, "top2_hit"),
+        "score_accuracy": avg(sample_results, "score_hit"),
+        "avg_brier": avg(sample_results, "brier_score"),
+        "avg_log_loss": avg(sample_results, "log_loss"),
+        "avg_roi": avg([row for row in sample_results if row.get("roi") is not None], "roi") if any(row.get("roi") is not None for row in sample_results) else None,
+        "calibration_buckets": calibration_buckets(sample_results),
         "by_scenario": [
             {
                 "scenario": scenario,
@@ -214,6 +260,23 @@ def tuning_suggestions(by_scenario: dict[str, list[dict[str, Any]]]) -> list[str
         suggestions.append("保守节奏模型表现较好，淘汰赛或低节奏场景应提高平局和低比分修正。")
     if baseline and avg(baseline, "log_loss") > 1.2:
         suggestions.append("基准模型 Log Loss 偏高，说明错误高置信预测较多，应降低置信度上限。")
+    all_rows = [row for rows in by_scenario.values() for row in rows]
+    if all_rows:
+        top1_rate = avg(all_rows, "top1_hit")
+        top2_rate = avg(all_rows, "top2_hit")
+        if top1_rate < 0.35 and top2_rate >= 0.70:
+            suggestions.append("Top1 方向偏激进、Top2 覆盖较好：应把热门单选转为双选、让平和低比分防护候选。")
+        draw_actual = [row for row in all_rows if row.get("actual_result") == "draw"]
+        draw_miss = [row for row in draw_actual if row.get("predicted_result") != "draw"]
+        if len(draw_actual) >= 2 and len(draw_miss) / len(draw_actual) >= 0.6:
+            suggestions.append("近期平局漏判偏多：强弱差不大、让1球和低比分场景应提高平局/让平保护。")
+        high_conf_wrong = [
+            row
+            for row in all_rows
+            if not row.get("top1_hit") and float(row.get("prediction_prob") or 0) >= 0.62
+        ]
+        if high_conf_wrong:
+            suggestions.append("出现高置信错误：强队方向概率需要加上轮换、领先降速和低位防守折扣。")
     if not suggestions:
         suggestions.append("当前回测样本不足或各模型差异不明显，暂不建议大幅调参。")
     return suggestions

@@ -1528,7 +1528,7 @@ def feature_deltas(match: dict[str, Any], market_signal: dict[str, Any], upset: 
     stall = favorite_stall_profile(match, stall_probs, stall_xg, match.get("sporttery_handicap"))
     stall_score = float(stall.get("score", 0) or 0)
     if stall_score >= 0.45:
-        cooldown = min(0.055, 0.030 + stall_score * 0.035)
+        cooldown = min(0.070, 0.034 + stall_score * 0.042)
         if favorite == "home":
             home_core -= cooldown
             away_core += cooldown * 0.25
@@ -1547,7 +1547,10 @@ def feature_deltas(match: dict[str, Any], market_signal: dict[str, Any], upset: 
         - abs(formal) * 0.012
     )
     if stall_score >= 0.45:
-        draw_delta += min(0.070, 0.030 + stall_score * 0.050)
+        draw_delta += min(0.090, 0.036 + stall_score * 0.060)
+        handicap = match.get("sporttery_handicap")
+        if handicap is not None and abs(int(handicap)) in {1, 2}:
+            draw_delta += 0.012
     return {"home": round(home_core, 4), "draw": round(draw_delta, 4), "away": round(away_core, 4)}
 
 

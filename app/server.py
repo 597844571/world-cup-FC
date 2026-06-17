@@ -176,11 +176,16 @@ class DashboardServer(BaseHTTPRequestHandler):
         inserted = 0
         evaluated = []
         for fixture in finished:
-            snapshots = self.store.prediction_snapshots(fixture["match_id"])
-            rows = evaluate_fixture(fixture, snapshots, self.store.odds_history(fixture["match_id"]))
+            match_ids = self.store.match_ids_for_fixture(fixture)
+            snapshots = []
+            odds_history = []
+            for match_id in match_ids:
+                snapshots.extend(self.store.prediction_snapshots(match_id))
+                odds_history.extend(self.store.odds_history(match_id))
+            rows = evaluate_fixture(fixture, snapshots, odds_history)
             inserted += self.store.insert_backtest_results(rows)
             if rows:
-                evaluated.append({"match_id": fixture["match_id"], "results": len(rows)})
+                evaluated.append({"match_id": fixture["match_id"], "matched_ids": match_ids, "results": len(rows)})
         self.send_json({"ok": True, "inserted": inserted, "evaluated": evaluated, "state": self.build_state()})
 
     def build_state(self) -> dict:

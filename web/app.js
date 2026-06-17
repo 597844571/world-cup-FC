@@ -1252,6 +1252,7 @@ function backtestSummaryTable(summary) {
     <table>
       <tbody>
         <tr><th>样本数</th><td>${summary.count}</td></tr>
+        ${summary.raw_count && summary.raw_count !== summary.count ? `<tr><th>原始快照</th><td>${summary.raw_count}</td></tr>` : ""}
         <tr><th>Top1 命中率</th><td>${pct(summary.top1_accuracy)}</td></tr>
         <tr><th>Top2 命中率</th><td>${pct(summary.top2_accuracy)}</td></tr>
         <tr><th>比分 Top1 命中率</th><td>${pct(summary.score_accuracy)}</td></tr>

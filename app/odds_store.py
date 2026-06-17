@@ -311,6 +311,18 @@ class OddsStore:
         if not results:
             return 0
         with self.connect() as conn:
+            existing_ids = {
+                row["snapshot_id"]
+                for row in conn.execute(
+                    "SELECT snapshot_id FROM backtest_results WHERE snapshot_id IN (%s)"
+                    % ",".join("?" for _ in results),
+                    [item["snapshot_id"] for item in results],
+                ).fetchall()
+            }
+        results = [item for item in results if item["snapshot_id"] not in existing_ids]
+        if not results:
+            return 0
+        with self.connect() as conn:
             conn.executemany(
                 """
                 INSERT INTO backtest_results
@@ -342,6 +354,29 @@ class OddsStore:
                 ],
             )
         return len(results)
+
+    def match_ids_for_fixture(self, fixture: dict[str, Any]) -> list[str]:
+        def normalize(value: Any) -> str:
+            return "".join(str(value or "").split()).lower()
+
+        def date_key(value: Any) -> str:
+            return str(value or "")[:10]
+
+        fixture_key = (
+            normalize(fixture.get("home_team")),
+            normalize(fixture.get("away_team")),
+            date_key(fixture.get("kickoff")),
+        )
+        ids: list[str] = []
+        if fixture.get("match_id"):
+            ids.append(str(fixture["match_id"]))
+        with self.connect() as conn:
+            rows = conn.execute("SELECT match_id, home_team, away_team, kickoff FROM matches").fetchall()
+        for row in rows:
+            row_key = (normalize(row["home_team"]), normalize(row["away_team"]), date_key(row["kickoff"]))
+            if row_key == fixture_key and row["match_id"] not in ids:
+                ids.append(row["match_id"])
+        return ids
 
     def backtest_results(self) -> list[dict[str, Any]]:
         with self.connect() as conn:
