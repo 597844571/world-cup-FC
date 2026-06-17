@@ -678,6 +678,8 @@ function topPickSort(a, b, prediction) {
   const aConflict = handicapPickConflict(a, prediction);
   const bConflict = handicapPickConflict(b, prediction);
   if (aConflict.conflict !== bConflict.conflict) return aConflict.conflict ? 1 : -1;
+  const actionDiff = Number(b.action_score ?? -100) - Number(a.action_score ?? -100);
+  if (Math.abs(actionDiff) > 0.001) return actionDiff;
   const decisionDiff = (b.decision === "可小注") - (a.decision === "可小注");
   if (decisionDiff) return decisionDiff;
   return (b.risk_adjusted_score || 0) - (a.risk_adjusted_score || 0);
@@ -772,8 +774,12 @@ function renderPickCard(row, matchLabel = "", prediction = null) {
   }
   const conflict = handicapPickConflict(row, prediction).conflict;
   const tone = conflict ? "watch" : decisionTone(row);
-  const action = row.sp == null ? "等SP" : row.decision;
+  const action = row.sp == null ? "等SP" : (row.action_tier || row.decision);
   const note = pickContextNote(row, prediction);
+  const reason = [
+    row.action_reason,
+    (row.rule_notes || []).join("；") || row.reason || row.score_note,
+  ].filter(Boolean).join("；") || "按官方玩法和模型价值筛选";
   return `
     <div class="pick-card ${tone}">
       <div class="pick-title">
@@ -784,8 +790,9 @@ function renderPickCard(row, matchLabel = "", prediction = null) {
         <span>模型 ${pct(row.model_prob)}</span>
         <span>EV ${row.ev == null ? "-" : pct(row.ev)}</span>
         <span>风险 ${row.risk_score ?? "-"}</span>
+        ${row.action_score != null ? `<span>行动分 ${Number(row.action_score).toFixed(1)}</span>` : ""}
       </div>
-      <div class="pick-reason">${esc((row.rule_notes || []).join("；") || row.reason || row.score_note || "按官方玩法和模型价值筛选")}</div>
+      <div class="pick-reason">${esc(reason)}</div>
       ${note ? `<div class="pick-warning">${esc(note)}</div>` : ""}
     </div>
   `;
@@ -803,6 +810,80 @@ function overviewUpcomingRows(limit = 6) {
     .filter((row) => isPrimaryScheduleRow(row) && fixtureStatus(row.fixture) !== "finished")
     .sort((a, b) => String(a.fixture.kickoff || "").localeCompare(String(b.fixture.kickoff || "")))
     .slice(0, limit);
+}
+
+function overviewActionRows(matches, limit = 8) {
+  return matches
+    .flatMap((match) => {
+      const prediction = match.prediction;
+      const picks = topPicks(prediction?.sporttery, 2, prediction)
+        .filter((row) => row.sp != null && !["放弃", "不可下单"].includes(row.action_tier || row.decision));
+      return picks.map((row) => ({
+        match,
+        prediction,
+        row,
+        weight: row.action_tier === "主推" ? 5 : row.action_tier === "可搭配" ? 3 : 1,
+      }));
+    })
+    .sort((a, b) => Number(b.row.action_score ?? -100) - Number(a.row.action_score ?? -100))
+    .slice(0, limit);
+}
+
+function renderOverviewOrderSheet(matches) {
+  const amount = Math.max(2, Math.floor(Number(state.stakeAmount || 100) / 2) * 2);
+  const rows = overviewActionRows(matches, 8);
+  if (!rows.length) {
+    return `
+      <section class="section">
+        <div class="section-heading-row">
+          <div>
+            <h2>今日下单清单</h2>
+            <p class="muted">暂无可执行候选。通常是因为还没加入预测、缺少体彩SP，或模型判断没有正向价值。</p>
+          </div>
+        </div>
+      </section>
+    `;
+  }
+  const stakes = splitStake(amount, rows.map((item) => item.weight));
+  const totalUsed = stakes.reduce((sum, value) => sum + value, 0);
+  const maxReturn = rows.reduce((sum, item, index) => sum + (stakes[index] || 0) * Number(item.row.sp || 0), 0);
+  return `
+    <section class="section">
+      <div class="section-heading-row">
+        <div>
+          <h2>今日下单清单</h2>
+          <p class="muted">只列当前有体彩SP、行动分靠前的候选。金额按行动层级拆分，比分和防冷项默认小仓。</p>
+        </div>
+        <label class="amount-control">金额
+          <input type="number" min="2" step="2" value="${amount}" data-stake-amount />
+        </label>
+      </div>
+      <div class="order-summary">
+        <span>计划投入 <strong>${totalUsed}</strong> 元</span>
+        <span>全部命中理论返奖 <strong>${maxReturn.toFixed(2)}</strong> 元</span>
+        <span>未命中不保本，临场截止前需核对SP和停售时间</span>
+      </div>
+      <table class="compact-table order-table">
+        <thead><tr><th>比赛</th><th>推荐</th><th>层级</th><th>金额</th><th>理论返奖</th><th>说明</th></tr></thead>
+        <tbody>
+          ${rows.map((item, index) => {
+            const stake = stakes[index] || 0;
+            const row = item.row;
+            return `
+              <tr>
+                <td>${esc(item.match.home_team)} vs ${esc(item.match.away_team)}</td>
+                <td><strong>${esc(readablePick(row))}</strong><br><span class="muted">SP ${Number(row.sp).toFixed(2)} · ${esc(row.play_type)}</span></td>
+                <td>${badge(row.action_tier || row.decision, row.action_tier === "主推" ? "green" : row.action_tier === "防冷小注" ? "amber" : "blue")}</td>
+                <td><strong>${stake}</strong> 元</td>
+                <td>${(stake * Number(row.sp || 0)).toFixed(2)} 元</td>
+                <td>${esc(row.action_reason || row.reason || "按价值和风险筛选")}</td>
+              </tr>
+            `;
+          }).join("")}
+        </tbody>
+      </table>
+    </section>
+  `;
 }
 
 function renderOverviewV2() {
@@ -860,6 +941,8 @@ function renderOverviewV2() {
         </div>
       </div>
     </section>
+
+    ${renderOverviewOrderSheet(matches)}
 
     <section class="section">
       <h2>当前已加入预测</h2>
@@ -1919,7 +2002,7 @@ function sportteryCandidateTable(sporttery, prediction = null) {
   return `
     <p class="muted">${esc(sporttery.settlement)}；让球数 H=${sporttery.handicap ?? 0}</p>
     <table>
-      <thead><tr><th>玩法</th><th>选项</th><th>SP</th><th>模型</th><th>公允</th><th>EV</th><th>风险</th><th>动作</th></tr></thead>
+      <thead><tr><th>玩法</th><th>选项</th><th>SP</th><th>模型</th><th>公允</th><th>EV</th><th>风险</th><th>下单动作</th></tr></thead>
       <tbody>
         ${rows.slice(0, 10).map((row) => `
           <tr>
@@ -1930,7 +2013,7 @@ function sportteryCandidateTable(sporttery, prediction = null) {
             <td>${row.fair_sp == null ? "-" : row.fair_sp.toFixed(2)}</td>
             <td>${row.ev == null ? "-" : pct(row.ev)}</td>
             <td>${row.risk_score}<br>${badge(row.risk_level)}</td>
-            <td>${esc(row.decision)}<br><span class="muted">${esc([row.reason, pickContextNote(row, prediction)].filter(Boolean).join("；"))}</span></td>
+            <td>${esc(row.action_tier || row.decision)}${row.action_score != null ? `<br><span class="muted">行动分 ${Number(row.action_score).toFixed(1)}</span>` : ""}<br><span class="muted">${esc([row.action_reason, row.reason, pickContextNote(row, prediction)].filter(Boolean).join("；"))}</span></td>
           </tr>
         `).join("")}
       </tbody>

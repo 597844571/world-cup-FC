@@ -404,6 +404,52 @@ main {
   overflow-wrap: anywhere;
 }
 
+.amount-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.amount-control input {
+  width: 112px;
+  border: 1px solid var(--line-strong);
+  border-radius: 7px;
+  padding: 9px 10px;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 900;
+}
+
+.order-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 12px;
+}
+
+.order-summary span {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #f8fafc;
+  padding: 7px 11px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.order-summary strong {
+  color: var(--ink);
+}
+
+.order-table td:first-child {
+  min-width: 150px;
+  font-weight: 900;
+  color: var(--ink);
+}
+
 .calendar-board {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

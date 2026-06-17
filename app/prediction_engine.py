@@ -1140,6 +1140,83 @@ def apply_recommendation_rules(options: list[dict[str, Any]], context: dict[str,
     return options
 
 
+def actionability_score(item: dict[str, Any]) -> tuple[float, str, str]:
+    decision = str(item.get("decision") or "")
+    play_type = str(item.get("play_type") or "")
+    ev = float(item.get("ev") if item.get("ev") is not None else -0.25)
+    probability = float(item.get("model_prob") or 0)
+    risk = int(item.get("risk_score") or 100)
+    role = str(item.get("recommendation_role") or "")
+
+    score = {
+        "可小注": 68,
+        "观察": 44,
+        "高风险观察": 26,
+        "放弃": -25,
+        "不可用": -90,
+    }.get(decision, 0)
+    score += clamp(ev, -0.25, 0.45) * 120
+    score += min(probability, 0.65) * 28
+    score -= risk * 0.34
+    score += int(item.get("mapping_priority") or 0) * 6
+    score += float(item.get("risk_adjusted_score") or 0) * 10
+
+    score += {
+        "胜平负": 12,
+        "让球胜平负": 9,
+        "总进球": 6,
+        "比分": -12,
+        "半全场": -18,
+    }.get(play_type, 0)
+
+    if item.get("score_bet_allowed"):
+        score += 5
+    if role == "main_scoreline_aligned":
+        score += 8
+    elif role == "anti_scoreline_value":
+        score -= 18
+    elif role in {"draw_low_score_protection", "low_total_protection"}:
+        score -= 2
+    elif role == "favorite_tail_hedge":
+        score -= 10
+
+    if ev <= 0:
+        score -= 30
+    if risk >= 82:
+        score -= 24
+    elif risk >= 72:
+        score -= 12
+    if play_type in {"比分", "半全场"} and probability < 0.055:
+        score -= 16
+
+    if decision == "不可用" or item.get("sp") is None:
+        return round(score, 2), "不可下单", "体彩未开售或缺少SP"
+    if decision == "放弃" or ev <= 0:
+        return round(score, 2), "放弃", "价格不划算或风险收益不匹配"
+    if score >= 50 and risk <= 70 and play_type not in {"比分", "半全场"}:
+        return round(score, 2), "主推", "价值、风险和玩法稳定性较均衡"
+    if score >= 32 and risk <= 78:
+        return round(score, 2), "可搭配", "可作为方案搭配，金额不宜过高"
+    if role in {"draw_low_score_protection", "low_total_protection", "favorite_tail_hedge", "anti_scoreline_value"} or play_type in {"比分", "半全场"}:
+        return round(score, 2), "防冷小注", "只适合小金额覆盖，不作为主仓"
+    return round(score, 2), "观察", "需要临场SP、阵容或风险再确认"
+
+
+def apply_actionability_scores(options: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    for item in options:
+        score, tier, reason = actionability_score(item)
+        item["action_score"] = score
+        item["action_tier"] = tier
+        item["action_reason"] = reason
+        if tier in {"放弃", "不可下单"}:
+            item["stake_pct"] = 0.0
+        elif tier == "防冷小注":
+            item["stake_pct"] = round(min(float(item.get("stake_pct") or 0.0), 0.002), 4)
+        elif tier == "可搭配":
+            item["stake_pct"] = round(min(float(item.get("stake_pct") or 0.0), 0.006), 4)
+    return options
+
+
 def derive_market_signal(history: list[dict[str, Any]]) -> dict[str, Any]:
     if not history:
         return {"direction": "无赔率数据", "strength": 0, "latest_probs": None, "movement": {}, "bookmakers": 0, "snapshots": 0, "weight": 0.0}
@@ -2251,10 +2328,13 @@ def build_sporttery_outputs(
     rec_context = recommendation_context(match, model_probs, xg, matrix, handicap)
     folk_parallel = folk_parallel_summary(match, model_probs)
     options = apply_recommendation_rules(options, rec_context, handicap)
+    options = apply_actionability_scores(options)
     play_priority = {"胜平负": 5, "让球胜平负": 4, "总进球": 3, "半全场": 2, "比分": 1}
     ranked = sorted(
         options,
         key=lambda item: (
+            {"主推": 5, "可搭配": 4, "防冷小注": 3, "观察": 2, "放弃": 1, "不可下单": 0}.get(item.get("action_tier"), 0),
+            item.get("action_score", -100),
             item["decision"] == "可小注",
             item.get("mapping_priority", 0),
             item.get("score_bet_allowed", False),
@@ -2282,7 +2362,16 @@ def build_sporttery_outputs(
             }
             for row in ranked_scorelines(matrix, limit=6, context=rec_context)
         ],
-        "candidate_pool": [item for item in available if item["decision"] in {"可小注", "观察", "高风险观察"}][:20],
+        "candidate_pool": [
+            item
+            for item in available
+            if item.get("action_tier") in {"主推", "可搭配", "防冷小注", "观察"}
+        ][:20],
+        "action_summary": {
+            "core": [item for item in ranked if item.get("action_tier") == "主推"][:4],
+            "support": [item for item in ranked if item.get("action_tier") == "可搭配"][:6],
+            "hedge": [item for item in ranked if item.get("action_tier") == "防冷小注"][:6],
+        },
         "abandon_list": abandoned,
         "compound_packages": build_compound_packages(ranked),
         "score_combo_pools": build_score_combo_pools(ranked, rec_context),
