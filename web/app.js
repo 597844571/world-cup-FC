@@ -1002,11 +1002,11 @@ function renderOverviewV2() {
   const upcomingRows = overviewUpcomingRows(6);
   const joinedWithLowData = matches.filter((match) => Number(match.prediction?.source_audit?.score || 0) < 58).length;
   content.innerHTML = `
-    <section class="command-center">
+    <section class="command-center sci-command-center">
       <div class="command-copy">
-        <span class="eyebrow">竞彩预测工作台</span>
-        <h2>先确认数据，再决定玩法</h2>
-        <p>首页按真实使用顺序排：刷新赛程、加入比赛、看数据可靠度、进入预测详情和下注测算，完赛后再复盘偏差。</p>
+        <span class="eyebrow">LIVE DESK · 预测前置台</span>
+        <h2>先锁定赛程，再判断能不能下</h2>
+        <p>桌面端按实战顺序排布：待开比赛、完赛复盘、数据可靠度、体彩可买玩法和金额测算。数据不够时，页面会直接降级提醒。</p>
       </div>
       <div class="command-actions">
         <button data-post="/api/schedule/query" data-message="赛程查询完成">刷新赛程和赛果</button>
@@ -1015,22 +1015,22 @@ function renderOverviewV2() {
       </div>
     </section>
 
-    <section class="workflow-rail">
-      <div><b>1</b><strong>刷新赛程</strong><span>拿体彩和公开赛果</span></div>
-      <div><b>2</b><strong>加入预测</strong><span>单场或未来4场</span></div>
-      <div><b>3</b><strong>看数据可靠度</strong><span>缺数据自动降级</span></div>
-      <div><b>4</b><strong>玩法测算</strong><span>按体彩可买项输出</span></div>
+    <section class="workflow-rail sci-workflow">
+      <div><b>01</b><strong>刷新赛程</strong><span>拿体彩和公开赛果</span></div>
+      <div><b>02</b><strong>加入预测</strong><span>单场或未来4场</span></div>
+      <div><b>03</b><strong>校验数据</strong><span>缺数据自动降级</span></div>
+      <div><b>04</b><strong>玩法测算</strong><span>按体彩可买项输出</span></div>
     </section>
 
-    <section class="grid cols-4">
+    <section class="grid cols-4 sci-metrics">
       <div class="metric"><div class="label">当前预测</div><div class="value">${matches.length}</div><div class="sub">可查看详情和测算</div></div>
       <div class="metric"><div class="label">待开比赛</div><div class="value">${fixtures.scheduled?.length || 0}</div><div class="sub">首页展示最近 ${upcomingRows.length} 场</div></div>
       <div class="metric"><div class="label">最新完赛</div><div class="value">${fixtures.finished?.length || 0}</div><div class="sub">首页展示最近 ${latestFinished.length} 场</div></div>
       <div class="metric"><div class="label">数据偏少</div><div class="value">${joinedWithLowData}</div><div class="sub">低可靠度场次需谨慎</div></div>
     </section>
 
-    <section class="grid cols-2">
-      <div class="section">
+    <section class="grid cols-2 sci-primary-grid">
+      <div class="section sci-panel">
         <div class="section-heading-row">
           <div>
             <h2>最新完赛复盘</h2>
@@ -1043,7 +1043,7 @@ function renderOverviewV2() {
         </div>
       </div>
 
-      <div class="section">
+      <div class="section sci-panel priority-glow">
         <div class="section-heading-row">
           <div>
             <h2>待开比赛</h2>
@@ -1059,7 +1059,7 @@ function renderOverviewV2() {
 
     ${renderOverviewOrderSheet(matches)}
 
-    <section class="section">
+    <section class="section sci-panel">
       <h2>当前已加入预测</h2>
       <div class="overview-grid">
         ${matches.length ? matches.map(renderOverviewCard).join("") : `<div class="empty-state">暂无已加入预测的比赛。先在“待开比赛”里加入单场或未来4场。</div>`}
@@ -1067,18 +1067,18 @@ function renderOverviewV2() {
     </section>
 
     <section class="grid cols-2">
-      <div class="section">
+      <div class="section sci-panel">
         <h3>数据源健康</h3>
         ${sourceHealthTable(state.data?.sources ?? [], state.data?.source_health ?? {}, true)}
       </div>
-      <div class="section">
+      <div class="section sci-panel">
         <h3>混合过关候选</h3>
         <p class="muted">只从有体彩SP且价值为正的跨场主玩法生成；缺少SP的比赛不会硬串。</p>
         ${globalComboTable(state.data?.sporttery_combos ?? [])}
       </div>
     </section>
 
-    <section class="section">
+    <section class="section sci-panel">
       <h3>回测给下一轮的提醒</h3>
       ${tuningSuggestionList(summary.tuning_suggestions || [])}
     </section>
@@ -1743,8 +1743,8 @@ function renderMatch(item) {
   const market = prediction.scenarios.find((s) => s.scenario === "market");
   const picks = topPicks(prediction.sporttery, 4, prediction);
   content.innerHTML = `
-    <section class="decision-board">
-      <div class="match-hero">
+    <section class="decision-board sci-decision-board">
+      <div class="match-hero sci-match-hero">
         <div class="hero-head">
           <div>
             <div class="team-line">${esc(item.home_team)} vs ${esc(item.away_team)}</div>
@@ -1753,7 +1753,7 @@ function renderMatch(item) {
           </div>
           <div class="headline">${esc(conclusionText(item, prediction))}</div>
         </div>
-        <div class="prob-strip">
+        <div class="prob-strip sci-prob-strip">
           <div class="prob-pill home"><span>主胜</span><strong>${pct(market.probabilities.home)}</strong></div>
           <div class="prob-pill draw"><span>平局</span><strong>${pct(market.probabilities.draw)}</strong></div>
           <div class="prob-pill away"><span>客胜</span><strong>${pct(market.probabilities.away)}</strong></div>
@@ -1772,11 +1772,21 @@ function renderMatch(item) {
           <button data-refresh="${esc(item.match_id)}">刷新当前比赛</button>
         </div>
       </div>
-      ${renderSharePanel(item, prediction, market)}
+      <div class="sci-side-stack">
+        ${renderSharePanel(item, prediction, market)}
+        <div class="section sci-panel mini-command">
+          <h3>下一步</h3>
+          <p class="muted">先核对官方让球和SP，再看玩法推荐。若数据可靠度偏低，只把结果当方向参考。</p>
+          <div class="card-actions">
+            <button data-open-betting="${esc(item.match_id)}">进入下注测算</button>
+            <button class="secondary" data-tab="calendar">回到赛程</button>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section class="grid cols-2">
-      <div class="section priority-section">
+      <div class="section priority-section sci-panel">
         <h3>下注前先看这三件事</h3>
         <div class="decision-checklist">
           <div><span>1</span><strong>体彩让球</strong><p>${esc(handicapText(prediction.sporttery.handicap ?? item.sporttery_handicap))}</p></div>
@@ -1784,13 +1794,13 @@ function renderMatch(item) {
           <div><span>3</span><strong>比分边界</strong><p>${esc(scoreContextText(prediction, picks))}</p></div>
         </div>
       </div>
-      <div class="section">
+      <div class="section sci-panel">
         <h3>数据源可靠度</h3>
         ${renderSourceAuditPanel(prediction, true)}
       </div>
     </section>
 
-    <section class="section">
+    <section class="section sci-panel">
       <h3>预测依据</h3>
       ${renderPredictionBasis(item, prediction)}
     </section>
