@@ -6,6 +6,7 @@ from copy import deepcopy
 from dataclasses import dataclass
 from typing import Any
 
+from .source_registry import load_source_health, load_sources
 from .standings_client import find_group_context
 
 
@@ -521,6 +522,10 @@ def side_signal_raw_items(match: dict[str, Any]) -> list[tuple[str, Any]]:
 
 def side_signal_effect(label: str, note: str) -> tuple[str, str]:
     text = f"{label} {note}"
+    if any(word in text for word in ("不败", "不输", "受让不败", "受让守住")):
+        return "non_loss_protection", "提示一方不败/受让守住"
+    if any(word in text for word in ("不穿盘", "打不穿", "防穿", "赢球不赢盘", "输盘", "守盘", "受让方向", "受让方")):
+        return "no_cover_protection", "提示热门不穿盘"
     if any(word in text for word in ("防平", "平局", "不稳", "不胜")):
         return "draw_protection", "提示防平/强队不稳"
     if any(word in text for word in ("爆冷", "防冷", "冷门", "受克", "弱队")):
@@ -540,6 +545,8 @@ def side_signal_effect(label: str, note: str) -> tuple[str, str]:
 
 def side_signal_display(effect: str) -> str:
     return {
+        "non_loss_protection": "提示一方不败/受让守住",
+        "no_cover_protection": "提示热门不穿盘",
         "draw_protection": "提示防平/强队不稳",
         "upset_protection": "提示可能爆冷",
         "low_total": "提示小球/低比分",
@@ -551,7 +558,35 @@ def side_signal_display(effect: str) -> str:
     }.get(effect, "信号不明确，仅作观察")
 
 
-def parse_side_signal(track: str, raw: Any) -> dict[str, Any]:
+def normalize_side_signal_text(value: Any) -> str:
+    return (
+        str(value or "")
+        .replace(" ", "")
+        .replace("(", "")
+        .replace(")", "")
+        .replace("（", "")
+        .replace("）", "")
+    )
+
+
+def side_signal_target(match: dict[str, Any], text: str) -> tuple[str | None, str | None]:
+    normalized = normalize_side_signal_text(text)
+    teams = [
+        ("home", match.get("home_team"), match.get("home_aliases") or []),
+        ("away", match.get("away_team"), match.get("away_aliases") or []),
+    ]
+    for side, team, aliases in teams:
+        names = [team, *aliases]
+        if any(name and normalize_side_signal_text(name) in normalized for name in names):
+            return side, str(team)
+    if any(word in normalized for word in ("主队", "主场")):
+        return "home", str(match.get("home_team"))
+    if any(word in normalized for word in ("客队", "客场")):
+        return "away", str(match.get("away_team"))
+    return None, None
+
+
+def parse_side_signal(track: str, raw: Any, match: dict[str, Any] | None = None) -> dict[str, Any]:
     if not raw:
         return {"enabled": False, "label": "无民间信号", "effect": "none", "confidence": 0.0, "note": ""}
     if isinstance(raw, str):
@@ -567,6 +602,8 @@ def parse_side_signal(track: str, raw: Any) -> dict[str, Any]:
     explicit_effect = str(raw.get("effect", "")) if isinstance(raw, dict) else ""
     effect, display = side_signal_effect(label, note)
     if explicit_effect in {
+        "non_loss_protection",
+        "no_cover_protection",
         "draw_protection",
         "upset_protection",
         "low_total",
@@ -578,12 +615,15 @@ def parse_side_signal(track: str, raw: Any) -> dict[str, Any]:
     }:
         effect = explicit_effect
         display = side_signal_display(effect)
+    target_side, target_team = side_signal_target(match, f"{label} {note}") if match else (None, None)
     return {
         "enabled": True,
         "track": track,
         "source": source,
         "label": label,
         "effect": effect,
+        "target_side": target_side,
+        "target_team": target_team,
         "confidence": round(clamp(confidence, 0, 1), 3),
         "display": f"{track}{display}",
         "note": note,
@@ -593,7 +633,7 @@ def parse_side_signal(track: str, raw: Any) -> dict[str, Any]:
 
 
 def side_signal_profiles(match: dict[str, Any]) -> list[dict[str, Any]]:
-    profiles = [parse_side_signal(track, raw) for track, raw in side_signal_raw_items(match)]
+    profiles = [parse_side_signal(track, raw, match) for track, raw in side_signal_raw_items(match)]
     return [profile for profile in profiles if profile.get("enabled")]
 
 
@@ -604,7 +644,97 @@ def folk_signal_profile(match: dict[str, Any]) -> dict[str, Any]:
     return {"enabled": False, "label": "无民间信号", "effect": "none", "confidence": 0.0, "note": ""}
 
 
+def side_signal_result_label(effect: str, target_team: str | None) -> str:
+    if effect == "non_loss_protection":
+        return f"{target_team}不败" if target_team else "一方不败/受让守住"
+    if effect == "no_cover_protection":
+        return "热门不穿盘"
+    if effect == "draw_protection":
+        return "防平"
+    if effect == "upset_protection":
+        return f"{target_team}方向防冷" if target_team else "防冷"
+    if effect == "low_total":
+        return "低比分/小球"
+    if effect == "high_total":
+        return "进球偏多"
+    if effect == "favorite_big_margin":
+        return "大比分分差"
+    if effect == "favorite_support":
+        return f"支持{target_team}" if target_team else "支持强队"
+    return "仅观察"
+
+
+def side_signal_handicap_label(effects: set[str], target_team: str | None) -> str:
+    if "no_cover_protection" in effects:
+        return "让负/让平保护"
+    if "non_loss_protection" in effects:
+        return f"{target_team or '受让方'}受让方向"
+    if "draw_protection" in effects or "upset_protection" in effects:
+        return "让负/防冷保护"
+    if "favorite_big_margin" in effects:
+        return "让胜/大胜尾部"
+    return "无明确让球支线"
+
+
+def main_side_comparison(
+    match: dict[str, Any],
+    main_label: str,
+    score_labels: list[str],
+    effects: set[str],
+    signal: dict[str, Any],
+    alignment: str,
+    betting_checks: list[str],
+) -> list[dict[str, str]]:
+    target_team = signal.get("target_team")
+    primary_effect = str(signal.get("effect") or "watch_only")
+    side_result = side_signal_result_label(primary_effect, target_team)
+    if alignment == "冲突观察":
+        result_relation = "冲突：主线偏热门，支线防冷/不败"
+    elif alignment == "可能一致":
+        result_relation = "一致：支线增强方向但不加仓"
+    elif alignment == "风险提醒":
+        result_relation = "部分一致：主线方向不变，支线提示保护"
+    else:
+        result_relation = alignment or "仅观察"
+
+    return [
+        {
+            "dimension": "赛果方向",
+            "main": main_label,
+            "side": side_result,
+            "relation": result_relation,
+        },
+        {
+            "dimension": "让球方向",
+            "main": "按官方让球和比分矩阵决定",
+            "side": side_signal_handicap_label(effects, target_team),
+            "relation": "只检查让球保护，不改主胜率",
+        },
+        {
+            "dimension": "比分/进球",
+            "main": " / ".join(score_labels[:3]) if score_labels else "待定",
+            "side": "低比分/小球" if "low_total" in effects or effects & {"non_loss_protection", "no_cover_protection", "draw_protection"} else ("高进球/大比分尾部" if effects & {"high_total", "favorite_big_margin"} else "无明确比分支线"),
+            "relation": "支线用于扩充比分池，不单压一个比分",
+        },
+        {
+            "dimension": "下注落点",
+            "main": "以EV、SP和风险分筛选候选",
+            "side": "、".join(betting_checks) if betting_checks else "不生成支线可买项",
+            "relation": "支线只给检查项，不能直接变主推",
+        },
+    ]
+
+
 def folk_parallel_summary(match: dict[str, Any], model_probs: dict[str, float] | None = None) -> dict[str, Any]:
+    return folk_parallel_summary_with_context(match, model_probs)
+
+
+def folk_parallel_summary_with_context(
+    match: dict[str, Any],
+    model_probs: dict[str, float] | None = None,
+    main_label: str | None = None,
+    score_labels: list[str] | None = None,
+) -> dict[str, Any]:
     tracks = side_signal_profiles(match)
     signal = sorted(tracks, key=lambda item: item.get("confidence", 0), reverse=True)[0] if tracks else folk_signal_profile(match)
     if not signal.get("enabled"):
@@ -613,19 +743,64 @@ def folk_parallel_summary(match: dict[str, Any], model_probs: dict[str, float] |
             "tracks": [],
             "alignment": "未提供",
             "model_relation": "本场没有录入支线标签",
+            "side_prediction": "未录入支线预测",
+            "betting_advice": "不生成支线下注建议",
+            "betting_checks": [],
+            "comparison": [
+                {"dimension": "赛果方向", "main": main_label or "按主线模型", "side": "未录入", "relation": "无支线对比"},
+                {"dimension": "下注落点", "main": "按EV、SP和风险分筛选", "side": "未录入", "relation": "只看主线"},
+            ],
+            "advice_boundary": "支线为空，按数据模型和官方SP判断",
             "action_hint": "按数据模型和官方SP判断",
         }
     effects = {item.get("effect") for item in tracks} or {signal.get("effect")}
     leader = None
+    leader_label = "待定"
     if model_probs:
         leader = max(model_probs, key=lambda key: model_probs[key])
-    if "conflict" in effects:
+        leader_label = {"home": match["home_team"], "draw": "平局", "away": match["away_team"]}.get(leader, "待定")
+    target_team = signal.get("target_team")
+    target_side = signal.get("target_side")
+    if "non_loss_protection" in effects and target_team:
+        side_prediction = f"支线独立判断：{target_team}不败或受让守住"
+    elif "no_cover_protection" in effects:
+        side_prediction = "支线独立判断：热门方可能赢球但不穿盘"
+    elif "draw_protection" in effects:
+        side_prediction = "支线独立判断：防平，强队稳定性不足"
+    elif "upset_protection" in effects:
+        side_prediction = f"支线独立判断：存在爆冷信号{f'，偏向{target_team}' if target_team else ''}"
+    elif "low_total" in effects:
+        side_prediction = "支线独立判断：低比分、小球倾向"
+    elif "high_total" in effects:
+        side_prediction = "支线独立判断：节奏可能打开，进球偏多"
+    elif "favorite_big_margin" in effects:
+        side_prediction = "支线独立判断：存在大比分分差信号"
+    elif "favorite_support" in effects:
+        side_prediction = f"支线独立判断：支持强势一方{f'，偏向{target_team}' if target_team else ''}"
+    else:
+        side_prediction = "支线独立判断：信号不明确，仅观察"
+
+    betting_checks: list[str] = []
+    if effects & {"non_loss_protection", "draw_protection", "upset_protection"}:
+        betting_checks.extend(["胜平负-平", "胜平负-冷门方向", "让球受让方向"])
+    if "no_cover_protection" in effects:
+        betting_checks.extend(["让球胜平负-让负", "让球胜平负-让平"])
+    if "low_total" in effects:
+        betting_checks.extend(["总进球0/1/2", "比分0-0/1-1/1-0/0-1"])
+    if "high_total" in effects or "favorite_big_margin" in effects:
+        betting_checks.extend(["总进球3/4/5+", "大胜比分尾部"])
+    betting_checks = list(dict.fromkeys(betting_checks))
+    betting_advice = "支线下注建议：只检查" + "、".join(betting_checks) if betting_checks else "支线下注建议：不单独给可买项"
+    advice_boundary = "支线不改主模型概率、EV、Kelly和仓位；只作为防冷、比分池和让球保护的检查项"
+
+    target_conflicts_with_model = target_side in {"home", "away"} and leader in {"home", "away"} and target_side != leader
+    if "conflict" in effects or target_conflicts_with_model:
         alignment = "冲突观察"
         action_hint = "不改变主推，只在风险区检查防平、防冷和低比分"
     elif "favorite_support" in effects and effects <= {"favorite_support"}:
         alignment = "可能一致" if leader in {"home", "away"} else "与模型不完全一致"
         action_hint = "只增强信心提示，不增加仓位"
-    elif effects & {"draw_protection", "upset_protection", "low_total"}:
+    elif effects & {"non_loss_protection", "no_cover_protection", "draw_protection", "upset_protection", "low_total"}:
         alignment = "风险提醒"
         action_hint = "用于检查防平、防冷、防不穿盘或低比分保护"
     elif effects & {"high_total", "favorite_big_margin"}:
@@ -635,11 +810,18 @@ def folk_parallel_summary(match: dict[str, Any], model_probs: dict[str, float] |
         alignment = "无明确方向"
         action_hint = "只保留备注，不参与推荐"
     track_text = "；".join(f"{item.get('track')}：{item.get('display')}" for item in tracks[:4])
+    resolved_main_label = main_label or leader_label
+    comparison = main_side_comparison(match, resolved_main_label, score_labels or [], effects, signal, alignment, betting_checks)
     return {
         **signal,
         "tracks": tracks,
         "alignment": alignment,
-        "model_relation": f"数据模型主线：{leader or '待定'}；支线：{track_text or signal.get('display')}",
+        "model_relation": f"数据模型主线：{leader_label}；支线：{track_text or signal.get('display')}",
+        "side_prediction": side_prediction,
+        "betting_advice": betting_advice,
+        "betting_checks": betting_checks,
+        "comparison": comparison,
+        "advice_boundary": advice_boundary,
         "action_hint": action_hint,
     }
 
@@ -1193,6 +1375,12 @@ def actionability_score(item: dict[str, Any]) -> tuple[float, str, str]:
         return round(score, 2), "不可下单", "体彩未开售或缺少SP"
     if decision == "放弃" or ev <= 0:
         return round(score, 2), "放弃", "价格不划算或风险收益不匹配"
+    if decision != "可小注":
+        if role in {"draw_low_score_protection", "low_total_protection", "favorite_tail_hedge", "anti_scoreline_value"} or play_type in {"比分", "半全场"}:
+            return round(score, 2), "防冷小注", "只适合小金额覆盖，不作为主仓"
+        if score >= 32 and risk <= 78:
+            return round(score, 2), "可搭配", "有参考价值，但未达到主推门槛"
+        return round(score, 2), "观察", "方向或价格有参考，但不作为主推"
     if score >= 50 and risk <= 70 and play_type not in {"比分", "半全场"}:
         return round(score, 2), "主推", "价值、风险和玩法稳定性较均衡"
     if score >= 32 and risk <= 78:
@@ -1210,6 +1398,8 @@ def apply_actionability_scores(options: list[dict[str, Any]]) -> list[dict[str, 
         item["action_reason"] = reason
         if tier in {"放弃", "不可下单"}:
             item["stake_pct"] = 0.0
+        elif tier == "观察":
+            item["stake_pct"] = 0.0
         elif tier == "防冷小注":
             item["stake_pct"] = round(min(float(item.get("stake_pct") or 0.0), 0.002), 4)
         elif tier == "可搭配":
@@ -1217,12 +1407,16 @@ def apply_actionability_scores(options: list[dict[str, Any]]) -> list[dict[str, 
     return options
 
 
+def captured_at_key(row: dict[str, Any]) -> str:
+    return str(row.get("captured_at") or row.get("updated_at") or row.get("timestamp") or "")
+
+
 def derive_market_signal(history: list[dict[str, Any]]) -> dict[str, Any]:
     if not history:
         return {"direction": "无赔率数据", "strength": 0, "latest_probs": None, "movement": {}, "bookmakers": 0, "snapshots": 0, "weight": 0.0}
 
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
-    for row in sorted(history, key=lambda x: x["captured_at"]):
+    for row in sorted(history, key=captured_at_key):
         if row["market"] == "h2h":
             grouped[row["bookmaker"]].append(row)
 
@@ -1231,7 +1425,7 @@ def derive_market_signal(history: list[dict[str, Any]]) -> dict[str, Any]:
     for rows in grouped.values():
         by_time: dict[str, dict[str, float]] = defaultdict(dict)
         for row in rows:
-            by_time[row["captured_at"]][row["selection"]] = float(row["odds_decimal"])
+            by_time[captured_at_key(row)][row["selection"]] = float(row["odds_decimal"])
         complete = [(ts, odds) for ts, odds in by_time.items() if {"home", "draw", "away"} <= set(odds)]
         if complete:
             first_by_book.append(complete[0][1])
@@ -1261,7 +1455,7 @@ def derive_market_signal(history: list[dict[str, Any]]) -> dict[str, Any]:
         direction = "市场基本稳定"
     else:
         direction = f"{direction_name}方向增强" if movement[leader] > 0 else f"{direction_name}方向降温"
-    snapshot_count = len({row["captured_at"] for row in history if row.get("market") == "h2h"})
+    snapshot_count = len({captured_at_key(row) for row in history if row.get("market") == "h2h" and captured_at_key(row)})
     bookmaker_count = len(latest_by_book)
     weight = dynamic_market_weight(bookmaker_count, snapshot_count, strength)
     return {
@@ -1635,7 +1829,7 @@ def latest_h2h_odds(history: list[dict[str, Any]], match: dict[str, Any]) -> dic
     grouped: dict[str, dict[str, list[float]]] = defaultdict(lambda: defaultdict(list))
     for row in history:
         if row.get("market") == "h2h" and row.get("selection") in {"home", "draw", "away"}:
-            grouped[row["captured_at"]][row["selection"]].append(float(row["odds_decimal"]))
+            grouped[captured_at_key(row)][row["selection"]].append(float(row["odds_decimal"]))
     if grouped:
         latest_ts = sorted(grouped)[-1]
         latest = grouped[latest_ts]
@@ -1654,7 +1848,7 @@ def aicai_market_context(history: list[dict[str, Any]]) -> dict[str, Any]:
     def complete_by_time(rows: list[dict[str, Any]]) -> list[tuple[str, dict[str, float]]]:
         grouped: dict[str, dict[str, list[float]]] = defaultdict(lambda: defaultdict(list))
         for row in rows:
-            grouped[row["captured_at"]][row["selection"]].append(float(row["odds_decimal"]))
+            grouped[captured_at_key(row)][row["selection"]].append(float(row["odds_decimal"]))
         output = []
         for ts in sorted(grouped):
             sample = grouped[ts]
@@ -1680,7 +1874,7 @@ def aicai_market_context(history: list[dict[str, Any]]) -> dict[str, Any]:
         rows = [row for row in aicai_rows if row.get("market") == market and row.get("selection") == "line"]
         if not rows:
             return None
-        rows = sorted(rows, key=lambda row: row["captured_at"])
+        rows = sorted(rows, key=captured_at_key)
         first = float(rows[0]["odds_decimal"])
         latest = float(rows[-1]["odds_decimal"])
         return {"first": round(first, 3), "latest": round(latest, 3), "movement": round(latest - first, 3)}
@@ -1689,7 +1883,7 @@ def aicai_market_context(history: list[dict[str, Any]]) -> dict[str, Any]:
         rows = [row for row in aicai_rows if row.get("market") == market and row.get("selection") == selection]
         if not rows:
             return None
-        return round(float(sorted(rows, key=lambda row: row["captured_at"])[-1]["odds_decimal"]), 3)
+        return round(float(sorted(rows, key=captured_at_key)[-1]["odds_decimal"]), 3)
 
     asia = line_context("aicai_asia_line")
     if asia:
@@ -1705,7 +1899,7 @@ def aicai_market_context(history: list[dict[str, Any]]) -> dict[str, Any]:
         "europe": europe,
         "asia": asia,
         "total_goals": total,
-        "snapshots": len({row["captured_at"] for row in aicai_rows}),
+        "snapshots": len({captured_at_key(row) for row in aicai_rows if captured_at_key(row)}),
     }
 
 
@@ -1779,7 +1973,7 @@ def latest_sporttery_sp_map(history: list[dict[str, Any]]) -> dict[tuple[str, st
     output: dict[tuple[str, str], tuple[float, str]] = {}
     sporttery_markets = {"胜平负", "让球胜平负", "总进球", "比分", "半全场"}
     pool_meta_markets = {"sporttery_pool_open", "sporttery_pool_single", "sporttery_pool_allup"}
-    for row in sorted(history, key=lambda item: item["captured_at"]):
+    for row in sorted(history, key=captured_at_key):
         if row.get("market") in sporttery_markets:
             output[(row["market"], row["selection"])] = (float(row["odds_decimal"]), row.get("source", "odds_history"))
         elif row.get("market") == "sporttery_handicap" and row.get("selection") == "H":
@@ -1791,7 +1985,7 @@ def latest_sporttery_sp_map(history: list[dict[str, Any]]) -> dict[tuple[str, st
 
 def latest_sporttery_handicap(history: list[dict[str, Any]]) -> int | None:
     handicap = None
-    for row in sorted(history, key=lambda item: item["captured_at"]):
+    for row in sorted(history, key=captured_at_key):
         if row.get("market") == "sporttery_handicap" and row.get("selection") == "H":
             handicap = int(float(row["odds_decimal"]))
     return handicap
@@ -2326,7 +2520,10 @@ def build_sporttery_outputs(
         options.append(evaluate_option(match, "半全场", selection, probability, None, upset, market_signal, market_sp=market_sp))
 
     rec_context = recommendation_context(match, model_probs, xg, matrix, handicap)
-    folk_parallel = folk_parallel_summary(match, model_probs)
+    leader_key = max(model_probs, key=lambda key: model_probs[key])
+    leader_label = {"home": match["home_team"], "draw": "平局", "away": match["away_team"]}[leader_key]
+    score_labels = [row["score"] for row in ranked_scorelines(matrix, limit=3, context=rec_context)]
+    folk_parallel = folk_parallel_summary_with_context(match, model_probs, leader_label, score_labels)
     options = apply_recommendation_rules(options, rec_context, handicap)
     options = apply_actionability_scores(options)
     play_priority = {"胜平负": 5, "让球胜平负": 4, "总进球": 3, "半全场": 2, "比分": 1}
@@ -2365,7 +2562,7 @@ def build_sporttery_outputs(
         "candidate_pool": [
             item
             for item in available
-            if item.get("action_tier") in {"主推", "可搭配", "防冷小注", "观察"}
+            if item.get("action_tier") in {"主推", "可搭配", "防冷小注"}
         ][:20],
         "action_summary": {
             "core": [item for item in ranked if item.get("action_tier") == "主推"][:4],
@@ -2387,30 +2584,228 @@ def level_from_probability(value: float) -> str:
     return "低"
 
 
+def source_status_from_health(
+    source_id: str,
+    evidence_count: int,
+    health: dict[str, Any],
+    enabled: bool = True,
+) -> tuple[str, str]:
+    if not enabled:
+        return "停用", "该源不参与当前抓取"
+    if evidence_count > 0:
+        return "已拿到", f"本场抓到 {evidence_count} 条可用记录"
+    item = health.get(source_id) or {}
+    success = int(item.get("success_count") or 0)
+    failure = int(item.get("failure_count") or 0)
+    last_success = str(item.get("last_success_at") or "")
+    last_failure = str(item.get("last_failure_at") or "")
+    if success and (not last_failure or last_success >= last_failure):
+        return "可用但本场缺失", "源近期成功过，但本场未匹配到数据"
+    if failure and (not success or last_failure >= last_success):
+        return "最近失败", str(item.get("last_error") or "最近抓取失败")
+    return "未验证", "还没有稳定抓取记录"
+
+
+def source_audit(match: dict[str, Any], odds_history: list[dict[str, Any]], group_context: dict[str, Any] | None) -> dict[str, Any]:
+    sources = {str(source.get("source_id")): source for source in load_sources()}
+    health = load_source_health()
+
+    official_rows = [
+        row
+        for row in odds_history
+        if str(row.get("source", "")).startswith("sporttery_official")
+        or row.get("bookmaker") == "中国体育彩票"
+    ]
+    calculator_rows = [row for row in odds_history if row.get("source") == "sporttery_mobile_calculator"]
+    manual_rows = [row for row in odds_history if row.get("source") == "manual"]
+    aicai_rows = [row for row in odds_history if str(row.get("source", "")).startswith("aicai_")]
+    market_rows = [row for row in odds_history if row.get("market") in {"h2h", "胜平负", "让球胜平负", "总进球", "比分", "半全场"}]
+    has_fifa = fifa_rank_value(match, "home") is not None and fifa_rank_value(match, "away") is not None
+    has_formal = bool(match.get("formal_competition_strength"))
+    has_process = bool(match.get("match_process_rating") or match.get("match_process_stats") or match.get("live_match_stats"))
+    has_lineup = bool(match.get("lineup_status") == "confirmed")
+    has_injury = bool(match.get("injury_notes"))
+
+    official_status, official_note = source_status_from_health(
+        "sporttery_official_match_list",
+        len([row for row in official_rows if row.get("source") == "sporttery_official_match_list"]),
+        health,
+        bool(sources.get("sporttery_official_match_list", {}).get("enabled", True)),
+    )
+    calculator_status, calculator_note = source_status_from_health(
+        "sporttery_mobile_calculator",
+        len(calculator_rows),
+        health,
+        bool(sources.get("sporttery_mobile_calculator", {}).get("enabled", True)),
+    )
+    aicai_status, aicai_note = source_status_from_health(
+        "aicai_worldcup_stats",
+        len(aicai_rows),
+        health,
+        bool(sources.get("aicai_worldcup_stats", {}).get("enabled", True)),
+    )
+    standings_status, standings_note = source_status_from_health(
+        "bing_worldcup_standings",
+        1 if group_context else 0,
+        health,
+        bool(sources.get("bing_worldcup_standings", {}).get("enabled", True)),
+    )
+    process_status, process_note = source_status_from_health(
+        "msn_worldcup_process",
+        1 if has_process else 0,
+        health,
+        bool(sources.get("msn_worldcup_process", {}).get("enabled", False)),
+    )
+
+    rows = [
+        {
+            "tier": "A",
+            "name": "体彩官方可下单数据",
+            "status": official_status,
+            "ok": bool(official_rows),
+            "impact": "决定能买什么、让几球、SP是多少。缺失时只能按手动或历史快照参考，不能强行给正式下单项。",
+            "detail": official_note,
+        },
+        {
+            "tier": "A+",
+            "name": "体彩计算器补充玩法",
+            "status": calculator_status,
+            "ok": bool(calculator_rows),
+            "impact": "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
+            "detail": calculator_note,
+        },
+        {
+            "tier": "B",
+            "name": "市场走势与盘口参考",
+            "status": aicai_status,
+            "ok": bool(aicai_rows),
+            "impact": "用于看欧赔、让球、大小球变化。缺失时市场方向和收盘变化判断变弱。",
+            "detail": aicai_note,
+        },
+        {
+            "tier": "C",
+            "name": "国家队基础实力",
+            "status": "已拿到" if has_fifa and match.get("home_elo") and match.get("away_elo") else "部分缺失",
+            "ok": bool(has_fifa and match.get("home_elo") and match.get("away_elo")),
+            "impact": "用于判断强弱底盘。缺少排名或 Elo 时，不能过度相信盘口方向。",
+            "detail": "FIFA 排名和 Elo 同时存在" if has_fifa and match.get("home_elo") and match.get("away_elo") else "FIFA 排名或 Elo 不完整",
+        },
+        {
+            "tier": "C",
+            "name": "预选赛/洲际杯正式赛表现",
+            "status": "已拿到" if has_formal else "缺失",
+            "ok": has_formal,
+            "impact": "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。",
+            "detail": "存在正式赛强度字段" if has_formal else "未配置 formal_competition_strength",
+        },
+        {
+            "tier": "C",
+            "name": "小组积分与出线动机",
+            "status": standings_status,
+            "ok": bool(group_context),
+            "impact": "用于判断抢分、轮换、默契和净胜球需求。缺失时第三轮尤其容易失真。",
+            "detail": standings_note,
+        },
+        {
+            "tier": "D",
+            "name": "过程统计/赛后技术数据",
+            "status": process_status,
+            "ok": has_process,
+            "impact": "用于复盘谁是真强、谁是运气球。缺失时赛后调参只能依赖比分和市场。",
+            "detail": process_note,
+        },
+        {
+            "tier": "D",
+            "name": "伤停与首发",
+            "status": "已拿到" if has_lineup and has_injury else "待临场确认",
+            "ok": has_lineup and has_injury,
+            "impact": "用于最后一轮校准。缺失时临场建议要降档，尤其是深盘强队。",
+            "detail": "首发和伤停均已确认" if has_lineup and has_injury else "首发或伤停未确认",
+        },
+    ]
+
+    score = 0
+    weights = {"A": 24, "A+": 10, "B": 14, "C": 14, "D": 8}
+    for row in rows:
+        if row["ok"]:
+            score += weights.get(row["tier"], 8)
+        elif row["tier"] == "A" and manual_rows:
+            score += 10
+            row["status"] = "手动兜底"
+            row["detail"] = "未抓到官方本场数据，但存在手动赔率或历史快照"
+    score = min(100, score)
+    if score >= 78:
+        level = "数据充分"
+        model_mode = "正常计算"
+        confidence_penalty = 0
+    elif score >= 58:
+        level = "可预测但需谨慎"
+        model_mode = "降级计算"
+        confidence_penalty = 6
+    elif score >= 40:
+        level = "数据偏少"
+        model_mode = "方向参考"
+        confidence_penalty = 12
+    else:
+        level = "只适合观察"
+        model_mode = "低置信参考"
+        confidence_penalty = 18
+
+    missing_impacts = [row["impact"] for row in rows if not row["ok"]][:5]
+    if not market_rows:
+        missing_impacts.insert(0, "缺少赔率/SP，无法判断官方价格是否值得买。")
+    return {
+        "score": score,
+        "level": level,
+        "model_mode": model_mode,
+        "confidence_penalty": confidence_penalty,
+        "rows": rows,
+        "missing_impacts": missing_impacts[:6],
+        "official_rows": len(official_rows),
+        "manual_rows": len(manual_rows),
+        "market_rows": len(market_rows),
+    }
+
+
 def data_completeness(match: dict[str, Any], odds_history: list[dict[str, Any]]) -> dict[str, Any]:
     group_context = find_group_context(match)
     has_aicai = any(str(row.get("source", "")).startswith("aicai_") for row in odds_history)
+    audit = source_audit(match, odds_history, group_context)
     checks = [
-        ("赛程匹配", bool(match.get("match_id") and match.get("kickoff")), 10),
-        ("Elo", bool(match.get("home_elo") and match.get("away_elo")), 10),
-        ("FIFA世界排名", fifa_rank_value(match, "home") is not None and fifa_rank_value(match, "away") is not None, 7),
-        ("预选赛/洲际杯正式赛", bool(match.get("formal_competition_strength")), 10),
-        ("近期/过程数据", bool(match.get("expected_goals") or match.get("process_notes")), 10),
-        ("权威侧面源", bool(match.get("authority_side_strength")), 7),
-        ("赛中/赛后过程统计", bool(match.get("match_process_rating") or match.get("match_process_stats") or match.get("live_match_stats")), 7),
-        ("赔率", bool(odds_history), 14),
-        ("赔率历史", len({r["captured_at"] for r in odds_history}) >= 2, 8),
-        ("爱彩盘口/赛果统计", has_aicai, 8),
-        ("伤停", bool(match.get("injury_notes")), 11),
-        ("首发", bool(match.get("lineup_status") == "confirmed"), 11),
-        ("小组积分榜", bool(group_context), 8),
-        ("天气/裁判/场地", bool(match.get("weather_notes") or match.get("referee_notes")), 7),
-        ("战术标签", bool(match.get("tactical_notes")), 4),
+        ("赛程匹配", bool(match.get("match_id") and match.get("kickoff")), 10, "没有准确比赛和时间，无法对齐体彩和赛程。"),
+        ("Elo", bool(match.get("home_elo") and match.get("away_elo")), 10, "基础实力底盘会变弱。"),
+        ("FIFA世界排名", fifa_rank_value(match, "home") is not None and fifa_rank_value(match, "away") is not None, 7, "国家队强弱侧面参考不足。"),
+        ("预选赛/洲际杯正式赛", bool(match.get("formal_competition_strength")), 10, "近期正式赛状态无法修正。"),
+        ("近期/过程数据", bool(match.get("expected_goals") or match.get("process_notes")), 10, "进攻/防守质量只能用默认估计。"),
+        ("权威侧面源", bool(match.get("authority_side_strength")), 7, "媒体和权威数据侧面强度缺失。"),
+        ("赛中/赛后过程统计", bool(match.get("match_process_rating") or match.get("match_process_stats") or match.get("live_match_stats")), 7, "复盘时无法区分实力与偶然。"),
+        ("赔率/SP", bool(odds_history), 14, "无法做去水概率和价值判断。"),
+        ("赔率历史", len({captured_at_key(r) for r in odds_history if captured_at_key(r)}) >= 2, 8, "看不到赔率波动，只能看单点价格。"),
+        ("爱彩盘口/赛果统计", has_aicai, 8, "市场走势、让球和大小球参考不足。"),
+        ("伤停", bool(match.get("injury_notes")), 11, "临场人员风险未确认。"),
+        ("首发", bool(match.get("lineup_status") == "confirmed"), 11, "赛前最后校准不足。"),
+        ("小组积分榜", bool(group_context), 8, "出线动机和轮换风险不清楚。"),
+        ("天气/裁判/场地", bool(match.get("weather_notes") or match.get("referee_notes")), 7, "红牌、点球、场地节奏风险无法修正。"),
+        ("战术标签", bool(match.get("tactical_notes")), 4, "打法相克只能粗略判断。"),
     ]
-    score = min(100, sum(weight for _, ok, weight in checks if ok))
+    score = min(100, sum(weight for _, ok, weight, _ in checks if ok))
+    if score >= 82:
+        level = "数据充分"
+    elif score >= 65:
+        level = "可正常预测"
+    elif score >= 50:
+        level = "谨慎预测"
+    else:
+        level = "方向参考"
     return {
         "score": score,
-        "items": [{"name": name, "ok": ok, "weight": weight} for name, ok, weight in checks],
+        "level": level,
+        "source_audit": audit,
+        "confidence_penalty": audit["confidence_penalty"],
+        "items": [
+            {"name": name, "ok": ok, "weight": weight, "impact": impact}
+            for name, ok, weight, impact in checks
+        ],
     }
 
 
@@ -2479,6 +2874,8 @@ def build_prediction(match: dict[str, Any], odds_history: list[dict[str, Any]]) 
     market_context = aicai_market_context(odds_history)
     upset = upset_profile(match)
     completeness = data_completeness(match, odds_history)
+    source_audit_payload = completeness["source_audit"]
+    source_penalty = int(source_audit_payload.get("confidence_penalty", 0))
     group_context = find_group_context(match)
 
     base = elo_probabilities(float(match.get("home_elo", 1800)), float(match.get("away_elo", 1800)), match.get("neutral", True))
@@ -2577,7 +2974,13 @@ def build_prediction(match: dict[str, Any], odds_history: list[dict[str, Any]]) 
                 over_under_lines=ou_lines,
                 over_25=round(over_25, 4),
                 btts=round(btts, 4),
-                confidence=clamp(completeness["score"] - (8 if probability_gap(base, market.get("latest_probs"))["level"] in {"明显分歧", "高分歧"} else 0), 35, 92),
+                confidence=clamp(
+                    completeness["score"]
+                    - source_penalty
+                    - (8 if probability_gap(base, market.get("latest_probs"))["level"] in {"明显分歧", "高分歧"} else 0),
+                    30,
+                    92,
+                ),
                 notes=notes,
             )
         )
@@ -2596,6 +2999,7 @@ def build_prediction(match: dict[str, Any], odds_history: list[dict[str, Any]]) 
         "handicap": effective_handicap,
     }
     value_matrix = score_matrix(value_xg["home"], value_xg["away"], mode="market", context=value_context)
+    value_top_scores = ranked_scorelines(value_matrix, limit=8, context=value_context)
     sporttery = build_sporttery_outputs(match, value_probs, value_matrix, value_xg, upset, market, h2h_odds, market_sp)
     gap = probability_gap(baseline.probabilities, market.get("latest_probs"))
     return {
@@ -2618,7 +3022,7 @@ def build_prediction(match: dict[str, Any], odds_history: list[dict[str, Any]]) 
                     "score_priority": row["score_priority"],
                     "score_note": row["score_note"],
                 }
-                for row in ranked_scorelines(value_matrix, limit=8, context=value_context)
+                for row in value_top_scores
             ],
             "score_grid": [
                 {"score": row["score"], "probability": round(row["probability"], 4)}
@@ -2630,11 +3034,12 @@ def build_prediction(match: dict[str, Any], odds_history: list[dict[str, Any]]) 
         "sporttery": sporttery,
         "upset": upset,
         "data_completeness": completeness,
+        "source_audit": source_audit_payload,
         "group_context": group_context,
         "dimension_scores": dimension_scores(match, market, upset),
         "model_market_gap": gap,
         "scenarios": [scenario.__dict__ for scenario in scenarios],
-        "summary": build_summary(match, scenarios, market, upset, completeness, gap),
+        "summary": build_summary(match, scenarios, market, upset, completeness, gap, value_probs, value_top_scores),
     }
 
 
@@ -2649,24 +3054,34 @@ def build_summary(
     upset: dict[str, Any],
     completeness: dict[str, Any],
     gap: dict[str, Any],
+    value_probs: dict[str, float] | None = None,
+    value_top_scores: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     baseline = next(item for item in scenarios if item.scenario == "baseline")
     market_scenario = next(item for item in scenarios if item.scenario == "market")
-    leader_key = max(baseline.probabilities, key=lambda k: baseline.probabilities[k])
+    summary_probs = value_probs or market_scenario.probabilities
+    leader_key = max(summary_probs, key=lambda k: summary_probs[k])
     leader = {"home": match["home_team"], "draw": "平局", "away": match["away_team"]}[leader_key]
-    best_scores = [row["score"] for row in baseline.top_scores[:3]]
+    source_scores = value_top_scores or market_scenario.top_scores
+    best_scores = [row["score"] for row in source_scores[:3]]
     return {
         "main_lean": leader,
         "score_group": best_scores,
         "market_direction": market["direction"],
         "upset_level": upset["level"],
-        "folk_parallel": folk_parallel_summary(match, market_scenario.probabilities),
+        "folk_parallel": folk_parallel_summary_with_context(match, summary_probs, leader, best_scores),
         "confidence": int(baseline.confidence),
         "data_score": completeness["score"],
+        "data_level": completeness.get("source_audit", {}).get("level") or completeness.get("level", "待确认"),
+        "source_level": completeness.get("source_audit", {}).get("level", "待确认"),
+        "model_mode": completeness.get("source_audit", {}).get("model_mode", "正常计算"),
+        "missing_impacts": completeness.get("source_audit", {}).get("missing_impacts", []),
         "gap_level": gap["level"],
         "reference": (
-            f"基准倾向 {leader}；比分参考 {' / '.join(best_scores)}；"
-            f"市场修正后主/平/客为 {pct(market_scenario.probabilities['home'])} / "
-            f"{pct(market_scenario.probabilities['draw'])} / {pct(market_scenario.probabilities['away'])}。"
+            f"最终模型倾向 {leader}；比分参考 {' / '.join(best_scores)}；"
+            f"去水与特征修正后主/平/客为 {pct(summary_probs['home'])} / "
+            f"{pct(summary_probs['draw'])} / {pct(summary_probs['away'])}；"
+            f"数据状态为 {completeness.get('source_audit', {}).get('level') or completeness.get('level', '待确认')}，"
+            f"{completeness.get('source_audit', {}).get('model_mode', '正常计算')}。"
         ),
     }

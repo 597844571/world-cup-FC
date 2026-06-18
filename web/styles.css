@@ -225,6 +225,89 @@ main {
   min-width: 0;
 }
 
+.command-center {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 20px;
+  padding: 24px;
+  border: 1px solid rgba(15, 23, 42, 0.10);
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, #ffffff 0%, #f4f9fb 58%, #fff7ed 100%);
+  box-shadow: var(--shadow);
+}
+
+.command-copy h2 {
+  margin: 5px 0 8px;
+  color: var(--ink);
+  font-size: 28px;
+  line-height: 1.15;
+}
+
+.command-copy p {
+  margin: 0;
+  max-width: 840px;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.eyebrow {
+  color: var(--cyan);
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.04em;
+}
+
+.command-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.workflow-rail {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.workflow-rail div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 3px 10px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #ffffff;
+  padding: 13px;
+  box-shadow: var(--shadow-soft);
+}
+
+.workflow-rail b {
+  grid-row: span 2;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--nav);
+  color: #ffffff;
+  font-size: 13px;
+}
+
+.workflow-rail strong {
+  color: var(--ink);
+  font-weight: 950;
+}
+
+.workflow-rail span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .section,
 .schedule-head,
 .match-hero,
@@ -717,6 +800,56 @@ main {
   font-size: 18px;
 }
 
+.reliability-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 11px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #f8fafc;
+  padding: 10px 12px;
+}
+
+.reliability-strip span,
+.source-audit-head span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.reliability-strip strong,
+.source-audit-head strong {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink);
+  font-weight: 950;
+}
+
+.reliability-strip.green {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.reliability-strip.amber {
+  border-color: #fde68a;
+  background: #fffbeb;
+}
+
+.reliability-strip.red {
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.reliability-score {
+  flex: 0 0 auto;
+  color: var(--ink);
+  font-size: 20px;
+  font-weight: 950;
+}
+
 .schedule-conclusion {
   margin: 10px 0;
   padding: 10px 12px;
@@ -822,6 +955,136 @@ main {
 
 .odds-chip b {
   color: var(--ink);
+}
+
+.priority-section {
+  border-left: 5px solid var(--cyan);
+}
+
+.decision-checklist {
+  display: grid;
+  gap: 10px;
+}
+
+.decision-checklist div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 3px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #f8fafc;
+  padding: 12px;
+}
+
+.decision-checklist span {
+  grid-row: span 2;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cyan);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.decision-checklist strong {
+  color: var(--ink);
+  font-weight: 950;
+}
+
+.decision-checklist p {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.source-audit-card {
+  display: grid;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #ffffff;
+  padding: 13px;
+}
+
+.source-audit-card.good {
+  border-color: #bbf7d0;
+}
+
+.source-audit-card.warn {
+  border-color: #fde68a;
+}
+
+.source-audit-card.bad {
+  border-color: #fecaca;
+}
+
+.source-audit-head,
+.source-audit-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.source-audit-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.source-audit-row {
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #f8fafc;
+  padding: 10px;
+}
+
+.source-audit-row.ok {
+  background: #f6fef9;
+}
+
+.source-audit-row.miss {
+  background: #fffaf0;
+}
+
+.source-audit-row b {
+  display: inline-flex;
+  margin-right: 7px;
+  color: var(--cyan);
+  font-size: 12px;
+}
+
+.source-audit-row strong {
+  color: var(--ink);
+  font-weight: 950;
+}
+
+.source-audit-row span:not(.badge) {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.impact-list {
+  border-left: 4px solid var(--amber);
+  background: #fffbeb;
+  border-radius: var(--radius);
+  padding: 10px 12px;
+}
+
+.impact-list strong {
+  color: #92400e;
+  font-weight: 950;
+}
+
+.impact-list p {
+  margin: 5px 0 0;
+  color: #6b4b11;
 }
 
 .muted,
@@ -985,6 +1248,33 @@ main {
   color: var(--muted);
   font-size: 12px;
   font-style: normal;
+}
+
+.main-side-compare {
+  margin-top: 12px;
+  overflow-x: auto;
+}
+
+.compare-title {
+  margin-bottom: 8px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.main-side-compare table {
+  min-width: 620px;
+  background: #ffffff;
+}
+
+.main-side-compare th {
+  background: #e7f3f1;
+  color: #0f3f42;
+}
+
+.main-side-compare td:nth-child(2),
+.main-side-compare td:nth-child(3) {
+  font-weight: 800;
 }
 
 .planner-controls {
@@ -1169,6 +1459,7 @@ li + li {
 
 @media (max-width: 1200px) {
   .calendar-board,
+  .workflow-rail,
   .grid.cols-3,
   .grid.cols-4 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1181,6 +1472,7 @@ li + li {
 
 @media (max-width: 900px) {
   .topbar,
+  .command-center,
   .schedule-head,
   .hero-head,
   .schedule-card-top,
@@ -1192,6 +1484,7 @@ li + li {
   .overview-grid,
   .schedule-grid,
   .calendar-board,
+  .workflow-rail,
   .grid.cols-2,
   .grid.cols-3,
   .grid.cols-4,
@@ -1203,6 +1496,10 @@ li + li {
 
   .tabs {
     top: 138px;
+  }
+
+  .command-actions {
+    justify-content: flex-start;
   }
 }
 
@@ -1235,6 +1532,10 @@ li + li {
 
   .team-line {
     font-size: 22px;
+  }
+
+  .command-copy h2 {
+    font-size: 23px;
   }
 
   .tabs {

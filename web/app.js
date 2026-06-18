@@ -17,7 +17,7 @@ const colors = {
   away: "#16a34a",
 };
 
-const RULES_VERSION = "规则 v2.2：官方体彩SP + 去除抽水概率 + 实力排名 + 支线观察";
+const RULES_VERSION = "规则 v2.4：数据源健康度 + 去水概率 + 小组赛修正 + 支线并排";
 
 async function readJsonResponse(response, actionName = "请求") {
   const contentType = response.headers.get("content-type") || "";
@@ -425,7 +425,8 @@ function shortBasisText(item, prediction) {
   const probs = scenario?.probabilities || {};
   const sporttery = prediction?.sporttery || {};
   const hText = handicapText(sporttery.handicap ?? item.sporttery_handicap);
-  return `${conclusionText(item, prediction)}；${hText}；胜平负 ${pct(probs.home, 0)}/${pct(probs.draw, 0)}/${pct(probs.away, 0)}；${scoreContextText(prediction, topPicks(sporttery, 2, prediction))}。`;
+  const mode = prediction?.summary?.model_mode || prediction?.source_audit?.model_mode || "正常计算";
+  return `${conclusionText(item, prediction)}；${hText}；胜平负 ${pct(probs.home, 0)}/${pct(probs.draw, 0)}/${pct(probs.away, 0)}；${mode}；${scoreContextText(prediction, topPicks(sporttery, 2, prediction))}。`;
 }
 
 function formatSp(value) {
@@ -578,7 +579,7 @@ function predictionBasisItems(item, prediction) {
       text: `爆冷等级 ${prediction.summary.upset_level}，模型/市场分歧 ${prediction.summary.gap_level}。主要风险：${upset}。`,
     },
     {
-      title: "支线观察",
+      title: "支线独立预测",
       text: folkText,
     },
     {
@@ -595,9 +596,10 @@ function folkSignalText(prediction) {
     ? folk.tracks.slice(0, 3).map((row) => `${row.track || "支线"}：${row.display || row.label}`).join("；")
     : (folk.display || folk.label || "支线信号");
   const relation = folk.alignment ? `关系：${folk.alignment}` : "";
-  const hint = folk.action_hint ? `提示：${folk.action_hint}` : "";
+  const sidePrediction = folk.side_prediction ? `预测：${folk.side_prediction}` : "";
+  const advice = folk.betting_advice ? `建议：${folk.betting_advice}` : "";
   const note = folk.note ? `备注：${folk.note}` : "";
-  return `${display}。${[relation, hint, note].filter(Boolean).join("；")}。支线信号不参与核心概率、EV和仓位计算。`;
+  return `${display}。${[sidePrediction, advice, relation, note].filter(Boolean).join("；")}。${folk.advice_boundary || "支线信号不参与核心概率、EV和仓位计算"}。`;
 }
 
 function renderPredictionBasis(item, prediction) {
@@ -625,7 +627,7 @@ function renderSideSignalPanel(prediction) {
     return `
       <div class="side-signal-panel muted-panel">
         <div class="side-signal-head">
-          <strong>支线观察</strong>
+          <strong>支线独立预测</strong>
           ${badge("未录入", "amber")}
         </div>
         <p>未录入八卦/周易、奇门或紫微标签。本场只按数据模型和官方SP判断。</p>
@@ -633,10 +635,11 @@ function renderSideSignalPanel(prediction) {
     `;
   }
   const tracks = Array.isArray(folk.tracks) && folk.tracks.length ? folk.tracks : [folk];
+  const comparison = Array.isArray(folk.comparison) ? folk.comparison : [];
   return `
     <div class="side-signal-panel">
       <div class="side-signal-head">
-        <strong>支线观察</strong>
+        <strong>支线独立预测</strong>
         ${badge(folk.alignment || "仅观察", folk.alignment === "可能一致" ? "green" : folk.alignment === "冲突观察" ? "red" : "amber")}
       </div>
       <div class="side-signal-grid">
@@ -648,7 +651,34 @@ function renderSideSignalPanel(prediction) {
           </div>
         `).join("")}
       </div>
-      <p>${esc(folk.action_hint || "只作风险观察")}。支线信号不参与核心概率、EV和仓位计算。</p>
+      ${comparison.length ? `
+        <div class="main-side-compare">
+          <div class="compare-title">主线 vs 支线对比</div>
+          <table class="compact-table">
+            <thead>
+              <tr>
+                <th>维度</th>
+                <th>主线</th>
+                <th>支线</th>
+                <th>关系</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${comparison.map((row) => `
+                <tr>
+                  <td>${esc(row.dimension || "-")}</td>
+                  <td>${esc(row.main || "-")}</td>
+                  <td>${esc(row.side || "-")}</td>
+                  <td>${esc(row.relation || "-")}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      ` : ""}
+      <p><strong>预测：</strong>${esc(folk.side_prediction || "信号不明确，仅观察")}</p>
+      <p><strong>下注建议：</strong>${esc(folk.betting_advice || folk.action_hint || "只作风险观察")}</p>
+      <p>${esc(folk.advice_boundary || "支线信号不参与核心概率、EV和仓位计算。")}</p>
     </div>
   `;
 }
@@ -656,7 +686,7 @@ function renderSideSignalPanel(prediction) {
 function topPicks(sporttery, limit = 4, prediction = null) {
   const usable = (row) => {
     const notes = `${row.reason || ""} ${(row.rule_notes || []).join(" ")}`;
-    if (!["可小注", "观察", "高风险观察"].includes(row.decision)) return false;
+    if (!["主推", "可搭配", "防冷小注"].includes(row.action_tier || "")) return false;
     if (row.ev != null && row.ev <= 0) return false;
     if (notes.includes("低总进球高赔")) return false;
     if (row.play_type === "比分" || row.play_type === "半全场") return false;
@@ -766,6 +796,82 @@ function riskText(prediction) {
   if (gap === "高分歧" || upset === "高") return "风险高，少串或只观察";
   if (gap === "明显分歧" || upset === "中高") return "有分歧，控制金额";
   return "风险正常，仍需看临场SP";
+}
+
+function auditTone(audit) {
+  const score = Number(audit?.score ?? 0);
+  if (score >= 78) return "good";
+  if (score >= 58) return "warn";
+  return "bad";
+}
+
+function auditBadgeLevel(audit) {
+  const tone = auditTone(audit);
+  if (tone === "good") return "green";
+  if (tone === "warn") return "amber";
+  return "red";
+}
+
+function dataReliabilitySummary(prediction) {
+  const audit = prediction?.source_audit || prediction?.data_completeness?.source_audit || {};
+  const summary = prediction?.summary || {};
+  return {
+    score: audit.score ?? summary.data_score ?? prediction?.data_completeness?.score ?? 0,
+    level: audit.level || summary.source_level || prediction?.data_completeness?.level || "待确认",
+    mode: audit.model_mode || summary.model_mode || "正常计算",
+    impacts: audit.missing_impacts || summary.missing_impacts || [],
+  };
+}
+
+function renderReliabilityStrip(prediction) {
+  const audit = dataReliabilitySummary(prediction);
+  const tone = auditBadgeLevel({ score: audit.score });
+  return `
+    <div class="reliability-strip ${tone}">
+      <div>
+        <span>数据可靠度</span>
+        <strong>${esc(audit.level)} · ${esc(audit.mode)}</strong>
+      </div>
+      <div class="reliability-score">${Number(audit.score || 0)}/100</div>
+    </div>
+  `;
+}
+
+function renderSourceAuditPanel(prediction, compact = false) {
+  const audit = prediction?.source_audit || prediction?.data_completeness?.source_audit;
+  if (!audit) return `<div class="empty-mini">暂无数据源审计。</div>`;
+  const rows = audit.rows || [];
+  const visibleRows = compact ? rows.slice(0, 4) : rows;
+  const impacts = audit.missing_impacts || [];
+  return `
+    <div class="source-audit-card ${auditTone(audit)}">
+      <div class="source-audit-head">
+        <div>
+          <span>数据源审计</span>
+          <strong>${esc(audit.level)} · ${esc(audit.model_mode)}</strong>
+        </div>
+        ${badge(`${audit.score}/100`, auditBadgeLevel(audit))}
+      </div>
+      <div class="source-audit-grid">
+        ${visibleRows.map((row) => `
+          <div class="source-audit-row ${row.ok ? "ok" : "miss"}">
+            <div>
+              <b>${esc(row.tier)}档</b>
+              <strong>${esc(row.name)}</strong>
+              <span>${esc(row.detail || row.impact || "")}</span>
+            </div>
+            ${badge(row.status || (row.ok ? "已拿到" : "缺失"), row.ok ? "green" : "amber")}
+          </div>
+        `).join("")}
+      </div>
+      ${impacts.length ? `
+        <div class="impact-list">
+          <strong>缺失影响</strong>
+          ${impacts.slice(0, compact ? 2 : 5).map((impact) => `<p>${esc(impact)}</p>`).join("")}
+        </div>
+      ` : `<div class="impact-list"><strong>缺失影响</strong><p>核心数据较完整，按正常模型输出。</p></div>`}
+    </div>
+  `;
 }
 
 function renderPickCard(row, matchLabel = "", prediction = null) {
@@ -894,24 +1000,33 @@ function renderOverviewV2() {
   const comboCount = state.data?.sporttery_combos?.length || 0;
   const latestFinished = overviewFinishedRows(4);
   const upcomingRows = overviewUpcomingRows(6);
+  const joinedWithLowData = matches.filter((match) => Number(match.prediction?.source_audit?.score || 0) < 58).length;
   content.innerHTML = `
-    <section class="schedule-head">
-      <div>
-        <h2>今天先看赛果，再看下一场</h2>
-        <p>首页只放最关键的两件事：刚结束的比赛有没有偏差，马上开始的比赛能不能加入预测并生成下注测算。</p>
+    <section class="command-center">
+      <div class="command-copy">
+        <span class="eyebrow">竞彩预测工作台</span>
+        <h2>先确认数据，再决定玩法</h2>
+        <p>首页按真实使用顺序排：刷新赛程、加入比赛、看数据可靠度、进入预测详情和下注测算，完赛后再复盘偏差。</p>
       </div>
-      <div class="actions">
-        <button data-post="/api/schedule/query" data-message="赛程查询完成">刷新赛程</button>
-        <button class="secondary" data-tab="calendar">全部赛程</button>
-        <button class="secondary" data-tab="schedule">完整复盘</button>
+      <div class="command-actions">
+        <button data-post="/api/schedule/query" data-message="赛程查询完成">刷新赛程和赛果</button>
+        <button class="secondary" data-tab="calendar">打开赛程挂历</button>
+        <button class="secondary" data-tab="schedule">看赛后复盘</button>
       </div>
+    </section>
+
+    <section class="workflow-rail">
+      <div><b>1</b><strong>刷新赛程</strong><span>拿体彩和公开赛果</span></div>
+      <div><b>2</b><strong>加入预测</strong><span>单场或未来4场</span></div>
+      <div><b>3</b><strong>看数据可靠度</strong><span>缺数据自动降级</span></div>
+      <div><b>4</b><strong>玩法测算</strong><span>按体彩可买项输出</span></div>
     </section>
 
     <section class="grid cols-4">
       <div class="metric"><div class="label">当前预测</div><div class="value">${matches.length}</div><div class="sub">可查看详情和测算</div></div>
       <div class="metric"><div class="label">待开比赛</div><div class="value">${fixtures.scheduled?.length || 0}</div><div class="sub">首页展示最近 ${upcomingRows.length} 场</div></div>
       <div class="metric"><div class="label">最新完赛</div><div class="value">${fixtures.finished?.length || 0}</div><div class="sub">首页展示最近 ${latestFinished.length} 场</div></div>
-      <div class="metric"><div class="label">过关组合</div><div class="value">${comboCount}</div><div class="sub">只纳入有SP候选</div></div>
+      <div class="metric"><div class="label">数据偏少</div><div class="value">${joinedWithLowData}</div><div class="sub">低可靠度场次需谨慎</div></div>
     </section>
 
     <section class="grid cols-2">
@@ -951,15 +1066,21 @@ function renderOverviewV2() {
       </div>
     </section>
 
-    <section class="section">
-      <h3>回测给下一轮的提醒</h3>
-      ${tuningSuggestionList(summary.tuning_suggestions || [])}
+    <section class="grid cols-2">
+      <div class="section">
+        <h3>数据源健康</h3>
+        ${sourceHealthTable(state.data?.sources ?? [], state.data?.source_health ?? {}, true)}
+      </div>
+      <div class="section">
+        <h3>混合过关候选</h3>
+        <p class="muted">只从有体彩SP且价值为正的跨场主玩法生成；缺少SP的比赛不会硬串。</p>
+        ${globalComboTable(state.data?.sporttery_combos ?? [])}
+      </div>
     </section>
 
     <section class="section">
-      <h3>混合过关候选</h3>
-      <p class="muted">只从有体彩SP且价值为正的跨场主玩法生成；缺少SP的比赛不会硬串。</p>
-      ${globalComboTable(state.data?.sporttery_combos ?? [])}
+      <h3>回测给下一轮的提醒</h3>
+      ${tuningSuggestionList(summary.tuning_suggestions || [])}
     </section>
   `;
 }
@@ -1008,6 +1129,7 @@ function renderOverviewUpcomingCard(row) {
         <div class="overview-source">${esc(fixture.stage || "赛程")}</div>
       </div>
       ${prediction ? `
+        ${renderReliabilityStrip(prediction)}
         <div class="mini-probs">
           <div><span>主胜</span><strong>${pct(market?.probabilities?.home)}</strong></div>
           <div><span>平局</span><strong>${pct(market?.probabilities?.draw)}</strong></div>
@@ -1121,6 +1243,7 @@ function renderOverviewCard(item) {
         <button data-refresh="${esc(item.match_id)}">刷新</button>
       </div>
       <div class="headline">${esc(conclusionText(item, prediction))}</div>
+      ${renderReliabilityStrip(prediction)}
       <div class="tag-row">
         ${badge(`置信 ${summary.confidence}/100`, summary.confidence >= 70 ? "green" : summary.confidence >= 55 ? "amber" : "red")}
         ${badge(`爆冷 ${summary.upset_level}`, summary.upset_level === "低" ? "green" : summary.upset_level === "高" ? "red" : "amber")}
@@ -1638,15 +1761,33 @@ function renderMatch(item) {
         <div class="tag-row">
           ${badge(`比分 ${topScoreText(prediction)}`, "blue")}
           ${badge(`置信 ${summary.confidence}/100`, summary.confidence >= 70 ? "green" : summary.confidence >= 55 ? "amber" : "red")}
+          ${badge(`${summary.data_level || "数据待确认"}`, summary.data_score >= 70 ? "green" : summary.data_score >= 55 ? "amber" : "red")}
+          ${badge(`${summary.model_mode || "正常计算"}`, summary.model_mode === "正常计算" ? "green" : "amber")}
           ${badge(`爆冷 ${summary.upset_level}`, summary.upset_level === "低" ? "green" : summary.upset_level === "高" ? "red" : "amber")}
           ${badge(`分歧 ${summary.gap_level}`, summary.gap_level === "一致" ? "green" : summary.gap_level === "高分歧" ? "red" : "amber")}
         </div>
+        ${renderReliabilityStrip(prediction)}
         <div class="actions" style="margin-top: 14px; justify-content: flex-start;">
           <button class="secondary" data-tab="overview">返回总览</button>
           <button data-refresh="${esc(item.match_id)}">刷新当前比赛</button>
         </div>
       </div>
       ${renderSharePanel(item, prediction, market)}
+    </section>
+
+    <section class="grid cols-2">
+      <div class="section priority-section">
+        <h3>下注前先看这三件事</h3>
+        <div class="decision-checklist">
+          <div><span>1</span><strong>体彩让球</strong><p>${esc(handicapText(prediction.sporttery.handicap ?? item.sporttery_handicap))}</p></div>
+          <div><span>2</span><strong>数据状态</strong><p>${esc(summary.data_level || "待确认")}，${esc(summary.model_mode || "正常计算")}。</p></div>
+          <div><span>3</span><strong>比分边界</strong><p>${esc(scoreContextText(prediction, picks))}</p></div>
+        </div>
+      </div>
+      <div class="section">
+        <h3>数据源可靠度</h3>
+        ${renderSourceAuditPanel(prediction, true)}
+      </div>
     </section>
 
     <section class="section">
@@ -1756,9 +1897,14 @@ function renderMatch(item) {
         ${dataHealthTable(prediction.data_completeness.items)}
       </div>
       <div class="section">
-        <h3>中文分析摘要</h3>
-        <div class="report">${esc(buildReport(item, prediction, market))}</div>
+        <h3>完整数据源审计</h3>
+        ${renderSourceAuditPanel(prediction)}
       </div>
+    </section>
+
+    <section class="section">
+      <h3>中文分析摘要</h3>
+      <div class="report">${esc(buildReport(item, prediction, market))}</div>
     </section>
   `;
   content.querySelectorAll("button[data-refresh]").forEach((button) => {
@@ -2431,16 +2577,19 @@ function dataScoreChart(matches) {
 function dataHealthTable(items) {
   return `
     <table>
-      <thead><tr><th>数据项</th><th>状态</th><th>权重</th></tr></thead>
+      <thead><tr><th>数据项</th><th>状态</th><th>权重</th><th>缺失影响</th></tr></thead>
       <tbody>
-        ${items.map((item) => `<tr><td>${esc(item.name)}</td><td>${item.ok ? badge("已确认", "green") : badge("缺失/待确认", "amber")}</td><td>${item.weight}</td></tr>`).join("")}
+        ${items.map((item) => `<tr><td>${esc(item.name)}</td><td>${item.ok ? badge("已确认", "green") : badge("缺失/待确认", "amber")}</td><td>${item.weight}</td><td>${item.ok ? "不扣分" : esc(item.impact || "需要谨慎")}</td></tr>`).join("")}
       </tbody>
     </table>
   `;
 }
 
-function sourceHealthTable(sources, health) {
+function sourceHealthTable(sources, health, compact = false) {
   if (!sources.length) return `<p class="muted">暂无数据源配置。</p>`;
+  const visible = compact
+    ? sources.filter((source) => source.enabled || health[source.source_id]).slice(0, 6)
+    : sources;
   return `
     <table>
       <thead>
@@ -2455,7 +2604,7 @@ function sourceHealthTable(sources, health) {
         </tr>
       </thead>
       <tbody>
-        ${sources.map((source) => {
+        ${visible.map((source) => {
           const item = health[source.source_id] || {};
           const enabled = source.enabled ? badge("启用", "green") : badge("停用", "amber");
           return `
@@ -2509,12 +2658,13 @@ function buildReport(item, prediction, marketScenario) {
     `市场方向：${s.market_direction}`,
     `模型/市场分歧：${s.gap_level}`,
     `爆冷等级：${s.upset_level}`,
-    `数据完整度：${s.data_score}/100`,
+    `数据完整度：${s.data_score}/100，${s.data_level || "待确认"}，${s.model_mode || "正常计算"}`,
     ``,
     `市场修正版概率：主胜 ${pct(marketScenario.probabilities.home)}，平局 ${pct(marketScenario.probabilities.draw)}，客胜 ${pct(marketScenario.probabilities.away)}。`,
     `市场修正版比分：${scores}`,
     `爆冷路径：${active}`,
     ``,
+    `数据缺口：${(s.missing_impacts || []).slice(0, 3).join("；") || "核心数据较完整"}`,
     `风险提示：首发、伤停、天气、裁判和临场赔率如果未确认，最终置信度需要下调。`,
   ].join("\n");
 }
