@@ -2,11 +2,11 @@
   "enabled": true,
   "interval_seconds": 14400,
   "running": false,
-  "last_started_at": "2026-06-19T06:12:48+00:00",
-  "last_finished_at": "2026-06-19T06:13:01+00:00",
+  "last_started_at": "2026-06-19T11:59:28+00:00",
+  "last_finished_at": "2026-06-19T12:02:23+00:00",
   "last_ok": true,
   "last_error": null,
-  "runs": 3,
+  "runs": 4,
   "last_summary": {
     "reason": "github-actions",
     "fixtures": 208,
@@ -15,25 +15,25 @@
       {
         "match_id": "AICAI_5997508",
         "match": "美国 vs 澳大利亚",
-        "inserted": 40,
+        "inserted": 17,
         "process_source": null
       },
       {
         "match_id": "AICAI_5997560",
         "match": "苏格兰 vs 摩洛哥",
-        "inserted": 40,
+        "inserted": 17,
         "process_source": null
       },
       {
         "match_id": "AICAI_5997512",
         "match": "巴西 vs 海地",
-        "inserted": 31,
+        "inserted": 17,
         "process_source": null
       },
       {
         "match_id": "AICAI_6008756",
         "match": "土耳其 vs 巴拉圭",
-        "inserted": 40,
+        "inserted": 17,
         "process_source": null
       }
     ],
@@ -57,40 +57,7 @@
     ],
     "backtest": {
       "inserted": 0,
-      "evaluated": [
-        {
-          "match_id": "AICAI_5997519",
-          "matched_ids": [
-            "AICAI_5997519",
-            "ESP_CPV_20260616"
-          ],
-          "results": 18
-        },
-        {
-          "match_id": "AICAI_5997524",
-          "matched_ids": [
-            "AICAI_5997524",
-            "BEL_EGY_20260616"
-          ],
-          "results": 18
-        },
-        {
-          "match_id": "AICAI_5997563",
-          "matched_ids": [
-            "AICAI_5997563",
-            "KSA_URU_20260616"
-          ],
-          "results": 18
-        },
-        {
-          "match_id": "AICAI_5997562",
-          "matched_ids": [
-            "AICAI_5997562",
-            "IRN_NZL_20260616"
-          ],
-          "results": 18
-        }
-      ]
+      "evaluated": []
     },
     "logs_removed": 0,
     "public_meta": {
@@ -100,8 +67,8 @@
     },
     "sporttery_meta": {
       "source": "https://webapi.sporttery.cn/gateway/uniform/football/getMatchListV1.qry?clientCode=3001",
-      "count": 12,
-      "error": null
+      "count": 0,
+      "error": "HTTP Error 567: Unknown Status"
     },
     "aicai_meta": {
       "source": "https://sport.ttyingqiu.com/sportdata/f",
