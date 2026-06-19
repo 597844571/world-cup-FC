@@ -14,6 +14,32 @@ python run_dashboard.py
 http://127.0.0.1:8765
 ```
 
+## 线上部署与自动刷新
+
+Vercel 是 serverless 环境，不能依赖本地后台线程长期运行。线上刷新使用 GitHub Actions：
+
+```text
+.github/workflows/refresh-data.yml
+```
+
+规则：
+
+```text
+每 4 小时运行一次 scripts/refresh_for_deploy.py
+刷新赛程、赔率、当前四场预测和预测快照
+写入 data/matches.json、data/refresh_status.json、data/latest_predictions.json、data/serverless_prediction_snapshots.json
+如文件有变化则自动 commit + push
+Vercel 监听 GitHub 后自动重新部署并读取最新 JSON
+```
+
+线上状态接口：
+
+```text
+/api/refresh/status
+```
+
+本地运行 `python run_dashboard.py` 时，仍会启动本地后台刷新线程；线上以 GitHub Actions 为准。
+
 ## 当前能力
 
 - 多比赛总览和独立比赛 Tab

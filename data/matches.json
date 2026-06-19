@@ -1,141 +1,146 @@
 [
   {
-    "match_id": "ESP_CPV_20260616",
-    "home_team": "西班牙",
-    "away_team": "佛得角",
-    "home_aliases": ["Spain", "España"],
-    "away_aliases": ["Cape Verde", "Cabo Verde"],
-    "fifa_ranking": {"home": 2, "away": 72, "confidence": 0.82, "source": "fifa_ranking_seed_2026_06"},
-    "kickoff": "2026-06-16T00:00:00+08:00",
-    "stage": "周一013",
+    "match_id": "AICAI_5997508",
+    "home_team": "美国",
+    "away_team": "澳大利亚",
+    "home_aliases": [
+      "美国"
+    ],
+    "away_aliases": [
+      "澳大利亚"
+    ],
+    "kickoff": "2026-06-20T03:00:00+08:00",
+    "stage": "周五029",
     "neutral": true,
-    "home_elo": 2105,
-    "away_elo": 1625,
-    "manual_odds": {"home": 1.12, "draw": 7.6, "away": 17.0},
-    "manual_odds_drift": {"home": -0.006, "draw": 0.01, "away": 0.02},
-    "sporttery_handicap": -2,
-    "expected_goals": {"home": 2.85, "away": 0.55},
-    "formal_competition_strength": {
-      "confidence": 0.82,
-      "home": {"score": 1.85, "confederation": "UEFA", "notes": "欧洲预选赛和欧洲杯正式赛含金量高，强队稳定性强"},
-      "away": {"score": 0.28, "confederation": "CAF", "notes": "非洲区正式赛有竞争力，但跨洲强强样本少"}
+    "home_elo": 1995,
+    "away_elo": 1960,
+    "expected_goals": {
+      "home": 1.87,
+      "away": 0.63
     },
     "lineup_status": "unknown",
-    "injury_notes": "临场首发待确认。强队深盘重点看轮换、领先后的节奏管理和替补强度。",
-    "tactical_notes": "西班牙控球、压迫和禁区前沿连续传切优势明显；佛得角主要依靠低位防守、门将发挥和定位球消耗时间。",
-    "weather_notes": "美国亚特兰大，中立场。赛前天气和草皮需临场复核。",
+    "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
+    "tactical_notes": "自动建模：先使用市场倍率、球队排名和盘口作为底盘；战术细节需后续补充。",
+    "weather_notes": "待确认",
     "referee_notes": "待确认",
     "upset_triggers": {
-      "strong_low_motivation": {"enabled": true, "strength": 0.55},
-      "underdog_low_block": true,
-      "underdog_goalkeeper": true,
-      "early_event_risk": true
-    },
-    "open_game_triggers": {
-      "favorite_multi_finishers": {"enabled": true, "strength": 0.8},
-      "underdog_chase_fragility": {"enabled": true, "strength": 0.55}
-    }
-  },
-  {
-    "match_id": "BEL_EGY_20260616",
-    "home_team": "比利时",
-    "away_team": "埃及",
-    "home_aliases": ["Belgium"],
-    "away_aliases": ["Egypt"],
-    "fifa_ranking": {"home": 8, "away": 32, "confidence": 0.78, "source": "fifa_ranking_seed_2026_06"},
-    "kickoff": "2026-06-16T03:00:00+08:00",
-    "stage": "周一014",
-    "neutral": true,
-    "home_elo": 1945,
-    "away_elo": 1785,
-    "manual_odds": {"home": 1.41, "draw": 3.92, "away": 6.05},
-    "manual_odds_drift": {"home": -0.004, "draw": 0.004, "away": 0.006},
-    "sporttery_handicap": -1,
-    "expected_goals": {"home": 1.8, "away": 0.85},
-    "formal_competition_strength": {
-      "confidence": 0.76,
-      "home": {"score": 1.12, "confederation": "UEFA", "notes": "欧洲正式赛对手强度高，但近年大赛稳定性较巅峰期下降"},
-      "away": {"score": 0.62, "confederation": "CAF", "notes": "非洲杯和非洲预选赛硬度较高，防守和反击不能低估"}
-    },
-    "lineup_status": "unknown",
-    "injury_notes": "临场首发待确认。比利时若前场轮换，穿盘稳定性下降；埃及反击核心状态影响爆冷路径。",
-    "tactical_notes": "比利时整体推进和前场个人能力更强；埃及适合低位压缩空间后打反击，比分可能被压在一球差。",
-    "weather_notes": "美国西雅图，中立场。天气和草皮需临场复核。",
-    "referee_notes": "待确认",
-    "upset_triggers": {
-      "strong_low_block_problem": true,
-      "underdog_low_block": true,
-      "underdog_counter_speed": true,
-      "early_event_risk": {"enabled": true, "strength": 0.6}
-    }
-  },
-  {
-    "match_id": "KSA_URU_20260616",
-    "home_team": "沙特阿拉伯",
-    "away_team": "乌拉圭",
-    "home_aliases": ["Saudi Arabia", "Saudi"],
-    "away_aliases": ["Uruguay"],
-    "fifa_ranking": {"home": 58, "away": 15, "confidence": 0.80, "source": "fifa_ranking_seed_2026_06"},
-    "kickoff": "2026-06-16T06:00:00+08:00",
-    "stage": "周一015",
-    "neutral": true,
-    "home_elo": 1680,
-    "away_elo": 1985,
-    "manual_odds": {"home": 7.65, "draw": 4.25, "away": 1.31},
-    "manual_odds_drift": {"home": 0.006, "draw": 0.004, "away": -0.004},
-    "sporttery_handicap": 1,
-    "expected_goals": {"home": 0.75, "away": 1.85},
-    "formal_competition_strength": {
-      "confidence": 0.84,
-      "home": {"score": 0.30, "confederation": "AFC", "notes": "亚洲区正式赛有韧性，但面对南美强队样本含金量不足"},
-      "away": {"score": 1.58, "confederation": "CONMEBOL", "notes": "南美预选赛强度高，强强对抗和客场抗压能力更有含金量"}
-    },
-    "lineup_status": "unknown",
-    "injury_notes": "临场首发待确认。乌拉圭赛前长途旅行和恢复质量会影响大胜概率。",
-    "tactical_notes": "乌拉圭对抗、转换和禁区终结更强；沙特需要通过压缩中路、定位球和反击制造一球以内的保护空间。",
-    "weather_notes": "美国迈阿密加登斯，中立场。湿热环境可能降低高强度压迫持续性。",
-    "referee_notes": "待确认",
-    "upset_triggers": {
-      "strong_fatigue": {"enabled": true, "strength": 0.55},
       "underdog_low_block": true,
       "underdog_set_piece": true,
-      "weather_pitch_against_technical": {"enabled": true, "strength": 0.45}
+      "early_event_risk": true
     },
-    "open_game_triggers": {
-      "favorite_multi_finishers": {"enabled": true, "strength": 0.65}
-    }
+    "manual_odds": {
+      "home": 1.45,
+      "draw": 3.83,
+      "away": 5.6
+    },
+    "sporttery_handicap": -1
   },
   {
-    "match_id": "IRN_NZL_20260616",
-    "home_team": "伊朗",
-    "away_team": "新西兰",
-    "home_aliases": ["Iran"],
-    "away_aliases": ["New Zealand"],
-    "fifa_ranking": {"home": 20, "away": 88, "confidence": 0.76, "source": "fifa_ranking_seed_2026_06"},
-    "kickoff": "2026-06-16T09:00:00+08:00",
-    "stage": "周一016",
+    "match_id": "AICAI_5997560",
+    "home_team": "苏格兰",
+    "away_team": "摩洛哥",
+    "home_aliases": [
+      "苏格兰"
+    ],
+    "away_aliases": [
+      "摩洛哥"
+    ],
+    "kickoff": "2026-06-20T06:00:00+08:00",
+    "stage": "周五030",
     "neutral": true,
-    "home_elo": 1815,
-    "away_elo": 1585,
-    "manual_odds": {"home": 1.59, "draw": 3.28, "away": 5.10},
-    "manual_odds_drift": {"home": -0.002, "draw": 0.002, "away": 0.004},
-    "sporttery_handicap": -1,
-    "expected_goals": {"home": 1.55, "away": 0.7},
-    "formal_competition_strength": {
-      "confidence": 0.70,
-      "home": {"score": 0.78, "confederation": "AFC", "notes": "亚洲正式赛稳定，但跨洲对抗和临场盘口走弱需要扣分"},
-      "away": {"score": -0.10, "confederation": "OFC", "notes": "大洋洲正式赛对手强度偏低，跨洲硬仗样本少"}
+    "home_elo": 1885,
+    "away_elo": 2040,
+    "expected_goals": {
+      "home": 0.66,
+      "away": 1.74
     },
     "lineup_status": "unknown",
-    "injury_notes": "临场首发待确认。伊朗若受外部因素干扰或心态保守，穿盘稳定性下降。",
-    "tactical_notes": "伊朗身体、经验和中前场效率占优；新西兰主要依赖防守纪律、空中球和定位球。",
-    "weather_notes": "美国英格尔伍德，中立场。场地条件需临场复核。",
+    "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
+    "tactical_notes": "自动建模：先使用市场倍率、球队排名和盘口作为底盘；战术细节需后续补充。",
+    "weather_notes": "待确认",
     "referee_notes": "待确认",
     "upset_triggers": {
-      "strong_low_block_problem": true,
       "underdog_low_block": true,
-      "underdog_set_piece": {"enabled": true, "strength": 0.7},
+      "underdog_set_piece": true,
       "early_event_risk": true
-    }
+    },
+    "manual_odds": {
+      "home": 5.35,
+      "draw": 3.42,
+      "away": 1.54
+    },
+    "sporttery_handicap": 1
+  },
+  {
+    "match_id": "AICAI_5997512",
+    "home_team": "巴西",
+    "away_team": "海地",
+    "home_aliases": [
+      "巴西"
+    ],
+    "away_aliases": [
+      "海地"
+    ],
+    "kickoff": "2026-06-20T08:30:00+08:00",
+    "stage": "周五031",
+    "neutral": true,
+    "home_elo": 2045,
+    "away_elo": 1645,
+    "expected_goals": {
+      "home": 2.62,
+      "away": 0.88
+    },
+    "lineup_status": "unknown",
+    "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
+    "tactical_notes": "自动建模：先使用市场倍率、球队排名和盘口作为底盘；战术细节需后续补充。",
+    "weather_notes": "待确认",
+    "referee_notes": "待确认",
+    "upset_triggers": {
+      "underdog_low_block": true,
+      "underdog_set_piece": true,
+      "early_event_risk": true
+    },
+    "manual_odds": {
+      "home": 1.1,
+      "draw": 11.0,
+      "away": 21.0
+    },
+    "sporttery_handicap": -2
+  },
+  {
+    "match_id": "AICAI_6008756",
+    "home_team": "土耳其",
+    "away_team": "巴拉圭",
+    "home_aliases": [
+      "土耳其"
+    ],
+    "away_aliases": [
+      "巴拉圭"
+    ],
+    "kickoff": "2026-06-20T11:00:00+08:00",
+    "stage": "周五032",
+    "neutral": true,
+    "home_elo": 1940,
+    "away_elo": 1860,
+    "expected_goals": {
+      "home": 1.53,
+      "away": 0.87
+    },
+    "lineup_status": "unknown",
+    "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
+    "tactical_notes": "自动建模：先使用市场倍率、球队排名和盘口作为底盘；战术细节需后续补充。",
+    "weather_notes": "待确认",
+    "referee_notes": "待确认",
+    "upset_triggers": {
+      "underdog_low_block": true,
+      "underdog_set_piece": true,
+      "early_event_risk": true
+    },
+    "manual_odds": {
+      "home": 1.82,
+      "draw": 3.22,
+      "away": 3.72
+    },
+    "sporttery_handicap": -1
   }
 ]

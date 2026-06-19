@@ -3,14 +3,19 @@ from __future__ import annotations
 import json
 import mimetypes
 import hashlib
+import os
 import re
+import threading
+import time
+import traceback
+from datetime import datetime, timedelta, timezone
 from itertools import combinations
 from math import prod
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
-from .config import WEB_DIR, ensure_dirs
+from .config import REFRESH_STATUS_PATH, ROOT, WEB_DIR, ensure_dirs, load_json, save_json
 from .aicai_client import fetch_aicai_worldcup_context, snapshots_for_match
 from .backtest import evaluate_fixture, summarize_backtests
 from .match_registry import find_match, load_matches, save_matches, sync_matches
@@ -23,6 +28,11 @@ from .source_registry import load_source_health, load_sources
 from .standings_client import fetch_bing_standings, load_standings
 
 
+REFRESH_INTERVAL_SECONDS = int(os.environ.get("WORLD_CUP_REFRESH_SECONDS", str(4 * 60 * 60)))
+TMP_DIR = ROOT / "tmp"
+_BACKGROUND_REFRESH_STARTED = False
+
+
 class DashboardServer(BaseHTTPRequestHandler):
     store = OddsStore()
 
@@ -30,6 +40,9 @@ class DashboardServer(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         if parsed.path == "/api/state":
             self.send_json(self.build_state())
+            return
+        if parsed.path == "/api/refresh/status":
+            self.send_json({"ok": True, "refresh_status": load_refresh_status()})
             return
         if parsed.path.startswith("/api/match/"):
             match_id = parsed.path.rsplit("/", 1)[-1]
@@ -231,6 +244,7 @@ class DashboardServer(BaseHTTPRequestHandler):
             "prediction_snapshots": self.store.prediction_snapshots(),
             "backtests": backtests,
             "backtest_summary": summarize_backtests(backtests),
+            "refresh_status": load_refresh_status(),
         }
 
     def serve_static(self, request_path: str) -> None:
@@ -629,7 +643,218 @@ def safe_fetch_aicai_context(matches: list[dict]) -> dict:
         return {"source": "https://live.aicai.com/league/index.htm?leagueId=1999&tab=4", "fixtures": [], "match_contexts": {}, "count": 0, "error": str(exc)}
 
 
+def utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+
+def load_refresh_status() -> dict:
+    return load_json(
+        REFRESH_STATUS_PATH,
+        {
+            "enabled": True,
+            "interval_seconds": REFRESH_INTERVAL_SECONDS,
+            "running": False,
+            "last_started_at": None,
+            "last_finished_at": None,
+            "last_ok": None,
+            "last_error": None,
+            "runs": 0,
+            "last_summary": {},
+        },
+    )
+
+
+def save_refresh_status(payload: dict) -> None:
+    payload["interval_seconds"] = REFRESH_INTERVAL_SECONDS
+    save_json(REFRESH_STATUS_PATH, payload)
+
+
+def parse_dt(value: str | None) -> datetime | None:
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def should_auto_replace_matches(matches: list[dict]) -> bool:
+    if not matches:
+        return True
+    now = datetime.now(timezone.utc)
+    for match in matches:
+        kickoff = parse_dt(match.get("kickoff"))
+        if kickoff is None:
+            return False
+        if kickoff.tzinfo is None:
+            kickoff = kickoff.replace(tzinfo=timezone.utc)
+        if kickoff > now - timedelta(hours=2) and match.get("status") != "finished":
+            return False
+    return True
+
+
+def cleanup_processing_logs(retain_days: int = 3) -> int:
+    if not TMP_DIR.exists():
+        return 0
+    cutoff = time.time() - retain_days * 24 * 60 * 60
+    removed = 0
+    patterns = ("*.log", "*.tmp", "rendered_*/*.png", "pdfs/rendered_*/*.png")
+    for pattern in patterns:
+        for path in TMP_DIR.glob(pattern):
+            try:
+                if path.is_file() and path.stat().st_mtime < cutoff:
+                    path.unlink()
+                    removed += 1
+            except OSError:
+                continue
+    return removed
+
+
+def archive_current_predictions(store: OddsStore, matches: list[dict]) -> list[dict]:
+    archived = []
+    sync_matches(store, matches)
+    for match in matches:
+        prediction = build_prediction(match, store.odds_history(match["match_id"]))
+        count = store.archive_prediction(match["match_id"], prediction)
+        archived.append({"match_id": match["match_id"], "snapshots": count})
+    return archived
+
+
+def run_backtest_for_finished(store: OddsStore) -> dict:
+    inserted = 0
+    evaluated = []
+    for fixture in store.fixtures("finished"):
+        match_ids = store.match_ids_for_fixture(fixture)
+        snapshots = []
+        odds_history = []
+        for match_id in match_ids:
+            snapshots.extend(store.prediction_snapshots(match_id))
+            odds_history.extend(store.odds_history(match_id))
+        rows = evaluate_fixture(fixture, snapshots, odds_history)
+        inserted += store.insert_backtest_results(rows)
+        if rows:
+            evaluated.append({"match_id": fixture["match_id"], "matched_ids": match_ids, "results": len(rows)})
+    return {"inserted": inserted, "evaluated": evaluated}
+
+
+def auto_refresh_cycle(store: OddsStore, reason: str = "scheduled") -> dict:
+    status = load_refresh_status()
+    status.update(
+        {
+            "enabled": True,
+            "running": True,
+            "last_started_at": utc_now(),
+            "last_error": None,
+            "reason": reason,
+        }
+    )
+    save_refresh_status(status)
+    summary: dict = {"reason": reason, "fixtures": 0, "selected_matches": 0, "refreshed": [], "archived": [], "backtest": {}, "logs_removed": 0}
+    try:
+        existing_matches = load_matches()
+        public_fixtures, public_meta = fetch_public_schedule()
+        sporttery_fixtures, sporttery_meta = fetch_sporttery_fixtures()
+        aicai_context = safe_fetch_aicai_context(existing_matches)
+        fixtures = merge_fixtures(public_fixtures, [*sporttery_fixtures, *aicai_context.get("fixtures", [])])
+        for fixture in fixtures:
+            store.upsert_fixture(fixture)
+        summary["fixtures"] = len(fixtures)
+        summary["public_meta"] = public_meta
+        summary["sporttery_meta"] = sporttery_meta
+        summary["aicai_meta"] = {
+            "source": aicai_context.get("source"),
+            "count": aicai_context.get("count", 0),
+            "error": aicai_context.get("error"),
+        }
+
+        matches = existing_matches
+        if should_auto_replace_matches(matches):
+            selected = select_fixture_window(fixtures, None, 4)
+            if selected:
+                matches = [match_from_fixture(fixture) for fixture in selected]
+                save_matches(matches)
+        summary["selected_matches"] = len(matches)
+
+        sync_matches(store, matches)
+        fresh_aicai_context = safe_fetch_aicai_context(matches)
+        process_changed = False
+        for match in matches:
+            snapshots = fetch_odds(match)
+            snapshots.extend(snapshots_for_match(match, fresh_aicai_context.get("match_contexts", {}).get(match["match_id"])))
+            inserted = store.insert_snapshots(match["match_id"], snapshots)
+            process_payload = fetch_match_process(match)
+            enriched, changed = merge_match_process(match, process_payload)
+            if changed:
+                match.update(enriched)
+                process_changed = True
+            summary["refreshed"].append(
+                {
+                    "match_id": match["match_id"],
+                    "match": f"{match.get('home_team')} vs {match.get('away_team')}",
+                    "inserted": inserted,
+                    "process_source": process_payload.get("source") if process_payload else None,
+                }
+            )
+        if process_changed:
+            save_matches(matches)
+
+        summary["archived"] = archive_current_predictions(store, matches)
+        summary["backtest"] = run_backtest_for_finished(store)
+        summary["logs_removed"] = cleanup_processing_logs()
+        status = load_refresh_status()
+        status.update(
+            {
+                "running": False,
+                "last_finished_at": utc_now(),
+                "last_ok": True,
+                "last_error": None,
+                "runs": int(status.get("runs") or 0) + 1,
+                "last_summary": summary,
+            }
+        )
+        save_refresh_status(status)
+        return summary
+    except Exception as exc:
+        status = load_refresh_status()
+        status.update(
+            {
+                "running": False,
+                "last_finished_at": utc_now(),
+                "last_ok": False,
+                "last_error": f"{exc}\n{traceback.format_exc(limit=6)}",
+                "runs": int(status.get("runs") or 0) + 1,
+                "last_summary": summary,
+            }
+        )
+        save_refresh_status(status)
+        raise
+
+
+def background_refresh_loop(store: OddsStore) -> None:
+    while True:
+        try:
+            auto_refresh_cycle(store, reason="startup" if not load_refresh_status().get("last_started_at") else "scheduled")
+        except Exception as exc:
+            print(f"[background-refresh] failed: {exc}")
+        time.sleep(max(60, REFRESH_INTERVAL_SECONDS))
+
+
+def start_background_refresh(store: OddsStore) -> None:
+    global _BACKGROUND_REFRESH_STARTED
+    if _BACKGROUND_REFRESH_STARTED:
+        return
+    if os.environ.get("WORLD_CUP_DISABLE_AUTO_REFRESH") == "1":
+        status = load_refresh_status()
+        status.update({"enabled": False, "running": False, "last_error": None})
+        save_refresh_status(status)
+        return
+    _BACKGROUND_REFRESH_STARTED = True
+    thread = threading.Thread(target=background_refresh_loop, args=(store,), name="world-cup-refresh", daemon=True)
+    thread.start()
+
+
 def run(host: str = "127.0.0.1", port: int = 8765) -> None:
+    start_background_refresh(DashboardServer.store)
     server = ThreadingHTTPServer((host, port), DashboardServer)
     print(f"World Cup Prediction Terminal running at http://{host}:{port}")
     server.serve_forever()

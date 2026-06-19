@@ -19,6 +19,32 @@ const colors = {
 
 const RULES_VERSION = "规则 v2.4：数据源健康度 + 去水概率 + 小组赛修正 + 支线并排";
 
+async function fetchWithRetry(url, options = {}, retries = 2) {
+  let lastError;
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    try {
+      const response = await fetch(url, {
+        cache: "no-store",
+        ...options,
+        headers: {
+          ...(options.headers || {}),
+          "X-Requested-With": "fetch",
+        },
+      });
+      if (!response.ok && response.status >= 500 && attempt < retries) {
+        await new Promise((resolve) => setTimeout(resolve, 450 * (attempt + 1)));
+        continue;
+      }
+      return response;
+    } catch (error) {
+      lastError = error;
+      if (attempt >= retries) break;
+      await new Promise((resolve) => setTimeout(resolve, 450 * (attempt + 1)));
+    }
+  }
+  throw lastError || new Error("网络请求失败");
+}
+
 async function readJsonResponse(response, actionName = "请求") {
   const contentType = response.headers.get("content-type") || "";
   const text = await response.text();
@@ -52,7 +78,7 @@ function esc(value) {
 }
 
 async function loadState() {
-  const response = await fetch("/api/state");
+  const response = await fetchWithRetry("/api/state");
   state.data = await readJsonResponse(response, "加载状态");
   render();
 }
@@ -60,7 +86,7 @@ async function loadState() {
 async function refresh(matchId = null) {
   setBusy(true);
   try {
-    const response = await fetch("/api/refresh", {
+    const response = await fetchWithRetry("/api/refresh", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(matchId ? { match_id: matchId } : {}),
@@ -77,7 +103,7 @@ async function refresh(matchId = null) {
 async function postAction(url, message) {
   setBusy(true);
   try {
-    const response = await fetch(url, {
+    const response = await fetchWithRetry(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: "{}",
@@ -95,7 +121,7 @@ async function selectFixture(fixtureKey, mode = "single") {
   setBusy(true);
   showToast(mode === "next4" ? "正在从这场起生成4场预测..." : "正在加入此场预测...");
   try {
-    const response = await fetch("/api/matches/select", {
+    const response = await fetchWithRetry("/api/matches/select", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ fixture_key: fixtureKey, mode }),
@@ -992,6 +1018,34 @@ function renderOverviewOrderSheet(matches) {
   `;
 }
 
+function renderRefreshStatusPanel() {
+  const status = state.data?.refresh_status || {};
+  const summary = status.last_summary || {};
+  const archived = (summary.archived || []).reduce((sum, row) => sum + Number(row.snapshots || 0), 0);
+  const last = status.last_finished_at || status.last_started_at || "尚未刷新";
+  const ok = status.last_ok === true ? "成功" : status.last_ok === false ? "失败" : "待确认";
+  const tone = status.last_ok === true ? "green" : status.last_ok === false ? "red" : "amber";
+  const hours = Math.round(Number(status.interval_seconds || 14400) / 3600);
+  return `
+    <section class="section sci-panel refresh-status-panel">
+      <div class="section-heading-row">
+        <div>
+          <h3>自动刷新状态</h3>
+          <p class="muted">线上由 GitHub Actions 每 ${hours} 小时刷新并提交数据，Vercel 自动读取 GitHub 最新版本。</p>
+        </div>
+        ${badge(ok, tone)}
+      </div>
+      <div class="mini-probs">
+        <div><span>最近完成</span><strong>${esc(last)}</strong></div>
+        <div><span>赛程数量</span><strong>${summary.fixtures ?? "-"}</strong></div>
+        <div><span>当前预测</span><strong>${summary.selected_matches ?? state.data?.matches?.length ?? "-"}</strong></div>
+        <div><span>预测快照</span><strong>${archived || (state.data?.prediction_snapshots || []).length || "-"}</strong></div>
+      </div>
+      ${status.last_error ? `<p class="muted">最近错误：${esc(String(status.last_error).slice(0, 180))}</p>` : ""}
+    </section>
+  `;
+}
+
 function renderOverviewV2() {
   const content = document.getElementById("content");
   const matches = state.data?.matches ?? [];
@@ -1021,6 +1075,8 @@ function renderOverviewV2() {
       <div><b>03</b><strong>校验数据</strong><span>缺数据自动降级</span></div>
       <div><b>04</b><strong>玩法测算</strong><span>按体彩可买项输出</span></div>
     </section>
+
+    ${renderRefreshStatusPanel()}
 
     <section class="grid cols-4 sci-metrics">
       <div class="metric"><div class="label">当前预测</div><div class="value">${matches.length}</div><div class="sub">可查看详情和测算</div></div>
@@ -1917,9 +1973,6 @@ function renderMatch(item) {
       <div class="report">${esc(buildReport(item, prediction, market))}</div>
     </section>
   `;
-  content.querySelectorAll("button[data-refresh]").forEach((button) => {
-    button.addEventListener("click", () => refresh(button.dataset.refresh));
-  });
 }
 
 function renderBettingPlanner(item, prediction) {

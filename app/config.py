@@ -14,6 +14,9 @@ MATCHES_PATH = DATA_DIR / "matches.json"
 SOURCES_PATH = DATA_DIR / "sources.json"
 SOURCE_HEALTH_PATH = DATA_DIR / "source_health.json"
 STANDINGS_PATH = DATA_DIR / "group_standings.json"
+REFRESH_STATUS_PATH = DATA_DIR / "refresh_status.json"
+SERVERLESS_PREDICTIONS_PATH = DATA_DIR / "latest_predictions.json"
+SERVERLESS_PREDICTION_SNAPSHOTS_PATH = DATA_DIR / "serverless_prediction_snapshots.json"
 
 
 def ensure_dirs() -> None:

@@ -86,6 +86,18 @@ DEFAULT_SOURCES = [
         "notes": "公开世界杯数据统计源，提供赛程赛果、欧赔初赔/即时赔、让球市场参考、总进球市场参考、半全场和常见比分统计；用于市场倍率变化、回测和算法修正，不作为中国体彩可下单选项。",
     },
     {
+        "source_id": "fivehundred_jczq",
+        "name": "500彩票网竞彩足球备份源",
+        "type": "fivehundred_jczq",
+        "enabled": True,
+        "priority": 14,
+        "url": "https://trade.500.com/jczq/",
+        "requires_browser": False,
+        "reliability": "public_aggregator",
+        "polite_delay_seconds": 0.8,
+        "notes": "第三方竞彩聚合源，用于官方体彩计算器缺失时的备份字段和一致性校验；可提供赛事编号、联赛、开赛时间、主客队、让球、胜平负/让球胜平负SP和停售时间。不得替代官方体彩最终下单确认。",
+    },
+    {
         "source_id": "msn_worldcup_process",
         "name": "MSN世界杯赛中/赛后过程统计",
         "type": "msn_match_process",

@@ -8,6 +8,7 @@ from http.server import BaseHTTPRequestHandler
 from typing import Any
 
 from .aicai_client import fetch_aicai_worldcup_context, snapshots_for_match
+from .config import REFRESH_STATUS_PATH, SERVERLESS_PREDICTION_SNAPSHOTS_PATH, load_json
 from .match_registry import load_matches
 from .prediction_engine import build_prediction
 from .schedule_client import fetch_public_schedule, fetch_sporttery_fixtures, split_fixtures
@@ -166,6 +167,21 @@ def build_serverless_state(selected_matches: list[dict[str, Any]] | None = None)
                 "odds_history": history,
             }
         )
+    refresh_status = load_json(
+        REFRESH_STATUS_PATH,
+        {
+            "enabled": False,
+            "interval_seconds": 14400,
+            "running": False,
+            "last_started_at": None,
+            "last_finished_at": None,
+            "last_ok": None,
+            "last_error": None,
+            "runs": 0,
+            "last_summary": {},
+        },
+    )
+    prediction_snapshots = load_json(SERVERLESS_PREDICTION_SNAPSHOTS_PATH, [])
     return {
         "matches": details,
         "sporttery_combos": [],
@@ -176,7 +192,7 @@ def build_serverless_state(selected_matches: list[dict[str, Any]] | None = None)
             "finished": [{key: value for key, value in fixture.items() if key != "raw_json"} for fixture in fixture_groups["finished"]],
         },
         "standings": load_standings(),
-        "prediction_snapshots": [],
+        "prediction_snapshots": prediction_snapshots,
         "backtests": [],
         "backtest_summary": {
             "count": 0,
@@ -201,6 +217,28 @@ def build_serverless_state(selected_matches: list[dict[str, Any]] | None = None)
                 },
                 "errors": errors,
             },
+        "refresh_status": refresh_status,
+    }
+
+
+def refresh_status_response() -> dict[str, Any]:
+    return {
+        "ok": True,
+        "mode": "vercel_git_snapshot",
+        "refresh_status": load_json(
+            REFRESH_STATUS_PATH,
+            {
+                "enabled": False,
+                "interval_seconds": 14400,
+                "running": False,
+                "last_started_at": None,
+                "last_finished_at": None,
+                "last_ok": None,
+                "last_error": None,
+                "runs": 0,
+                "last_summary": {},
+            },
+        ),
     }
 
 
