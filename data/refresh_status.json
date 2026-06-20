@@ -2,11 +2,11 @@
   "enabled": true,
   "interval_seconds": 14400,
   "running": false,
-  "last_started_at": "2026-06-20T13:28:56+00:00",
-  "last_finished_at": "2026-06-20T13:36:28+00:00",
+  "last_started_at": "2026-06-20T17:15:53+00:00",
+  "last_finished_at": "2026-06-20T17:19:14+00:00",
   "last_ok": true,
   "last_error": null,
-  "runs": 11,
+  "runs": 12,
   "last_summary": {
     "reason": "github-actions",
     "fixtures": 208,
@@ -56,8 +56,16 @@
       }
     ],
     "backtest": {
-      "inserted": 0,
-      "evaluated": []
+      "inserted": 6,
+      "evaluated": [
+        {
+          "match_id": "AICAI_6008130",
+          "matched_ids": [
+            "AICAI_6008130"
+          ],
+          "results": 6
+        }
+      ]
     },
     "logs_removed": 0,
     "public_meta": {
