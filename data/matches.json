@@ -1,22 +1,22 @@
 [
   {
-    "match_id": "AICAI_5997508",
-    "home_team": "美国",
-    "away_team": "澳大利亚",
+    "match_id": "AICAI_6008130",
+    "home_team": "荷兰",
+    "away_team": "瑞典",
     "home_aliases": [
-      "美国"
+      "荷兰"
     ],
     "away_aliases": [
-      "澳大利亚"
+      "瑞典"
     ],
-    "kickoff": "2026-06-20T03:00:00+08:00",
-    "stage": "周五029",
+    "kickoff": "2026-06-21T01:00:00+08:00",
+    "stage": "小组赛",
     "neutral": true,
-    "home_elo": 1995,
-    "away_elo": 1960,
+    "home_elo": 2030,
+    "away_elo": 1900,
     "expected_goals": {
-      "home": 1.87,
-      "away": 0.63
+      "home": 1.68,
+      "away": 0.72
     },
     "lineup_status": "unknown",
     "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
@@ -29,30 +29,29 @@
       "early_event_risk": true
     },
     "manual_odds": {
-      "home": 1.45,
-      "draw": 3.83,
-      "away": 5.6
-    },
-    "sporttery_handicap": -1
+      "home": 1.69,
+      "draw": 4.2,
+      "away": 4.7
+    }
   },
   {
-    "match_id": "AICAI_5997560",
-    "home_team": "苏格兰",
-    "away_team": "摩洛哥",
+    "match_id": "AICAI_5997514",
+    "home_team": "德国",
+    "away_team": "科特迪瓦",
     "home_aliases": [
-      "苏格兰"
+      "德国"
     ],
     "away_aliases": [
-      "摩洛哥"
+      "科特迪瓦"
     ],
-    "kickoff": "2026-06-20T06:00:00+08:00",
-    "stage": "周五030",
+    "kickoff": "2026-06-21T04:00:00+08:00",
+    "stage": "小组赛",
     "neutral": true,
-    "home_elo": 1885,
-    "away_elo": 2040,
+    "home_elo": 2025,
+    "away_elo": 1920,
     "expected_goals": {
-      "home": 0.66,
-      "away": 1.74
+      "home": 2.25,
+      "away": 0.75
     },
     "lineup_status": "unknown",
     "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
@@ -65,30 +64,29 @@
       "early_event_risk": true
     },
     "manual_odds": {
-      "home": 5.35,
-      "draw": 3.42,
-      "away": 1.54
-    },
-    "sporttery_handicap": 1
+      "home": 1.51,
+      "draw": 4.75,
+      "away": 5.9
+    }
   },
   {
-    "match_id": "AICAI_5997512",
-    "home_team": "巴西",
-    "away_team": "海地",
+    "match_id": "AICAI_5997570",
+    "home_team": "厄瓜多尔",
+    "away_team": "库拉索",
     "home_aliases": [
-      "巴西"
+      "厄瓜多尔"
     ],
     "away_aliases": [
-      "海地"
+      "库拉索"
     ],
-    "kickoff": "2026-06-20T08:30:00+08:00",
-    "stage": "周五031",
+    "kickoff": "2026-06-21T08:00:00+08:00",
+    "stage": "小组赛",
     "neutral": true,
-    "home_elo": 2045,
-    "away_elo": 1645,
+    "home_elo": 1930,
+    "away_elo": 1655,
     "expected_goals": {
-      "home": 2.62,
-      "away": 0.88
+      "home": 2.25,
+      "away": 0.75
     },
     "lineup_status": "unknown",
     "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
@@ -101,30 +99,29 @@
       "early_event_risk": true
     },
     "manual_odds": {
-      "home": 1.1,
-      "draw": 11.0,
-      "away": 21.0
-    },
-    "sporttery_handicap": -2
+      "home": 1.13,
+      "draw": 8.7,
+      "away": 23.0
+    }
   },
   {
-    "match_id": "AICAI_6008756",
-    "home_team": "土耳其",
-    "away_team": "巴拉圭",
+    "match_id": "AICAI_5997572",
+    "home_team": "突尼斯",
+    "away_team": "日本",
     "home_aliases": [
-      "土耳其"
+      "突尼斯"
     ],
     "away_aliases": [
-      "巴拉圭"
+      "日本"
     ],
-    "kickoff": "2026-06-20T11:00:00+08:00",
-    "stage": "周五032",
+    "kickoff": "2026-06-21T12:00:00+08:00",
+    "stage": "小组赛",
     "neutral": true,
-    "home_elo": 1940,
-    "away_elo": 1860,
+    "home_elo": 1800,
+    "away_elo": 1985,
     "expected_goals": {
-      "home": 1.53,
-      "away": 0.87
+      "home": 0.6,
+      "away": 1.8
     },
     "lineup_status": "unknown",
     "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
@@ -137,10 +134,9 @@
       "early_event_risk": true
     },
     "manual_odds": {
-      "home": 1.82,
-      "draw": 3.22,
-      "away": 3.72
-    },
-    "sporttery_handicap": -1
+      "home": 6.3,
+      "draw": 4.1,
+      "away": 1.56
+    }
   }
 ]
