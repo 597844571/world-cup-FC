@@ -1,54 +1,19 @@
 [
   {
-    "match_id": "AICAI_5997520",
-    "home_team": "西班牙",
-    "away_team": "沙特阿拉伯",
+    "match_id": "AICAI_5997529",
+    "home_team": "阿根廷",
+    "away_team": "奥地利",
     "home_aliases": [
-      "西班牙"
+      "阿根廷"
     ],
     "away_aliases": [
-      "沙特阿拉伯"
+      "奥地利"
     ],
-    "kickoff": "2026-06-22T00:00:00+08:00",
+    "kickoff": "2026-06-23T01:00:00+08:00",
     "stage": "小组赛",
     "neutral": true,
-    "home_elo": 2055,
-    "away_elo": 1775,
-    "expected_goals": {
-      "home": 2.62,
-      "away": 0.88
-    },
-    "lineup_status": "unknown",
-    "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
-    "tactical_notes": "自动建模：先使用市场倍率、球队排名和盘口作为底盘；战术细节需后续补充。",
-    "weather_notes": "待确认",
-    "referee_notes": "待确认",
-    "upset_triggers": {
-      "underdog_low_block": true,
-      "underdog_set_piece": true,
-      "early_event_risk": true
-    },
-    "manual_odds": {
-      "home": 1.09,
-      "draw": 11.0,
-      "away": 29.0
-    }
-  },
-  {
-    "match_id": "AICAI_5997517",
-    "home_team": "比利时",
-    "away_team": "伊朗",
-    "home_aliases": [
-      "比利时"
-    ],
-    "away_aliases": [
-      "伊朗"
-    ],
-    "kickoff": "2026-06-22T03:00:00+08:00",
-    "stage": "小组赛",
-    "neutral": true,
-    "home_elo": 2020,
-    "away_elo": 1960,
+    "home_elo": 2065,
+    "away_elo": 1965,
     "expected_goals": {
       "home": 1.88,
       "away": 0.62
@@ -64,29 +29,29 @@
       "early_event_risk": true
     },
     "manual_odds": {
-      "home": 1.44,
-      "draw": 4.7,
+      "home": 1.47,
+      "draw": 4.45,
       "away": 7.3
     }
   },
   {
-    "match_id": "AICAI_5997575",
-    "home_team": "乌拉圭",
-    "away_team": "佛得角",
+    "match_id": "AICAI_5997526",
+    "home_team": "法国",
+    "away_team": "伊拉克",
     "home_aliases": [
-      "乌拉圭"
+      "法国"
     ],
     "away_aliases": [
-      "佛得角"
+      "伊拉克"
     ],
-    "kickoff": "2026-06-22T06:00:00+08:00",
+    "kickoff": "2026-06-23T05:00:00+08:00",
     "stage": "小组赛",
     "neutral": true,
-    "home_elo": 1980,
-    "away_elo": 1755,
+    "home_elo": 2060,
+    "away_elo": 1770,
     "expected_goals": {
-      "home": 1.8,
-      "away": 0.6
+      "home": 2.62,
+      "away": 0.88
     },
     "lineup_status": "unknown",
     "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
@@ -99,29 +64,29 @@
       "early_event_risk": true
     },
     "manual_odds": {
-      "home": 1.44,
-      "draw": 4.25,
-      "away": 8.7
+      "home": 1.08,
+      "draw": 12.0,
+      "away": 31.0
     }
   },
   {
-    "match_id": "AICAI_5997573",
-    "home_team": "新西兰",
-    "away_team": "埃及",
+    "match_id": "AICAI_5997577",
+    "home_team": "挪威",
+    "away_team": "塞内加尔",
     "home_aliases": [
-      "新西兰"
+      "挪威"
     ],
     "away_aliases": [
-      "埃及"
+      "塞内加尔"
     ],
-    "kickoff": "2026-06-22T09:00:00+08:00",
+    "kickoff": "2026-06-23T08:00:00+08:00",
     "stage": "小组赛",
     "neutral": true,
-    "home_elo": 1655,
-    "away_elo": 1930,
+    "home_elo": 1935,
+    "away_elo": 1985,
     "expected_goals": {
-      "home": 0.61,
-      "away": 1.79
+      "home": 1.49,
+      "away": 1.01
     },
     "lineup_status": "unknown",
     "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
@@ -134,9 +99,44 @@
       "early_event_risk": true
     },
     "manual_odds": {
-      "home": 6.1,
-      "draw": 4.05,
-      "away": 1.58
+      "home": 2.12,
+      "draw": 3.55,
+      "away": 3.45
+    }
+  },
+  {
+    "match_id": "AICAI_5997579",
+    "home_team": "约旦",
+    "away_team": "阿尔及利亚",
+    "home_aliases": [
+      "约旦"
+    ],
+    "away_aliases": [
+      "阿尔及利亚"
+    ],
+    "kickoff": "2026-06-23T11:00:00+08:00",
+    "stage": "小组赛",
+    "neutral": true,
+    "home_elo": 1730,
+    "away_elo": 1925,
+    "expected_goals": {
+      "home": 0.62,
+      "away": 1.88
+    },
+    "lineup_status": "unknown",
+    "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
+    "tactical_notes": "自动建模：先使用市场倍率、球队排名和盘口作为底盘；战术细节需后续补充。",
+    "weather_notes": "待确认",
+    "referee_notes": "待确认",
+    "upset_triggers": {
+      "underdog_low_block": true,
+      "underdog_set_piece": true,
+      "early_event_risk": true
+    },
+    "manual_odds": {
+      "home": 6.3,
+      "draw": 4.3,
+      "away": 1.53
     }
   }
 ]
