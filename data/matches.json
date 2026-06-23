@@ -1,22 +1,22 @@
 [
   {
-    "match_id": "AICAI_5997529",
-    "home_team": "阿根廷",
-    "away_team": "奥地利",
+    "match_id": "AICAI_5997532",
+    "home_team": "葡萄牙",
+    "away_team": "乌兹别克斯坦",
     "home_aliases": [
-      "阿根廷"
+      "葡萄牙"
     ],
     "away_aliases": [
-      "奥地利"
+      "乌兹别克斯坦"
     ],
-    "kickoff": "2026-06-23T01:00:00+08:00",
+    "kickoff": "2026-06-24T01:00:00+08:00",
     "stage": "小组赛",
     "neutral": true,
-    "home_elo": 2065,
-    "away_elo": 1965,
+    "home_elo": 2025,
+    "away_elo": 1800,
     "expected_goals": {
-      "home": 1.88,
-      "away": 0.62
+      "home": 1.8,
+      "away": 0.6
     },
     "lineup_status": "unknown",
     "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
@@ -29,29 +29,29 @@
       "early_event_risk": true
     },
     "manual_odds": {
-      "home": 1.47,
-      "draw": 4.45,
-      "away": 7.3
+      "home": 1.14,
+      "draw": 8.3,
+      "away": 17.5
     }
   },
   {
-    "match_id": "AICAI_5997526",
-    "home_team": "法国",
-    "away_team": "伊拉克",
+    "match_id": "AICAI_5997536",
+    "home_team": "英格兰",
+    "away_team": "加纳",
     "home_aliases": [
-      "法国"
+      "英格兰"
     ],
     "away_aliases": [
-      "伊拉克"
+      "加纳"
     ],
-    "kickoff": "2026-06-23T05:00:00+08:00",
+    "kickoff": "2026-06-24T04:00:00+08:00",
     "stage": "小组赛",
     "neutral": true,
-    "home_elo": 2060,
-    "away_elo": 1770,
+    "home_elo": 2050,
+    "away_elo": 1745,
     "expected_goals": {
-      "home": 2.62,
-      "away": 0.88
+      "home": 2.25,
+      "away": 0.75
     },
     "lineup_status": "unknown",
     "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
@@ -64,29 +64,29 @@
       "early_event_risk": true
     },
     "manual_odds": {
-      "home": 1.08,
-      "draw": 12.0,
-      "away": 31.0
+      "home": 1.19,
+      "draw": 6.9,
+      "away": 14.5
     }
   },
   {
-    "match_id": "AICAI_5997577",
-    "home_team": "挪威",
-    "away_team": "塞内加尔",
+    "match_id": "AICAI_5997583",
+    "home_team": "巴拿马",
+    "away_team": "克罗地亚",
     "home_aliases": [
-      "挪威"
+      "巴拿马"
     ],
     "away_aliases": [
-      "塞内加尔"
+      "克罗地亚"
     ],
-    "kickoff": "2026-06-23T08:00:00+08:00",
+    "kickoff": "2026-06-24T07:00:00+08:00",
     "stage": "小组赛",
     "neutral": true,
-    "home_elo": 1935,
-    "away_elo": 1985,
+    "home_elo": 1870,
+    "away_elo": 1995,
     "expected_goals": {
-      "home": 1.49,
-      "away": 1.01
+      "home": 0.6,
+      "away": 1.8
     },
     "lineup_status": "unknown",
     "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
@@ -99,29 +99,29 @@
       "early_event_risk": true
     },
     "manual_odds": {
-      "home": 2.12,
-      "draw": 3.55,
-      "away": 3.45
+      "home": 6.5,
+      "draw": 4.5,
+      "away": 1.48
     }
   },
   {
-    "match_id": "AICAI_5997579",
-    "home_team": "约旦",
-    "away_team": "阿尔及利亚",
+    "match_id": "AICAI_5997581",
+    "home_team": "哥伦比亚",
+    "away_team": "刚果(金)",
     "home_aliases": [
-      "约旦"
+      "哥伦比亚"
     ],
     "away_aliases": [
-      "阿尔及利亚"
+      "刚果(金)"
     ],
-    "kickoff": "2026-06-23T11:00:00+08:00",
+    "kickoff": "2026-06-24T10:00:00+08:00",
     "stage": "小组赛",
     "neutral": true,
-    "home_elo": 1730,
-    "away_elo": 1925,
+    "home_elo": 2010,
+    "away_elo": 1855,
     "expected_goals": {
-      "home": 0.62,
-      "away": 1.88
+      "home": 1.8,
+      "away": 0.6
     },
     "lineup_status": "unknown",
     "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
@@ -134,9 +134,9 @@
       "early_event_risk": true
     },
     "manual_odds": {
-      "home": 6.3,
-      "draw": 4.3,
-      "away": 1.53
+      "home": 1.52,
+      "draw": 4.05,
+      "away": 6.7
     }
   }
 ]
