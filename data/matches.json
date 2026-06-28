@@ -1,22 +1,22 @@
 [
   {
-    "match_id": "AICAI_5997518",
-    "home_team": "新西兰",
-    "away_team": "比利时",
+    "match_id": "AICAI_5998042",
+    "home_team": "南非",
+    "away_team": "加拿大",
     "home_aliases": [
-      "新西兰"
+      "南非"
     ],
     "away_aliases": [
-      "比利时"
+      "加拿大"
     ],
-    "kickoff": "2026-06-27T11:00:00+08:00",
-    "stage": "小组赛",
+    "kickoff": "2026-06-29T03:00:00+08:00",
+    "stage": "1/16决赛",
     "neutral": true,
-    "home_elo": 1650,
-    "away_elo": 2020,
+    "home_elo": 1800,
+    "away_elo": 1910,
     "expected_goals": {
-      "home": 0.6,
-      "away": 1.8
+      "home": 0.71,
+      "away": 1.69
     },
     "lineup_status": "unknown",
     "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
@@ -29,57 +29,22 @@
       "early_event_risk": true
     },
     "manual_odds": {
-      "home": 14.0,
-      "draw": 8.4,
-      "away": 1.18
+      "home": 5.2,
+      "draw": 3.6,
+      "away": 1.72
     }
   },
   {
-    "match_id": "AICAI_5997574",
-    "home_team": "埃及",
-    "away_team": "伊朗",
+    "match_id": "AUTO_4279F0C7FF",
+    "home_team": "1I",
+    "away_team": "3C/D/F/G/H",
     "home_aliases": [
-      "埃及"
+      "1I"
     ],
     "away_aliases": [
-      "伊朗"
+      "3C/D/F/G/H"
     ],
-    "kickoff": "2026-06-27T11:00:00+08:00",
-    "stage": "小组赛",
-    "neutral": true,
-    "home_elo": 1940,
-    "away_elo": 1965,
-    "expected_goals": {
-      "home": 1.07,
-      "away": 0.93
-    },
-    "lineup_status": "unknown",
-    "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
-    "tactical_notes": "自动建模：先使用市场倍率、球队排名和盘口作为底盘；战术细节需后续补充。",
-    "weather_notes": "待确认",
-    "referee_notes": "待确认",
-    "upset_triggers": {
-      "underdog_low_block": true,
-      "underdog_set_piece": true,
-      "early_event_risk": true
-    },
-    "manual_odds": {
-      "home": 2.66,
-      "draw": 2.65,
-      "away": 3.25
-    }
-  },
-  {
-    "match_id": "AUTO_D6608FFBDD",
-    "home_team": "South Africa",
-    "away_team": "Canada",
-    "home_aliases": [
-      "South Africa"
-    ],
-    "away_aliases": [
-      "Canada"
-    ],
-    "kickoff": "2026-06-28T00:00:00",
+    "kickoff": "2026-06-30T00:00:00",
     "stage": "Round of 32",
     "neutral": true,
     "home_elo": 1800,
@@ -100,23 +65,23 @@
     }
   },
   {
-    "match_id": "AICAI_5997537",
-    "home_team": "巴拿马",
-    "away_team": "英格兰",
+    "match_id": "AUTO_AB7D803DAE",
+    "home_team": "Ivory Coast",
+    "away_team": "2I",
     "home_aliases": [
-      "巴拿马"
+      "Ivory Coast"
     ],
     "away_aliases": [
-      "英格兰"
+      "2I"
     ],
-    "kickoff": "2026-06-28T05:00:00+08:00",
-    "stage": "小组赛",
+    "kickoff": "2026-06-30T00:00:00",
+    "stage": "Round of 32",
     "neutral": true,
-    "home_elo": 1860,
-    "away_elo": 2050,
+    "home_elo": 1800,
+    "away_elo": 1800,
     "expected_goals": {
-      "home": 0.6,
-      "away": 1.8
+      "home": 1.25,
+      "away": 1.15
     },
     "lineup_status": "unknown",
     "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
@@ -127,11 +92,36 @@
       "underdog_low_block": true,
       "underdog_set_piece": true,
       "early_event_risk": true
+    }
+  },
+  {
+    "match_id": "AUTO_47E0031350",
+    "home_team": "Mexico",
+    "away_team": "3C/E/F/H/I",
+    "home_aliases": [
+      "Mexico"
+    ],
+    "away_aliases": [
+      "3C/E/F/H/I"
+    ],
+    "kickoff": "2026-06-30T00:00:00",
+    "stage": "Round of 32",
+    "neutral": true,
+    "home_elo": 1800,
+    "away_elo": 1800,
+    "expected_goals": {
+      "home": 1.25,
+      "away": 1.15
     },
-    "manual_odds": {
-      "home": 15.0,
-      "draw": 7.6,
-      "away": 1.17
+    "lineup_status": "unknown",
+    "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
+    "tactical_notes": "自动建模：先使用市场倍率、球队排名和盘口作为底盘；战术细节需后续补充。",
+    "weather_notes": "待确认",
+    "referee_notes": "待确认",
+    "upset_triggers": {
+      "underdog_low_block": true,
+      "underdog_set_piece": true,
+      "early_event_risk": true
     }
   }
 ]

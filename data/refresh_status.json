@@ -2,77 +2,62 @@
   "enabled": true,
   "interval_seconds": 14400,
   "running": false,
-  "last_started_at": "2026-06-27T20:51:24+00:00",
-  "last_finished_at": "2026-06-27T20:56:00+00:00",
+  "last_started_at": "2026-06-28T02:36:30+00:00",
+  "last_finished_at": "2026-06-28T02:39:19+00:00",
   "last_ok": true,
   "last_error": null,
-  "runs": 52,
+  "runs": 53,
   "last_summary": {
     "reason": "github-actions",
     "fixtures": 208,
     "selected_matches": 4,
     "refreshed": [
       {
-        "match_id": "AICAI_5997518",
-        "match": "新西兰 vs 比利时",
+        "match_id": "AICAI_5998042",
+        "match": "南非 vs 加拿大",
         "inserted": 17,
         "process_source": null
       },
       {
-        "match_id": "AICAI_5997574",
-        "match": "埃及 vs 伊朗",
-        "inserted": 17,
-        "process_source": null
-      },
-      {
-        "match_id": "AUTO_D6608FFBDD",
-        "match": "South Africa vs Canada",
+        "match_id": "AUTO_4279F0C7FF",
+        "match": "1I vs 3C/D/F/G/H",
         "inserted": 3,
         "process_source": null
       },
       {
-        "match_id": "AICAI_5997537",
-        "match": "巴拿马 vs 英格兰",
-        "inserted": 17,
+        "match_id": "AUTO_AB7D803DAE",
+        "match": "Ivory Coast vs 2I",
+        "inserted": 3,
+        "process_source": null
+      },
+      {
+        "match_id": "AUTO_47E0031350",
+        "match": "Mexico vs 3C/E/F/H/I",
+        "inserted": 3,
         "process_source": null
       }
     ],
     "archived": [
       {
-        "match_id": "AICAI_5997518",
+        "match_id": "AICAI_5998042",
         "snapshots": 6
       },
       {
-        "match_id": "AICAI_5997574",
+        "match_id": "AUTO_4279F0C7FF",
         "snapshots": 6
       },
       {
-        "match_id": "AUTO_D6608FFBDD",
+        "match_id": "AUTO_AB7D803DAE",
         "snapshots": 6
       },
       {
-        "match_id": "AICAI_5997537",
+        "match_id": "AUTO_47E0031350",
         "snapshots": 6
       }
     ],
     "backtest": {
-      "inserted": 12,
-      "evaluated": [
-        {
-          "match_id": "AICAI_5997518",
-          "matched_ids": [
-            "AICAI_5997518"
-          ],
-          "results": 6
-        },
-        {
-          "match_id": "AICAI_5997574",
-          "matched_ids": [
-            "AICAI_5997574"
-          ],
-          "results": 6
-        }
-      ]
+      "inserted": 0,
+      "evaluated": []
     },
     "logs_removed": 0,
     "public_meta": {
