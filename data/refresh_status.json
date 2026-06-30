@@ -2,70 +2,62 @@
   "enabled": true,
   "interval_seconds": 14400,
   "running": false,
-  "last_started_at": "2026-06-29T21:17:16+00:00",
-  "last_finished_at": "2026-06-29T21:20:56+00:00",
+  "last_started_at": "2026-06-30T02:31:00+00:00",
+  "last_finished_at": "2026-06-30T02:34:03+00:00",
   "last_ok": true,
   "last_error": null,
-  "runs": 63,
+  "runs": 64,
   "last_summary": {
     "reason": "github-actions",
     "fixtures": 208,
     "selected_matches": 4,
     "refreshed": [
       {
-        "match_id": "AICAI_5998042",
-        "match": "南非 vs 加拿大",
+        "match_id": "AICAI_6020276",
+        "match": "科特迪瓦 vs 挪威",
         "inserted": 17,
         "process_source": null
       },
       {
-        "match_id": "AUTO_4279F0C7FF",
-        "match": "1I vs 3C/D/F/G/H",
-        "inserted": 3,
+        "match_id": "AICAI_6020275",
+        "match": "法国 vs 瑞典",
+        "inserted": 17,
         "process_source": null
       },
       {
-        "match_id": "AUTO_AB7D803DAE",
-        "match": "Ivory Coast vs 2I",
-        "inserted": 3,
+        "match_id": "AICAI_6020277",
+        "match": "墨西哥 vs 厄瓜多尔",
+        "inserted": 17,
         "process_source": null
       },
       {
-        "match_id": "AUTO_47E0031350",
-        "match": "Mexico vs 3C/E/F/H/I",
+        "match_id": "AUTO_B735F2AB55",
+        "match": "Portugal vs Croatia",
         "inserted": 3,
         "process_source": null
       }
     ],
     "archived": [
       {
-        "match_id": "AICAI_5998042",
+        "match_id": "AICAI_6020276",
         "snapshots": 6
       },
       {
-        "match_id": "AUTO_4279F0C7FF",
+        "match_id": "AICAI_6020275",
         "snapshots": 6
       },
       {
-        "match_id": "AUTO_AB7D803DAE",
+        "match_id": "AICAI_6020277",
         "snapshots": 6
       },
       {
-        "match_id": "AUTO_47E0031350",
+        "match_id": "AUTO_B735F2AB55",
         "snapshots": 6
       }
     ],
     "backtest": {
-      "inserted": 6,
-      "evaluated": [
-        {
-          "match_id": "AICAI_5998042",
-          "matched_ids": [
-            "AICAI_5998042"
-          ],
-          "results": 6
-        }
-      ]
+      "inserted": 0,
+      "evaluated": []
     },
     "logs_removed": 0,
     "public_meta": {

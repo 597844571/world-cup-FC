@@ -1,22 +1,22 @@
 [
   {
-    "match_id": "AICAI_5998042",
-    "home_team": "南非",
-    "away_team": "加拿大",
+    "match_id": "AICAI_6020276",
+    "home_team": "科特迪瓦",
+    "away_team": "挪威",
     "home_aliases": [
-      "南非"
+      "科特迪瓦"
     ],
     "away_aliases": [
-      "加拿大"
+      "挪威"
     ],
-    "kickoff": "2026-06-29T03:00:00+08:00",
+    "kickoff": "2026-07-01T01:00:00+08:00",
     "stage": "1/16决赛",
     "neutral": true,
-    "home_elo": 1800,
-    "away_elo": 1910,
+    "home_elo": 1915,
+    "away_elo": 1955,
     "expected_goals": {
-      "home": 0.71,
-      "away": 1.69
+      "home": 0.99,
+      "away": 1.51
     },
     "lineup_status": "unknown",
     "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
@@ -29,29 +29,29 @@
       "early_event_risk": true
     },
     "manual_odds": {
-      "home": 5.2,
-      "draw": 3.6,
-      "away": 1.72
+      "home": 3.6,
+      "draw": 3.35,
+      "away": 2.11
     }
   },
   {
-    "match_id": "AUTO_4279F0C7FF",
-    "home_team": "1I",
-    "away_team": "3C/D/F/G/H",
+    "match_id": "AICAI_6020275",
+    "home_team": "法国",
+    "away_team": "瑞典",
     "home_aliases": [
-      "1I"
+      "法国"
     ],
     "away_aliases": [
-      "3C/D/F/G/H"
+      "瑞典"
     ],
-    "kickoff": "2026-06-30T00:00:00",
-    "stage": "Round of 32",
+    "kickoff": "2026-07-01T05:00:00+08:00",
+    "stage": "1/16决赛",
     "neutral": true,
-    "home_elo": 1800,
-    "away_elo": 1800,
+    "home_elo": 2060,
+    "away_elo": 1885,
     "expected_goals": {
-      "home": 1.25,
-      "away": 1.15
+      "home": 1.8,
+      "away": 0.6
     },
     "lineup_status": "unknown",
     "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
@@ -62,26 +62,31 @@
       "underdog_low_block": true,
       "underdog_set_piece": true,
       "early_event_risk": true
+    },
+    "manual_odds": {
+      "home": 1.29,
+      "draw": 6.0,
+      "away": 9.0
     }
   },
   {
-    "match_id": "AUTO_AB7D803DAE",
-    "home_team": "Ivory Coast",
-    "away_team": "2I",
+    "match_id": "AICAI_6020277",
+    "home_team": "墨西哥",
+    "away_team": "厄瓜多尔",
     "home_aliases": [
-      "Ivory Coast"
+      "墨西哥"
     ],
     "away_aliases": [
-      "2I"
+      "厄瓜多尔"
     ],
-    "kickoff": "2026-06-30T00:00:00",
-    "stage": "Round of 32",
+    "kickoff": "2026-07-01T09:00:00+08:00",
+    "stage": "1/16决赛",
     "neutral": true,
-    "home_elo": 1800,
-    "away_elo": 1800,
+    "home_elo": 2025,
+    "away_elo": 1950,
     "expected_goals": {
-      "home": 1.25,
-      "away": 1.15
+      "home": 1.43,
+      "away": 0.97
     },
     "lineup_status": "unknown",
     "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
@@ -92,19 +97,24 @@
       "underdog_low_block": true,
       "underdog_set_piece": true,
       "early_event_risk": true
+    },
+    "manual_odds": {
+      "home": 2.25,
+      "draw": 2.9,
+      "away": 3.8
     }
   },
   {
-    "match_id": "AUTO_47E0031350",
-    "home_team": "Mexico",
-    "away_team": "3C/E/F/H/I",
+    "match_id": "AUTO_B735F2AB55",
+    "home_team": "Portugal",
+    "away_team": "Croatia",
     "home_aliases": [
-      "Mexico"
+      "Portugal"
     ],
     "away_aliases": [
-      "3C/E/F/H/I"
+      "Croatia"
     ],
-    "kickoff": "2026-06-30T00:00:00",
+    "kickoff": "2026-07-02T00:00:00",
     "stage": "Round of 32",
     "neutral": true,
     "home_elo": 1800,
