@@ -1,14 +1,14 @@
 {
-  "captured_at": "2026-06-30T07:45:41+00:00",
+  "captured_at": "2026-06-30T10:52:02+00:00",
   "refresh_status": {
     "enabled": true,
     "interval_seconds": 14400,
     "running": false,
-    "last_started_at": "2026-06-30T07:42:43+00:00",
-    "last_finished_at": "2026-06-30T07:45:41+00:00",
+    "last_started_at": "2026-06-30T10:48:58+00:00",
+    "last_finished_at": "2026-06-30T10:52:02+00:00",
     "last_ok": true,
     "last_error": null,
-    "runs": 65,
+    "runs": 66,
     "last_summary": {
       "reason": "github-actions",
       "fixtures": 208,
@@ -138,13 +138,13 @@
           "用于判断抢分、轮换、默契和净胜球需求。缺失时第三轮尤其容易失真。"
         ],
         "gap_level": "轻微分歧",
-        "reference": "最终模型倾向 挪威；比分参考 1-1 / 0-1 / 0-0；去水与特征修正后主/平/客为 27.6% / 29.5% / 42.9%；数据状态为 只适合观察，低置信参考。"
+        "reference": "最终模型倾向 挪威；比分参考 1-1 / 0-1 / 0-0；去水与特征修正后主/平/客为 26.9% / 29.8% / 43.4%；数据状态为 只适合观察，低置信参考。"
       },
       "market_scenario": {
         "probabilities": {
-          "home": 0.3021,
-          "draw": 0.2818,
-          "away": 0.4161
+          "home": 0.2996,
+          "draw": 0.2826,
+          "away": 0.4178
         },
         "top_scores": [
           {
@@ -315,11 +315,11 @@
               "胜",
               "平"
             ],
-            "hit_prob": 0.5645,
+            "hit_prob": 0.5597,
             "num_bets": 2,
-            "ev": -0.0273,
-            "min_return_sp": 3.42,
-            "max_return_sp": 3.474,
+            "ev": -0.0309,
+            "min_return_sp": 3.38,
+            "max_return_sp": 3.553,
             "decision": "放弃",
             "reason": "复选包EV按注数重算"
           },
@@ -329,11 +329,11 @@
               "平",
               "负"
             ],
-            "hit_prob": 0.7249,
+            "hit_prob": 0.732,
             "num_bets": 2,
-            "ev": -0.0418,
-            "min_return_sp": 2.128,
-            "max_return_sp": 3.42,
+            "ev": -0.0452,
+            "min_return_sp": 2.098,
+            "max_return_sp": 3.38,
             "decision": "放弃",
             "reason": "复选包EV按注数重算"
           },
@@ -343,11 +343,11 @@
               "胜",
               "负"
             ],
-            "hit_prob": 0.7106,
+            "hit_prob": 0.7083,
             "num_bets": 2,
-            "ev": -0.0588,
-            "min_return_sp": 2.128,
-            "max_return_sp": 3.474,
+            "ev": -0.062,
+            "min_return_sp": 2.098,
+            "max_return_sp": 3.553,
             "decision": "放弃",
             "reason": "复选包EV按注数重算"
           },
@@ -689,8 +689,8 @@
       },
       "market_scenario": {
         "probabilities": {
-          "home": 0.6128,
-          "draw": 0.2255,
+          "home": 0.6129,
+          "draw": 0.2253,
           "away": 0.1617
         },
         "top_scores": [
@@ -812,8 +812,7 @@
       "sporttery": {
         "settlement": "90分钟含伤停补时，不含加时赛和点球大战",
         "action_summary": {
-          "core": [],
-          "support": [
+          "core": [
             {
               "match_id": "AICAI_6020275",
               "play_type": "胜平负",
@@ -822,28 +821,29 @@
               "single_allowed": true,
               "allup_allowed": true,
               "min_legs": 1,
-              "sp": 5.957,
+              "sp": 6.027,
               "sp_source": "market_h2h_proxy",
-              "model_prob": 0.1719,
-              "market_prob": 0.1581,
-              "fair_sp": 5.819,
-              "implied_prob": 0.1679,
-              "value_gap": 0.004,
-              "ev": 0.0237,
+              "model_prob": 0.1712,
+              "market_prob": 0.1575,
+              "fair_sp": 5.842,
+              "implied_prob": 0.1659,
+              "value_gap": 0.0053,
+              "ev": 0.0317,
               "risk_score": 40,
               "risk_level": "中低",
-              "kelly": 0.0048,
-              "stake_pct": 0.0012,
-              "decision": "观察",
-              "reason": "EV为正但不足玩法门槛",
-              "risk_adjusted_score": -0.0163,
-              "raw_model_prob": 0.1792,
-              "market_model_gap": 0.0211,
-              "action_score": 49.89,
-              "action_tier": "可搭配",
-              "action_reason": "有参考价值，但未达到主推门槛"
+              "kelly": 0.0063,
+              "stake_pct": 0.0016,
+              "decision": "可小注",
+              "reason": "EV达到门槛且风险可控",
+              "risk_adjusted_score": -0.0083,
+              "raw_model_prob": 0.1785,
+              "market_model_gap": 0.021,
+              "action_score": 74.91,
+              "action_tier": "主推",
+              "action_reason": "价值、风险和玩法稳定性较均衡"
             }
           ],
+          "support": [],
           "hedge": []
         },
         "score_reference": [
@@ -893,26 +893,26 @@
             "single_allowed": true,
             "allup_allowed": true,
             "min_legs": 1,
-            "sp": 5.957,
+            "sp": 6.027,
             "sp_source": "market_h2h_proxy",
-            "model_prob": 0.1719,
-            "market_prob": 0.1581,
-            "fair_sp": 5.819,
-            "implied_prob": 0.1679,
-            "value_gap": 0.004,
-            "ev": 0.0237,
+            "model_prob": 0.1712,
+            "market_prob": 0.1575,
+            "fair_sp": 5.842,
+            "implied_prob": 0.1659,
+            "value_gap": 0.0053,
+            "ev": 0.0317,
             "risk_score": 40,
             "risk_level": "中低",
-            "kelly": 0.0048,
-            "stake_pct": 0.0012,
-            "decision": "观察",
-            "reason": "EV为正但不足玩法门槛",
-            "risk_adjusted_score": -0.0163,
-            "raw_model_prob": 0.1792,
-            "market_model_gap": 0.0211,
-            "action_score": 49.89,
-            "action_tier": "可搭配",
-            "action_reason": "有参考价值，但未达到主推门槛"
+            "kelly": 0.0063,
+            "stake_pct": 0.0016,
+            "decision": "可小注",
+            "reason": "EV达到门槛且风险可控",
+            "risk_adjusted_score": -0.0083,
+            "raw_model_prob": 0.1785,
+            "market_model_gap": 0.021,
+            "action_score": 74.91,
+            "action_tier": "主推",
+            "action_reason": "价值、风险和玩法稳定性较均衡"
           }
         ],
         "compound_packages": [
@@ -922,11 +922,11 @@
               "胜",
               "平"
             ],
-            "hit_prob": 0.9028,
+            "hit_prob": 0.9026,
             "num_bets": 2,
-            "ev": -0.0268,
-            "min_return_sp": 1.262,
-            "max_return_sp": 5.957,
+            "ev": -0.0189,
+            "min_return_sp": 1.272,
+            "max_return_sp": 6.027,
             "decision": "放弃",
             "reason": "复选包EV按注数重算"
           },
@@ -936,12 +936,12 @@
               "平",
               "负"
             ],
-            "hit_prob": 0.2691,
+            "hit_prob": 0.2686,
             "num_bets": 2,
-            "ev": -0.0041,
-            "min_return_sp": 5.957,
-            "max_return_sp": 9.956,
-            "decision": "放弃",
+            "ev": 0.0035,
+            "min_return_sp": 6.027,
+            "max_return_sp": 10.012,
+            "decision": "观察",
             "reason": "复选包EV按注数重算"
           },
           {
@@ -950,11 +950,11 @@
               "胜",
               "负"
             ],
-            "hit_prob": 0.8281,
+            "hit_prob": 0.8288,
             "num_bets": 2,
-            "ev": -0.0549,
-            "min_return_sp": 1.262,
-            "max_return_sp": 9.956,
+            "ev": -0.0472,
+            "min_return_sp": 1.272,
+            "max_return_sp": 10.012,
             "decision": "放弃",
             "reason": "复选包EV按注数重算"
           },
@@ -1292,13 +1292,13 @@
           "用于判断抢分、轮换、默契和净胜球需求。缺失时第三轮尤其容易失真。"
         ],
         "gap_level": "轻微分歧",
-        "reference": "最终模型倾向 墨西哥；比分参考 1-1 / 1-0 / 0-0；去水与特征修正后主/平/客为 41.0% / 34.4% / 24.7%；数据状态为 只适合观察，低置信参考。"
+        "reference": "最终模型倾向 墨西哥；比分参考 1-1 / 1-0 / 0-0；去水与特征修正后主/平/客为 40.6% / 34.3% / 25.2%；数据状态为 只适合观察，低置信参考。"
       },
       "market_scenario": {
         "probabilities": {
-          "home": 0.4334,
-          "draw": 0.2943,
-          "away": 0.2723
+          "home": 0.4316,
+          "draw": 0.2952,
+          "away": 0.2732
         },
         "top_scores": [
           {
@@ -1469,11 +1469,11 @@
               "胜",
               "平"
             ],
-            "hit_prob": 0.753,
+            "hit_prob": 0.748,
             "num_bets": 2,
-            "ev": -0.0457,
-            "min_return_sp": 2.24,
-            "max_return_sp": 2.896,
+            "ev": -0.0484,
+            "min_return_sp": 2.255,
+            "max_return_sp": 2.897,
             "decision": "放弃",
             "reason": "复选包EV按注数重算"
           },
@@ -1483,11 +1483,11 @@
               "平",
               "负"
             ],
-            "hit_prob": 0.5852,
+            "hit_prob": 0.5893,
             "num_bets": 2,
-            "ev": -0.0363,
-            "min_return_sp": 2.896,
-            "max_return_sp": 3.838,
+            "ev": -0.0389,
+            "min_return_sp": 2.897,
+            "max_return_sp": 3.75,
             "decision": "放弃",
             "reason": "复选包EV按注数重算"
           },
@@ -1497,11 +1497,11 @@
               "胜",
               "负"
             ],
-            "hit_prob": 0.6616,
+            "hit_prob": 0.6627,
             "num_bets": 2,
-            "ev": -0.0617,
-            "min_return_sp": 2.24,
-            "max_return_sp": 3.838,
+            "ev": -0.0644,
+            "min_return_sp": 2.255,
+            "max_return_sp": 3.75,
             "decision": "放弃",
             "reason": "复选包EV按注数重算"
           },
@@ -1789,7 +1789,7 @@
       "kickoff": "2026-07-02T00:00:00",
       "sporttery_handicap": null,
       "summary": {
-        "main_lean": "Portugal",
+        "main_lean": "Croatia",
         "score_group": [
           "1-1",
           "1-0",
@@ -1812,7 +1812,7 @@
           "comparison": [
             {
               "dimension": "赛果方向",
-              "main": "Portugal",
+              "main": "Croatia",
               "side": "未录入",
               "relation": "无支线对比"
             },
@@ -1839,39 +1839,39 @@
           "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。"
         ],
         "gap_level": "一致",
-        "reference": "最终模型倾向 Portugal；比分参考 1-1 / 1-0 / 0-1；去水与特征修正后主/平/客为 35.4% / 30.5% / 34.1%；数据状态为 只适合观察，低置信参考。"
+        "reference": "最终模型倾向 Croatia；比分参考 1-1 / 1-0 / 0-1；去水与特征修正后主/平/客为 33.4% / 30.9% / 35.6%；数据状态为 只适合观察，低置信参考。"
       },
       "market_scenario": {
         "probabilities": {
-          "home": 0.3542,
-          "draw": 0.2891,
-          "away": 0.3567
+          "home": 0.3549,
+          "draw": 0.2903,
+          "away": 0.3548
         },
         "top_scores": [
           {
             "score": "1-1",
-            "probability": 0.1381,
+            "probability": 0.1382,
             "score_group": "常见比分",
             "score_priority": 3,
             "score_note": "和胜平负、总进球主线一致，可作为比分参考"
           },
           {
             "score": "1-0",
-            "probability": 0.1087,
+            "probability": 0.1088,
             "score_group": "常见比分",
             "score_priority": 3,
             "score_note": "和胜平负、总进球主线一致，可作为比分参考"
           },
           {
             "score": "0-1",
-            "probability": 0.0997,
+            "probability": 0.0998,
             "score_group": "常见比分",
             "score_priority": 3,
             "score_note": "和胜平负、总进球主线一致，可作为比分参考"
           },
           {
             "score": "0-0",
-            "probability": 0.0996,
+            "probability": 0.0997,
             "score_group": "常见比分",
             "score_priority": 3,
             "score_note": "和胜平负、总进球主线一致，可作为比分参考"
@@ -1885,7 +1885,7 @@
           },
           {
             "score": "1-2",
-            "probability": 0.0717,
+            "probability": 0.0718,
             "score_group": "常见比分",
             "score_priority": 3,
             "score_note": "和胜平负、总进球主线一致，可作为比分参考"
@@ -1909,27 +1909,27 @@
           "exact": [
             {
               "goals": "0",
-              "probability": 0.0996
+              "probability": 0.0997
             },
             {
               "goals": "1",
-              "probability": 0.2085
+              "probability": 0.2086
             },
             {
               "goals": "2",
-              "probability": 0.2645
+              "probability": 0.2647
             },
             {
               "goals": "3",
-              "probability": 0.2019
+              "probability": 0.2017
             },
             {
               "goals": "4",
-              "probability": 0.1266
+              "probability": 0.1265
             },
             {
               "goals": "5",
-              "probability": 0.0613
+              "probability": 0.0612
             },
             {
               "goals": "6",
@@ -1943,7 +1943,7 @@
           "ranges": [
             {
               "range": "0-1",
-              "probability": 0.3081
+              "probability": 0.3084
             },
             {
               "range": "2-3",
@@ -1951,7 +1951,7 @@
             },
             {
               "range": "4+",
-              "probability": 0.2255
+              "probability": 0.2252
             }
           ],
           "most_likely": "2",
@@ -1959,8 +1959,8 @@
           "low_score_risk": "中",
           "high_score_risk": "低"
         },
-        "over_25": 0.4274,
-        "btts": 0.4921,
+        "over_25": 0.4269,
+        "btts": 0.4922,
         "confidence": 48
       },
       "sporttery": {
@@ -1975,53 +1975,24 @@
               "single_allowed": true,
               "allup_allowed": true,
               "min_legs": 1,
-              "sp": 3.745,
+              "sp": 3.642,
               "sp_source": "market_h2h_proxy",
-              "model_prob": 0.2987,
-              "market_prob": 0.2869,
-              "fair_sp": 3.348,
-              "implied_prob": 0.267,
-              "value_gap": 0.0317,
-              "ev": 0.1187,
+              "model_prob": 0.3029,
+              "market_prob": 0.291,
+              "fair_sp": 3.301,
+              "implied_prob": 0.2746,
+              "value_gap": 0.0283,
+              "ev": 0.1032,
               "risk_score": 34,
               "risk_level": "中低",
-              "kelly": 0.0432,
-              "stake_pct": 0.01,
+              "kelly": 0.0391,
+              "stake_pct": 0.0098,
               "decision": "可小注",
               "reason": "EV达到门槛且风险可控",
-              "risk_adjusted_score": 0.0847,
-              "raw_model_prob": 0.3051,
-              "market_model_gap": 0.0182,
-              "action_score": 91.89,
-              "action_tier": "主推",
-              "action_reason": "价值、风险和玩法稳定性较均衡"
-            },
-            {
-              "match_id": "AUTO_B735F2AB55",
-              "play_type": "胜平负",
-              "selection": "胜",
-              "pool_code": "HAD",
-              "single_allowed": true,
-              "allup_allowed": true,
-              "min_legs": 1,
-              "sp": 3.053,
-              "sp_source": "market_h2h_proxy",
-              "model_prob": 0.3533,
-              "market_prob": 0.3519,
-              "fair_sp": 2.83,
-              "implied_prob": 0.3275,
-              "value_gap": 0.0258,
-              "ev": 0.0787,
-              "risk_score": 33,
-              "risk_level": "中低",
-              "kelly": 0.0383,
-              "stake_pct": 0.0096,
-              "decision": "可小注",
-              "reason": "EV达到门槛且风险可控",
-              "risk_adjusted_score": 0.0457,
-              "raw_model_prob": 0.3541,
-              "market_model_gap": 0.0022,
-              "action_score": 88.57,
+              "risk_adjusted_score": 0.0692,
+              "raw_model_prob": 0.3093,
+              "market_model_gap": 0.0183,
+              "action_score": 90.0,
               "action_tier": "主推",
               "action_reason": "价值、风险和玩法稳定性较均衡"
             },
@@ -2033,53 +2004,83 @@
               "single_allowed": true,
               "allup_allowed": true,
               "min_legs": 1,
-              "sp": 2.974,
+              "sp": 2.992,
               "sp_source": "market_h2h_proxy",
-              "model_prob": 0.348,
-              "market_prob": 0.3612,
-              "fair_sp": 2.874,
-              "implied_prob": 0.3362,
-              "value_gap": 0.0117,
-              "ev": 0.0348,
-              "risk_score": 34,
+              "model_prob": 0.3555,
+              "market_prob": 0.3542,
+              "fair_sp": 2.813,
+              "implied_prob": 0.3342,
+              "value_gap": 0.0213,
+              "ev": 0.0638,
+              "risk_score": 33,
               "risk_level": "中低",
-              "kelly": 0.0177,
-              "stake_pct": 0.0044,
+              "kelly": 0.032,
+              "stake_pct": 0.008,
               "decision": "可小注",
               "reason": "EV达到门槛且风险可控",
-              "risk_adjusted_score": 0.0008,
-              "raw_model_prob": 0.3408,
-              "market_model_gap": -0.0204,
-              "action_score": 82.37,
+              "risk_adjusted_score": 0.0308,
+              "raw_model_prob": 0.3562,
+              "market_model_gap": 0.002,
+              "action_score": 86.7,
               "action_tier": "主推",
               "action_reason": "价值、风险和玩法稳定性较均衡"
             }
           ],
-          "support": [],
+          "support": [
+            {
+              "match_id": "AUTO_B735F2AB55",
+              "play_type": "胜平负",
+              "selection": "胜",
+              "pool_code": "HAD",
+              "single_allowed": true,
+              "allup_allowed": true,
+              "min_legs": 1,
+              "sp": 2.988,
+              "sp_source": "market_h2h_proxy",
+              "model_prob": 0.3415,
+              "market_prob": 0.3547,
+              "fair_sp": 2.928,
+              "implied_prob": 0.3347,
+              "value_gap": 0.0069,
+              "ev": 0.0205,
+              "risk_score": 34,
+              "risk_level": "中低",
+              "kelly": 0.0103,
+              "stake_pct": 0.0026,
+              "decision": "观察",
+              "reason": "EV为正但不足玩法门槛",
+              "risk_adjusted_score": -0.0135,
+              "raw_model_prob": 0.3345,
+              "market_model_gap": -0.0202,
+              "action_score": 56.33,
+              "action_tier": "可搭配",
+              "action_reason": "有参考价值，但未达到主推门槛"
+            }
+          ],
           "hedge": []
         },
         "score_reference": [
           {
             "score": "1-1",
-            "probability": 0.1382,
+            "probability": 0.1381,
             "score_group": "常见比分",
             "score_note": "和胜平负、总进球主线一致，可作为比分参考"
           },
           {
             "score": "1-0",
-            "probability": 0.1088,
+            "probability": 0.1087,
             "score_group": "常见比分",
             "score_note": "和胜平负、总进球主线一致，可作为比分参考"
           },
           {
             "score": "0-1",
-            "probability": 0.0998,
+            "probability": 0.0997,
             "score_group": "常见比分",
             "score_note": "和胜平负、总进球主线一致，可作为比分参考"
           },
           {
             "score": "0-0",
-            "probability": 0.0997,
+            "probability": 0.0996,
             "score_group": "常见比分",
             "score_note": "和胜平负、总进球主线一致，可作为比分参考"
           },
@@ -2091,7 +2092,7 @@
           },
           {
             "score": "1-2",
-            "probability": 0.0718,
+            "probability": 0.0717,
             "score_group": "常见比分",
             "score_note": "和胜平负、总进球主线一致，可作为比分参考"
           }
@@ -2105,53 +2106,24 @@
             "single_allowed": true,
             "allup_allowed": true,
             "min_legs": 1,
-            "sp": 3.745,
+            "sp": 3.642,
             "sp_source": "market_h2h_proxy",
-            "model_prob": 0.2987,
-            "market_prob": 0.2869,
-            "fair_sp": 3.348,
-            "implied_prob": 0.267,
-            "value_gap": 0.0317,
-            "ev": 0.1187,
+            "model_prob": 0.3029,
+            "market_prob": 0.291,
+            "fair_sp": 3.301,
+            "implied_prob": 0.2746,
+            "value_gap": 0.0283,
+            "ev": 0.1032,
             "risk_score": 34,
             "risk_level": "中低",
-            "kelly": 0.0432,
-            "stake_pct": 0.01,
+            "kelly": 0.0391,
+            "stake_pct": 0.0098,
             "decision": "可小注",
             "reason": "EV达到门槛且风险可控",
-            "risk_adjusted_score": 0.0847,
-            "raw_model_prob": 0.3051,
-            "market_model_gap": 0.0182,
-            "action_score": 91.89,
-            "action_tier": "主推",
-            "action_reason": "价值、风险和玩法稳定性较均衡"
-          },
-          {
-            "match_id": "AUTO_B735F2AB55",
-            "play_type": "胜平负",
-            "selection": "胜",
-            "pool_code": "HAD",
-            "single_allowed": true,
-            "allup_allowed": true,
-            "min_legs": 1,
-            "sp": 3.053,
-            "sp_source": "market_h2h_proxy",
-            "model_prob": 0.3533,
-            "market_prob": 0.3519,
-            "fair_sp": 2.83,
-            "implied_prob": 0.3275,
-            "value_gap": 0.0258,
-            "ev": 0.0787,
-            "risk_score": 33,
-            "risk_level": "中低",
-            "kelly": 0.0383,
-            "stake_pct": 0.0096,
-            "decision": "可小注",
-            "reason": "EV达到门槛且风险可控",
-            "risk_adjusted_score": 0.0457,
-            "raw_model_prob": 0.3541,
-            "market_model_gap": 0.0022,
-            "action_score": 88.57,
+            "risk_adjusted_score": 0.0692,
+            "raw_model_prob": 0.3093,
+            "market_model_gap": 0.0183,
+            "action_score": 90.0,
             "action_tier": "主推",
             "action_reason": "价值、风险和玩法稳定性较均衡"
           },
@@ -2163,26 +2135,55 @@
             "single_allowed": true,
             "allup_allowed": true,
             "min_legs": 1,
-            "sp": 2.974,
+            "sp": 2.992,
             "sp_source": "market_h2h_proxy",
-            "model_prob": 0.348,
-            "market_prob": 0.3612,
-            "fair_sp": 2.874,
-            "implied_prob": 0.3362,
-            "value_gap": 0.0117,
-            "ev": 0.0348,
-            "risk_score": 34,
+            "model_prob": 0.3555,
+            "market_prob": 0.3542,
+            "fair_sp": 2.813,
+            "implied_prob": 0.3342,
+            "value_gap": 0.0213,
+            "ev": 0.0638,
+            "risk_score": 33,
             "risk_level": "中低",
-            "kelly": 0.0177,
-            "stake_pct": 0.0044,
+            "kelly": 0.032,
+            "stake_pct": 0.008,
             "decision": "可小注",
             "reason": "EV达到门槛且风险可控",
-            "risk_adjusted_score": 0.0008,
-            "raw_model_prob": 0.3408,
-            "market_model_gap": -0.0204,
-            "action_score": 82.37,
+            "risk_adjusted_score": 0.0308,
+            "raw_model_prob": 0.3562,
+            "market_model_gap": 0.002,
+            "action_score": 86.7,
             "action_tier": "主推",
             "action_reason": "价值、风险和玩法稳定性较均衡"
+          },
+          {
+            "match_id": "AUTO_B735F2AB55",
+            "play_type": "胜平负",
+            "selection": "胜",
+            "pool_code": "HAD",
+            "single_allowed": true,
+            "allup_allowed": true,
+            "min_legs": 1,
+            "sp": 2.988,
+            "sp_source": "market_h2h_proxy",
+            "model_prob": 0.3415,
+            "market_prob": 0.3547,
+            "fair_sp": 2.928,
+            "implied_prob": 0.3347,
+            "value_gap": 0.0069,
+            "ev": 0.0205,
+            "risk_score": 34,
+            "risk_level": "中低",
+            "kelly": 0.0103,
+            "stake_pct": 0.0026,
+            "decision": "观察",
+            "reason": "EV为正但不足玩法门槛",
+            "risk_adjusted_score": -0.0135,
+            "raw_model_prob": 0.3345,
+            "market_model_gap": -0.0202,
+            "action_score": 56.33,
+            "action_tier": "可搭配",
+            "action_reason": "有参考价值，但未达到主推门槛"
           }
         ],
         "compound_packages": [
@@ -2192,11 +2193,11 @@
               "胜",
               "平"
             ],
-            "hit_prob": 0.652,
+            "hit_prob": 0.6444,
             "num_bets": 2,
-            "ev": 0.0986,
-            "min_return_sp": 3.053,
-            "max_return_sp": 3.745,
+            "ev": 0.0618,
+            "min_return_sp": 2.988,
+            "max_return_sp": 3.642,
             "decision": "可小注",
             "reason": "复选包EV按注数重算"
           },
@@ -2206,11 +2207,11 @@
               "平",
               "负"
             ],
-            "hit_prob": 0.6467,
+            "hit_prob": 0.6584,
             "num_bets": 2,
-            "ev": 0.0768,
-            "min_return_sp": 2.974,
-            "max_return_sp": 3.745,
+            "ev": 0.0834,
+            "min_return_sp": 2.992,
+            "max_return_sp": 3.642,
             "decision": "可小注",
             "reason": "复选包EV按注数重算"
           },
@@ -2220,12 +2221,12 @@
               "胜",
               "负"
             ],
-            "hit_prob": 0.7013,
+            "hit_prob": 0.697,
             "num_bets": 2,
-            "ev": 0.0568,
-            "min_return_sp": 2.974,
-            "max_return_sp": 3.053,
-            "decision": "可小注",
+            "ev": 0.042,
+            "min_return_sp": 2.988,
+            "max_return_sp": 2.992,
+            "decision": "观察",
             "reason": "复选包EV按注数重算"
           },
           {
