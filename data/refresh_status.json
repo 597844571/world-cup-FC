@@ -2,84 +2,62 @@
   "enabled": true,
   "interval_seconds": 14400,
   "running": false,
-  "last_started_at": "2026-07-01T21:18:43+00:00",
-  "last_finished_at": "2026-07-01T22:00:17+00:00",
+  "last_started_at": "2026-07-02T02:26:48+00:00",
+  "last_finished_at": "2026-07-02T02:29:48+00:00",
   "last_ok": true,
   "last_error": null,
-  "runs": 74,
+  "runs": 75,
   "last_summary": {
     "reason": "github-actions",
     "fixtures": 208,
     "selected_matches": 4,
     "refreshed": [
       {
-        "match_id": "AICAI_6020276",
-        "match": "科特迪瓦 vs 挪威",
+        "match_id": "AICAI_6020282",
+        "match": "西班牙 vs 奥地利",
         "inserted": 17,
         "process_source": null
       },
       {
-        "match_id": "AICAI_6020275",
-        "match": "法国 vs 瑞典",
+        "match_id": "AICAI_6020281",
+        "match": "葡萄牙 vs 克罗地亚",
         "inserted": 17,
         "process_source": null
       },
       {
-        "match_id": "AICAI_6020277",
-        "match": "墨西哥 vs 厄瓜多尔",
+        "match_id": "AICAI_5998053",
+        "match": "瑞士 vs 阿尔及利亚",
         "inserted": 17,
         "process_source": null
       },
       {
-        "match_id": "AUTO_B735F2AB55",
-        "match": "Portugal vs Croatia",
+        "match_id": "AUTO_0534B0167B",
+        "match": "Paraguay vs France",
         "inserted": 3,
         "process_source": null
       }
     ],
     "archived": [
       {
-        "match_id": "AICAI_6020276",
+        "match_id": "AICAI_6020282",
         "snapshots": 6
       },
       {
-        "match_id": "AICAI_6020275",
+        "match_id": "AICAI_6020281",
         "snapshots": 6
       },
       {
-        "match_id": "AICAI_6020277",
+        "match_id": "AICAI_5998053",
         "snapshots": 6
       },
       {
-        "match_id": "AUTO_B735F2AB55",
+        "match_id": "AUTO_0534B0167B",
         "snapshots": 6
       }
     ],
     "backtest": {
-      "inserted": 18,
-      "evaluated": [
-        {
-          "match_id": "AICAI_6020276",
-          "matched_ids": [
-            "AICAI_6020276"
-          ],
-          "results": 6
-        },
-        {
-          "match_id": "AICAI_6020275",
-          "matched_ids": [
-            "AICAI_6020275"
-          ],
-          "results": 6
-        },
-        {
-          "match_id": "AICAI_6020277",
-          "matched_ids": [
-            "AICAI_6020277"
-          ],
-          "results": 6
-        }
-      ]
+      "inserted": 0,
+      "evaluated": []
     },
     "logs_removed": 0,
     "public_meta": {
@@ -90,7 +68,7 @@
     "sporttery_meta": {
       "source": "https://webapi.sporttery.cn/gateway/uniform/football/getMatchListV1.qry?clientCode=3001",
       "count": 0,
-      "error": "<urlopen error timed out>"
+      "error": "HTTP Error 567: Unknown Status"
     },
     "aicai_meta": {
       "source": "https://sport.ttyingqiu.com/sportdata/f",
