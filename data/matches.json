@@ -1,22 +1,22 @@
 [
   {
-    "match_id": "AICAI_6020282",
-    "home_team": "西班牙",
-    "away_team": "奥地利",
+    "match_id": "AICAI_6020305",
+    "home_team": "加拿大",
+    "away_team": "摩洛哥",
     "home_aliases": [
-      "西班牙"
+      "加拿大"
     ],
     "away_aliases": [
-      "奥地利"
+      "摩洛哥"
     ],
-    "kickoff": "2026-07-03T03:00:00+08:00",
-    "stage": "1/16决赛",
+    "kickoff": "2026-07-05T01:00:00+08:00",
+    "stage": "1/8决赛",
     "neutral": true,
-    "home_elo": 2055,
-    "away_elo": 1955,
+    "home_elo": 1920,
+    "away_elo": 2040,
     "expected_goals": {
-      "home": 1.8,
-      "away": 0.6
+      "home": 0.82,
+      "away": 1.58
     },
     "lineup_status": "unknown",
     "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
@@ -29,29 +29,29 @@
       "early_event_risk": true
     },
     "manual_odds": {
-      "home": 1.32,
-      "draw": 5.2,
-      "away": 9.6
+      "home": 4.4,
+      "draw": 3.35,
+      "away": 1.9
     }
   },
   {
-    "match_id": "AICAI_6020281",
-    "home_team": "葡萄牙",
-    "away_team": "克罗地亚",
+    "match_id": "AICAI_6020304",
+    "home_team": "巴拉圭",
+    "away_team": "法国",
     "home_aliases": [
-      "葡萄牙"
+      "巴拉圭"
     ],
     "away_aliases": [
-      "克罗地亚"
+      "法国"
     ],
-    "kickoff": "2026-07-03T07:00:00+08:00",
-    "stage": "1/16决赛",
+    "kickoff": "2026-07-05T05:00:00+08:00",
+    "stage": "1/8决赛",
     "neutral": true,
-    "home_elo": 2030,
-    "away_elo": 2005,
+    "home_elo": 1900,
+    "away_elo": 2065,
     "expected_goals": {
-      "home": 1.73,
-      "away": 0.77
+      "home": 0.6,
+      "away": 1.8
     },
     "lineup_status": "unknown",
     "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
@@ -64,29 +64,29 @@
       "early_event_risk": true
     },
     "manual_odds": {
-      "home": 1.74,
-      "draw": 3.7,
-      "away": 4.8
+      "home": 16.0,
+      "draw": 6.7,
+      "away": 1.19
     }
   },
   {
-    "match_id": "AICAI_5998053",
-    "home_team": "瑞士",
-    "away_team": "阿尔及利亚",
+    "match_id": "AUTO_BF26523542",
+    "home_team": "Portugal",
+    "away_team": "Spain",
     "home_aliases": [
-      "瑞士"
+      "Portugal"
     ],
     "away_aliases": [
-      "阿尔及利亚"
+      "Spain"
     ],
-    "kickoff": "2026-07-03T11:00:00+08:00",
-    "stage": "1/16决赛",
+    "kickoff": "2026-07-06T00:00:00",
+    "stage": "Round of 16",
     "neutral": true,
-    "home_elo": 1990,
-    "away_elo": 1925,
+    "home_elo": 1800,
+    "away_elo": 1800,
     "expected_goals": {
-      "home": 1.5,
-      "away": 0.9
+      "home": 1.25,
+      "away": 1.15
     },
     "lineup_status": "unknown",
     "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
@@ -97,24 +97,19 @@
       "underdog_low_block": true,
       "underdog_set_piece": true,
       "early_event_risk": true
-    },
-    "manual_odds": {
-      "home": 2.04,
-      "draw": 3.2,
-      "away": 4.0
     }
   },
   {
-    "match_id": "AUTO_0534B0167B",
-    "home_team": "Paraguay",
-    "away_team": "France",
+    "match_id": "AUTO_F5818FA8D9",
+    "home_team": "USA",
+    "away_team": "Belgium",
     "home_aliases": [
-      "Paraguay"
+      "USA"
     ],
     "away_aliases": [
-      "France"
+      "Belgium"
     ],
-    "kickoff": "2026-07-04T00:00:00",
+    "kickoff": "2026-07-06T00:00:00",
     "stage": "Round of 16",
     "neutral": true,
     "home_elo": 1800,
