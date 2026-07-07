@@ -2,11 +2,11 @@
   "enabled": true,
   "interval_seconds": 14400,
   "running": false,
-  "last_started_at": "2026-07-07T17:52:30+00:00",
-  "last_finished_at": "2026-07-07T17:55:47+00:00",
+  "last_started_at": "2026-07-07T21:15:34+00:00",
+  "last_finished_at": "2026-07-07T21:17:30+00:00",
   "last_ok": true,
   "last_error": null,
-  "runs": 108,
+  "runs": 109,
   "last_summary": {
     "reason": "github-actions",
     "fixtures": 208,
@@ -56,7 +56,7 @@
       }
     ],
     "backtest": {
-      "inserted": 18,
+      "inserted": 24,
       "evaluated": [
         {
           "match_id": "AICAI_6020308",
@@ -78,6 +78,13 @@
             "AICAI_6020310"
           ],
           "results": 6
+        },
+        {
+          "match_id": "AICAI_6020311",
+          "matched_ids": [
+            "AICAI_6020311"
+          ],
+          "results": 6
         }
       ]
     },
@@ -90,7 +97,7 @@
     "sporttery_meta": {
       "source": "https://webapi.sporttery.cn/gateway/uniform/football/getMatchListV1.qry?clientCode=3001",
       "count": 0,
-      "error": "<urlopen error _ssl.c:993: The handshake operation timed out>"
+      "error": "HTTP Error 567: Unknown Status"
     },
     "aicai_meta": {
       "source": "https://sport.ttyingqiu.com/sportdata/f",
