@@ -2,91 +2,62 @@
   "enabled": true,
   "interval_seconds": 14400,
   "running": false,
-  "last_started_at": "2026-07-07T21:15:34+00:00",
-  "last_finished_at": "2026-07-07T21:17:30+00:00",
+  "last_started_at": "2026-07-08T01:49:02+00:00",
+  "last_finished_at": "2026-07-08T01:52:25+00:00",
   "last_ok": true,
   "last_error": null,
-  "runs": 109,
+  "runs": 110,
   "last_summary": {
     "reason": "github-actions",
     "fixtures": 208,
     "selected_matches": 4,
     "refreshed": [
       {
-        "match_id": "AICAI_6020308",
-        "match": "葡萄牙 vs 西班牙",
+        "match_id": "AICAI_5998051",
+        "match": "法国 vs 摩洛哥",
         "inserted": 17,
         "process_source": null
       },
       {
-        "match_id": "AICAI_6020309",
-        "match": "美国 vs 比利时",
-        "inserted": 17,
+        "match_id": "AUTO_185230D6A5",
+        "match": "Norway vs England",
+        "inserted": 3,
         "process_source": null
       },
       {
-        "match_id": "AICAI_6020310",
-        "match": "阿根廷 vs 埃及",
-        "inserted": 17,
+        "match_id": "AUTO_8B068BF925",
+        "match": "W95 vs W96",
+        "inserted": 3,
         "process_source": null
       },
       {
-        "match_id": "AICAI_6020311",
-        "match": "瑞士 vs 哥伦比亚",
+        "match_id": "AICAI_5998050",
+        "match": "西班牙 vs 比利时",
         "inserted": 17,
         "process_source": null
       }
     ],
     "archived": [
       {
-        "match_id": "AICAI_6020308",
+        "match_id": "AICAI_5998051",
         "snapshots": 6
       },
       {
-        "match_id": "AICAI_6020309",
+        "match_id": "AUTO_185230D6A5",
         "snapshots": 6
       },
       {
-        "match_id": "AICAI_6020310",
+        "match_id": "AUTO_8B068BF925",
         "snapshots": 6
       },
       {
-        "match_id": "AICAI_6020311",
+        "match_id": "AICAI_5998050",
         "snapshots": 6
       }
     ],
     "backtest": {
-      "inserted": 24,
-      "evaluated": [
-        {
-          "match_id": "AICAI_6020308",
-          "matched_ids": [
-            "AICAI_6020308"
-          ],
-          "results": 6
-        },
-        {
-          "match_id": "AICAI_6020309",
-          "matched_ids": [
-            "AICAI_6020309"
-          ],
-          "results": 6
-        },
-        {
-          "match_id": "AICAI_6020310",
-          "matched_ids": [
-            "AICAI_6020310"
-          ],
-          "results": 6
-        },
-        {
-          "match_id": "AICAI_6020311",
-          "matched_ids": [
-            "AICAI_6020311"
-          ],
-          "results": 6
-        }
-      ]
+      "inserted": 0,
+      "evaluated": []
     },
     "logs_removed": 0,
     "public_meta": {
