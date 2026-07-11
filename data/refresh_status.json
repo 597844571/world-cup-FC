@@ -2,77 +2,62 @@
   "enabled": true,
   "interval_seconds": 14400,
   "running": false,
-  "last_started_at": "2026-07-11T01:47:52+00:00",
-  "last_finished_at": "2026-07-11T01:52:25+00:00",
+  "last_started_at": "2026-07-11T06:06:45+00:00",
+  "last_finished_at": "2026-07-11T06:09:59+00:00",
   "last_ok": true,
   "last_error": null,
-  "runs": 127,
+  "runs": 128,
   "last_summary": {
     "reason": "github-actions",
     "fixtures": 208,
     "selected_matches": 4,
     "refreshed": [
       {
-        "match_id": "AICAI_5998051",
-        "match": "法国 vs 摩洛哥",
+        "match_id": "AICAI_5998049",
+        "match": "挪威 vs 英格兰",
         "inserted": 17,
         "process_source": null
       },
       {
-        "match_id": "AUTO_185230D6A5",
-        "match": "Norway vs England",
-        "inserted": 3,
-        "process_source": null
-      },
-      {
-        "match_id": "AUTO_8B068BF925",
-        "match": "W95 vs W96",
-        "inserted": 3,
-        "process_source": null
-      },
-      {
-        "match_id": "AICAI_5998050",
-        "match": "西班牙 vs 比利时",
+        "match_id": "AICAI_5998109",
+        "match": "阿根廷 vs 瑞士",
         "inserted": 17,
+        "process_source": null
+      },
+      {
+        "match_id": "AUTO_FEC549A3F0",
+        "match": "W97 vs W98",
+        "inserted": 3,
+        "process_source": null
+      },
+      {
+        "match_id": "AUTO_09BB2543E8",
+        "match": "W99 vs W100",
+        "inserted": 3,
         "process_source": null
       }
     ],
     "archived": [
       {
-        "match_id": "AICAI_5998051",
+        "match_id": "AICAI_5998049",
         "snapshots": 6
       },
       {
-        "match_id": "AUTO_185230D6A5",
+        "match_id": "AICAI_5998109",
         "snapshots": 6
       },
       {
-        "match_id": "AUTO_8B068BF925",
+        "match_id": "AUTO_FEC549A3F0",
         "snapshots": 6
       },
       {
-        "match_id": "AICAI_5998050",
+        "match_id": "AUTO_09BB2543E8",
         "snapshots": 6
       }
     ],
     "backtest": {
-      "inserted": 12,
-      "evaluated": [
-        {
-          "match_id": "AICAI_5998051",
-          "matched_ids": [
-            "AICAI_5998051"
-          ],
-          "results": 6
-        },
-        {
-          "match_id": "AICAI_5998050",
-          "matched_ids": [
-            "AICAI_5998050"
-          ],
-          "results": 6
-        }
-      ]
+      "inserted": 0,
+      "evaluated": []
     },
     "logs_removed": 0,
     "public_meta": {

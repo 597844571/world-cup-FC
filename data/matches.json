@@ -1,22 +1,22 @@
 [
   {
-    "match_id": "AICAI_5998051",
-    "home_team": "法国",
-    "away_team": "摩洛哥",
+    "match_id": "AICAI_5998049",
+    "home_team": "挪威",
+    "away_team": "英格兰",
     "home_aliases": [
-      "法国"
+      "挪威"
     ],
     "away_aliases": [
-      "摩洛哥"
+      "英格兰"
     ],
-    "kickoff": "2026-07-10T04:00:00+08:00",
+    "kickoff": "2026-07-12T05:00:00+08:00",
     "stage": "1/4决赛",
     "neutral": true,
-    "home_elo": 2065,
-    "away_elo": 2040,
+    "home_elo": 1975,
+    "away_elo": 2050,
     "expected_goals": {
-      "home": 1.87,
-      "away": 0.63
+      "home": 0.88,
+      "away": 1.52
     },
     "lineup_status": "unknown",
     "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
@@ -29,86 +29,26 @@
       "early_event_risk": true
     },
     "manual_odds": {
-      "home": 1.55,
-      "draw": 3.95,
-      "away": 6.0
+      "home": 3.85,
+      "draw": 3.7,
+      "away": 1.95
     }
   },
   {
-    "match_id": "AUTO_185230D6A5",
-    "home_team": "Norway",
-    "away_team": "England",
+    "match_id": "AICAI_5998109",
+    "home_team": "阿根廷",
+    "away_team": "瑞士",
     "home_aliases": [
-      "Norway"
+      "阿根廷"
     ],
     "away_aliases": [
-      "England"
+      "瑞士"
     ],
-    "kickoff": "2026-07-11T00:00:00",
-    "stage": "Quarter-final",
-    "neutral": true,
-    "home_elo": 1800,
-    "away_elo": 1800,
-    "expected_goals": {
-      "home": 1.25,
-      "away": 1.15
-    },
-    "lineup_status": "unknown",
-    "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
-    "tactical_notes": "自动建模：先使用市场倍率、球队排名和盘口作为底盘；战术细节需后续补充。",
-    "weather_notes": "待确认",
-    "referee_notes": "待确认",
-    "upset_triggers": {
-      "underdog_low_block": true,
-      "underdog_set_piece": true,
-      "early_event_risk": true
-    }
-  },
-  {
-    "match_id": "AUTO_8B068BF925",
-    "home_team": "W95",
-    "away_team": "W96",
-    "home_aliases": [
-      "W95"
-    ],
-    "away_aliases": [
-      "W96"
-    ],
-    "kickoff": "2026-07-11T00:00:00",
-    "stage": "Quarter-final",
-    "neutral": true,
-    "home_elo": 1800,
-    "away_elo": 1800,
-    "expected_goals": {
-      "home": 1.25,
-      "away": 1.15
-    },
-    "lineup_status": "unknown",
-    "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
-    "tactical_notes": "自动建模：先使用市场倍率、球队排名和盘口作为底盘；战术细节需后续补充。",
-    "weather_notes": "待确认",
-    "referee_notes": "待确认",
-    "upset_triggers": {
-      "underdog_low_block": true,
-      "underdog_set_piece": true,
-      "early_event_risk": true
-    }
-  },
-  {
-    "match_id": "AICAI_5998050",
-    "home_team": "西班牙",
-    "away_team": "比利时",
-    "home_aliases": [
-      "西班牙"
-    ],
-    "away_aliases": [
-      "比利时"
-    ],
-    "kickoff": "2026-07-11T03:00:00+08:00",
+    "kickoff": "2026-07-12T09:00:00+08:00",
     "stage": "1/4决赛",
     "neutral": true,
     "home_elo": 2055,
-    "away_elo": 2030,
+    "away_elo": 2000,
     "expected_goals": {
       "home": 1.76,
       "away": 0.64
@@ -124,9 +64,69 @@
       "early_event_risk": true
     },
     "manual_odds": {
-      "home": 1.6,
-      "draw": 4.05,
-      "away": 5.5
+      "home": 1.65,
+      "draw": 3.65,
+      "away": 6.1
+    }
+  },
+  {
+    "match_id": "AUTO_FEC549A3F0",
+    "home_team": "W97",
+    "away_team": "W98",
+    "home_aliases": [
+      "W97"
+    ],
+    "away_aliases": [
+      "W98"
+    ],
+    "kickoff": "2026-07-14T00:00:00",
+    "stage": "Semi-final",
+    "neutral": true,
+    "home_elo": 1800,
+    "away_elo": 1800,
+    "expected_goals": {
+      "home": 1.25,
+      "away": 1.15
+    },
+    "lineup_status": "unknown",
+    "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
+    "tactical_notes": "自动建模：先使用市场倍率、球队排名和盘口作为底盘；战术细节需后续补充。",
+    "weather_notes": "待确认",
+    "referee_notes": "待确认",
+    "upset_triggers": {
+      "underdog_low_block": true,
+      "underdog_set_piece": true,
+      "early_event_risk": true
+    }
+  },
+  {
+    "match_id": "AUTO_09BB2543E8",
+    "home_team": "W99",
+    "away_team": "W100",
+    "home_aliases": [
+      "W99"
+    ],
+    "away_aliases": [
+      "W100"
+    ],
+    "kickoff": "2026-07-15T00:00:00",
+    "stage": "Semi-final",
+    "neutral": true,
+    "home_elo": 1800,
+    "away_elo": 1800,
+    "expected_goals": {
+      "home": 1.25,
+      "away": 1.15
+    },
+    "lineup_status": "unknown",
+    "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
+    "tactical_notes": "自动建模：先使用市场倍率、球队排名和盘口作为底盘；战术细节需后续补充。",
+    "weather_notes": "待确认",
+    "referee_notes": "待确认",
+    "upset_triggers": {
+      "underdog_low_block": true,
+      "underdog_set_piece": true,
+      "early_event_risk": true
     }
   }
 ]
