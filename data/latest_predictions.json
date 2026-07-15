@@ -1,80 +1,65 @@
 {
-  "captured_at": "2026-07-15T01:31:59+00:00",
+  "captured_at": "2026-07-15T06:48:50+00:00",
   "refresh_status": {
     "enabled": true,
     "interval_seconds": 14400,
     "running": false,
-    "last_started_at": "2026-07-15T01:26:07+00:00",
-    "last_finished_at": "2026-07-15T01:31:59+00:00",
+    "last_started_at": "2026-07-15T06:07:32+00:00",
+    "last_finished_at": "2026-07-15T06:48:50+00:00",
     "last_ok": true,
     "last_error": null,
-    "runs": 151,
+    "runs": 152,
     "last_summary": {
       "reason": "github-actions",
       "fixtures": 208,
       "selected_matches": 4,
       "refreshed": [
         {
-          "match_id": "AICAI_5998049",
-          "match": "挪威 vs 英格兰",
+          "match_id": "AICAI_5998046",
+          "match": "英格兰 vs 阿根廷",
           "inserted": 17,
           "process_source": null
         },
         {
-          "match_id": "AICAI_5998109",
-          "match": "阿根廷 vs 瑞士",
-          "inserted": 17,
-          "process_source": null
-        },
-        {
-          "match_id": "AUTO_FEC549A3F0",
-          "match": "W97 vs W98",
+          "match_id": "AUTO_63329EE867",
+          "match": "L101 vs L102",
           "inserted": 3,
           "process_source": null
         },
         {
-          "match_id": "AUTO_09BB2543E8",
-          "match": "W99 vs W100",
+          "match_id": "AUTO_DC30F146CD",
+          "match": "W101 vs W102",
+          "inserted": 3,
+          "process_source": null
+        },
+        {
+          "match_id": "AICAI_5997550",
+          "match": "法国 vs 英格兰/阿根廷败者",
           "inserted": 3,
           "process_source": null
         }
       ],
       "archived": [
         {
-          "match_id": "AICAI_5998049",
+          "match_id": "AICAI_5998046",
           "snapshots": 6
         },
         {
-          "match_id": "AICAI_5998109",
+          "match_id": "AUTO_63329EE867",
           "snapshots": 6
         },
         {
-          "match_id": "AUTO_FEC549A3F0",
+          "match_id": "AUTO_DC30F146CD",
           "snapshots": 6
         },
         {
-          "match_id": "AUTO_09BB2543E8",
+          "match_id": "AICAI_5997550",
           "snapshots": 6
         }
       ],
       "backtest": {
-        "inserted": 12,
-        "evaluated": [
-          {
-            "match_id": "AICAI_5998049",
-            "matched_ids": [
-              "AICAI_5998049"
-            ],
-            "results": 6
-          },
-          {
-            "match_id": "AICAI_5998109",
-            "matched_ids": [
-              "AICAI_5998109"
-            ],
-            "results": 6
-          }
-        ]
+        "inserted": 0,
+        "evaluated": []
       },
       "logs_removed": 0,
       "public_meta": {
@@ -85,7 +70,7 @@
       "sporttery_meta": {
         "source": "https://webapi.sporttery.cn/gateway/uniform/football/getMatchListV1.qry?clientCode=3001",
         "count": 0,
-        "error": "HTTP Error 567: Unknown Status"
+        "error": "<urlopen error timed out>"
       },
       "aicai_meta": {
         "source": "https://sport.ttyingqiu.com/sportdata/f",
@@ -97,19 +82,19 @@
   },
   "matches": [
     {
-      "match_id": "AICAI_5998049",
-      "home_team": "挪威",
-      "away_team": "英格兰",
-      "kickoff": "2026-07-12T05:00:00+08:00",
+      "match_id": "AICAI_5998046",
+      "home_team": "英格兰",
+      "away_team": "阿根廷",
+      "kickoff": "2026-07-16T03:00:00+08:00",
       "sporttery_handicap": null,
       "summary": {
-        "main_lean": "英格兰",
+        "main_lean": "平局",
         "score_group": [
-          "0-1",
-          "1-1",
-          "0-2"
+          "0-0",
+          "1-0",
+          "1-1"
         ],
-        "market_direction": "客胜方向增强",
+        "market_direction": "平局方向增强",
         "upset_level": "中低",
         "folk_parallel": {
           "enabled": false,
@@ -126,7 +111,7 @@
           "comparison": [
             {
               "dimension": "赛果方向",
-              "main": "英格兰",
+              "main": "平局",
               "side": "未录入",
               "relation": "无支线对比"
             },
@@ -153,67 +138,67 @@
           "用于判断抢分、轮换、默契和净胜球需求。缺失时第三轮尤其容易失真。"
         ],
         "gap_level": "轻微分歧",
-        "reference": "最终模型倾向 英格兰；比分参考 0-1 / 1-1 / 0-2；去水与特征修正后主/平/客为 23.8% / 26.5% / 49.6%；数据状态为 只适合观察，低置信参考。"
+        "reference": "最终模型倾向 平局；比分参考 0-0 / 1-0 / 1-1；去水与特征修正后主/平/客为 33.6% / 34.9% / 31.5%；数据状态为 只适合观察，低置信参考。"
       },
       "market_scenario": {
         "probabilities": {
-          "home": 0.2679,
-          "draw": 0.2687,
-          "away": 0.4634
+          "home": 0.3527,
+          "draw": 0.3021,
+          "away": 0.3452
         },
         "top_scores": [
           {
-            "score": "0-1",
-            "probability": 0.1338,
-            "score_group": "常见比分",
-            "score_priority": 3,
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "1-1",
-            "probability": 0.1291,
-            "score_group": "常见比分",
-            "score_priority": 3,
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "0-2",
-            "probability": 0.1012,
-            "score_group": "常见比分",
-            "score_priority": 3,
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
             "score": "0-0",
-            "probability": 0.0998,
-            "score_group": "常见比分",
-            "score_priority": 3,
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "1-2",
-            "probability": 0.0884,
+            "probability": 0.1513,
             "score_group": "常见比分",
             "score_priority": 3,
             "score_note": "和胜平负、总进球主线一致，可作为比分参考"
           },
           {
             "score": "1-0",
-            "probability": 0.0761,
+            "probability": 0.1421,
             "score_group": "常见比分",
             "score_priority": 3,
             "score_note": "和胜平负、总进球主线一致，可作为比分参考"
           },
           {
-            "score": "2-1",
-            "probability": 0.0514,
+            "score": "1-1",
+            "probability": 0.142,
+            "score_group": "常见比分",
+            "score_priority": 3,
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "0-1",
+            "probability": 0.1282,
             "score_group": "常见比分",
             "score_priority": 3,
             "score_note": "和胜平负、总进球主线一致，可作为比分参考"
           },
           {
             "score": "2-0",
-            "probability": 0.0343,
+            "probability": 0.0715,
+            "score_group": "常见比分",
+            "score_priority": 3,
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "2-1",
+            "probability": 0.0674,
+            "score_group": "常见比分",
+            "score_priority": 3,
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "1-2",
+            "probability": 0.061,
+            "score_group": "常见比分",
+            "score_priority": 3,
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "0-2",
+            "probability": 0.0586,
             "score_group": "常见比分",
             "score_priority": 3,
             "score_note": "和胜平负、总进球主线一致，可作为比分参考"
@@ -223,49 +208,49 @@
           "exact": [
             {
               "goals": "0",
-              "probability": 0.0998
+              "probability": 0.1513
             },
             {
               "goals": "1",
-              "probability": 0.21
+              "probability": 0.2703
             },
             {
               "goals": "2",
-              "probability": 0.2646
+              "probability": 0.2722
             },
             {
               "goals": "3",
-              "probability": 0.2014
+              "probability": 0.1731
             },
             {
               "goals": "4",
-              "probability": 0.1262
+              "probability": 0.0834
             },
             {
               "goals": "5",
-              "probability": 0.0607
+              "probability": 0.0337
             },
             {
               "goals": "6",
-              "probability": 0.025
+              "probability": 0.0115
             },
             {
               "goals": "7+",
-              "probability": 0.0123
+              "probability": 0.0045
             }
           ],
           "ranges": [
             {
               "range": "0-1",
-              "probability": 0.3098
+              "probability": 0.4216
             },
             {
               "range": "2-3",
-              "probability": 0.466
+              "probability": 0.4453
             },
             {
               "range": "4+",
-              "probability": 0.2242
+              "probability": 0.1331
             }
           ],
           "most_likely": "2",
@@ -273,8 +258,8 @@
           "low_score_risk": "中",
           "high_score_risk": "低"
         },
-        "over_25": 0.4257,
-        "btts": 0.4624,
+        "over_25": 0.3062,
+        "btts": 0.3903,
         "confidence": 64
       },
       "sporttery": {
@@ -286,38 +271,38 @@
         },
         "score_reference": [
           {
-            "score": "0-1",
-            "probability": 0.1338,
-            "score_group": "常见比分",
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "1-1",
-            "probability": 0.1291,
-            "score_group": "常见比分",
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "0-2",
-            "probability": 0.1012,
-            "score_group": "常见比分",
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
             "score": "0-0",
-            "probability": 0.0998,
-            "score_group": "常见比分",
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "1-2",
-            "probability": 0.0884,
+            "probability": 0.1513,
             "score_group": "常见比分",
             "score_note": "和胜平负、总进球主线一致，可作为比分参考"
           },
           {
             "score": "1-0",
-            "probability": 0.0761,
+            "probability": 0.1421,
+            "score_group": "常见比分",
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "1-1",
+            "probability": 0.142,
+            "score_group": "常见比分",
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "0-1",
+            "probability": 0.1282,
+            "score_group": "常见比分",
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "2-0",
+            "probability": 0.0715,
+            "score_group": "常见比分",
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "2-1",
+            "probability": 0.0674,
             "score_group": "常见比分",
             "score_note": "和胜平负、总进球主线一致，可作为比分参考"
           }
@@ -330,11 +315,11 @@
               "胜",
               "平"
             ],
-            "hit_prob": 0.4986,
+            "hit_prob": 0.6855,
             "num_bets": 2,
-            "ev": -0.0314,
-            "min_return_sp": 3.776,
-            "max_return_sp": 4.005,
+            "ev": -0.0447,
+            "min_return_sp": 2.671,
+            "max_return_sp": 2.904,
             "decision": "放弃",
             "reason": "复选包EV按注数重算"
           },
@@ -344,1357 +329,26 @@
               "平",
               "负"
             ],
-            "hit_prob": 0.7619,
+            "hit_prob": 0.6563,
             "num_bets": 2,
-            "ev": -0.0416,
-            "min_return_sp": 1.861,
-            "max_return_sp": 3.776,
-            "decision": "放弃",
-            "reason": "复选包EV按注数重算"
-          },
-          {
-            "name": "分胜负",
-            "options": [
-              "胜",
-              "负"
-            ],
-            "hit_prob": 0.7395,
-            "num_bets": 2,
-            "ev": -0.0567,
-            "min_return_sp": 1.861,
-            "max_return_sp": 4.005,
-            "decision": "放弃",
-            "reason": "复选包EV按注数重算"
-          },
-          {
-            "name": "总进球低位覆盖",
-            "num_bets": 3,
-            "decision": "不可用",
-            "reason": "复选包存在SP缺失"
-          },
-          {
-            "name": "总进球中位覆盖",
-            "num_bets": 3,
-            "decision": "不可用",
-            "reason": "复选包存在SP缺失"
-          }
-        ],
-        "score_combo_pools": []
-      },
-      "data_completeness": {
-        "score": 82,
-        "level": "数据充分",
-        "source_audit": {
-          "score": 24,
-          "level": "只适合观察",
-          "model_mode": "低置信参考",
-          "confidence_penalty": 18,
-          "rows": [
-            {
-              "tier": "A",
-              "name": "体彩官方可下单数据",
-              "status": "手动兜底",
-              "ok": false,
-              "impact": "决定能买什么、让几球、SP是多少。缺失时只能按手动或历史快照参考，不能强行给正式下单项。",
-              "detail": "未抓到官方本场数据，但存在手动赔率或历史快照"
-            },
-            {
-              "tier": "A+",
-              "name": "体彩计算器补充玩法",
-              "status": "最近失败",
-              "ok": false,
-              "impact": "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
-              "detail": "official/public endpoint blocked by WAF or access policy: HTTP 567"
-            },
-            {
-              "tier": "B",
-              "name": "市场走势与盘口参考",
-              "status": "已拿到",
-              "ok": true,
-              "impact": "用于看欧赔、让球、大小球变化。缺失时市场方向和收盘变化判断变弱。",
-              "detail": "本场抓到 14 条可用记录"
-            },
-            {
-              "tier": "C",
-              "name": "国家队基础实力",
-              "status": "部分缺失",
-              "ok": false,
-              "impact": "用于判断强弱底盘。缺少排名或 Elo 时，不能过度相信盘口方向。",
-              "detail": "FIFA 排名或 Elo 不完整"
-            },
-            {
-              "tier": "C",
-              "name": "预选赛/洲际杯正式赛表现",
-              "status": "缺失",
-              "ok": false,
-              "impact": "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。",
-              "detail": "未配置 formal_competition_strength"
-            },
-            {
-              "tier": "C",
-              "name": "小组积分与出线动机",
-              "status": "未验证",
-              "ok": false,
-              "impact": "用于判断抢分、轮换、默契和净胜球需求。缺失时第三轮尤其容易失真。",
-              "detail": "还没有稳定抓取记录"
-            },
-            {
-              "tier": "D",
-              "name": "过程统计/赛后技术数据",
-              "status": "停用",
-              "ok": false,
-              "impact": "用于复盘谁是真强、谁是运气球。缺失时赛后调参只能依赖比分和市场。",
-              "detail": "该源不参与当前抓取"
-            },
-            {
-              "tier": "D",
-              "name": "伤停与首发",
-              "status": "待临场确认",
-              "ok": false,
-              "impact": "用于最后一轮校准。缺失时临场建议要降档，尤其是深盘强队。",
-              "detail": "首发或伤停未确认"
-            }
-          ],
-          "missing_impacts": [
-            "决定能买什么、让几球、SP是多少。缺失时只能按手动或历史快照参考，不能强行给正式下单项。",
-            "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
-            "用于判断强弱底盘。缺少排名或 Elo 时，不能过度相信盘口方向。",
-            "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。",
-            "用于判断抢分、轮换、默契和净胜球需求。缺失时第三轮尤其容易失真。"
-          ],
-          "official_rows": 0,
-          "manual_rows": 3,
-          "market_rows": 9
-        },
-        "confidence_penalty": 18,
-        "items": [
-          {
-            "name": "赛程匹配",
-            "ok": true,
-            "weight": 10,
-            "impact": "没有准确比赛和时间，无法对齐体彩和赛程。"
-          },
-          {
-            "name": "Elo",
-            "ok": true,
-            "weight": 10,
-            "impact": "基础实力底盘会变弱。"
-          },
-          {
-            "name": "FIFA世界排名",
-            "ok": false,
-            "weight": 7,
-            "impact": "国家队强弱侧面参考不足。"
-          },
-          {
-            "name": "预选赛/洲际杯正式赛",
-            "ok": false,
-            "weight": 10,
-            "impact": "近期正式赛状态无法修正。"
-          },
-          {
-            "name": "近期/过程数据",
-            "ok": true,
-            "weight": 10,
-            "impact": "进攻/防守质量只能用默认估计。"
-          },
-          {
-            "name": "权威侧面源",
-            "ok": false,
-            "weight": 7,
-            "impact": "媒体和权威数据侧面强度缺失。"
-          },
-          {
-            "name": "赛中/赛后过程统计",
-            "ok": false,
-            "weight": 7,
-            "impact": "复盘时无法区分实力与偶然。"
-          },
-          {
-            "name": "赔率/SP",
-            "ok": true,
-            "weight": 14,
-            "impact": "无法做去水概率和价值判断。"
-          },
-          {
-            "name": "赔率历史",
-            "ok": true,
-            "weight": 8,
-            "impact": "看不到赔率波动，只能看单点价格。"
-          },
-          {
-            "name": "爱彩盘口/赛果统计",
-            "ok": true,
-            "weight": 8,
-            "impact": "市场走势、让球和大小球参考不足。"
-          },
-          {
-            "name": "伤停",
-            "ok": true,
-            "weight": 11,
-            "impact": "临场人员风险未确认。"
-          },
-          {
-            "name": "首发",
-            "ok": false,
-            "weight": 11,
-            "impact": "赛前最后校准不足。"
-          },
-          {
-            "name": "小组积分榜",
-            "ok": false,
-            "weight": 8,
-            "impact": "出线动机和轮换风险不清楚。"
-          },
-          {
-            "name": "天气/裁判/场地",
-            "ok": true,
-            "weight": 7,
-            "impact": "红牌、点球、场地节奏风险无法修正。"
-          },
-          {
-            "name": "战术标签",
-            "ok": true,
-            "weight": 4,
-            "impact": "打法相克只能粗略判断。"
-          }
-        ]
-      },
-      "source_audit": {
-        "score": 24,
-        "level": "只适合观察",
-        "model_mode": "低置信参考",
-        "confidence_penalty": 18,
-        "rows": [
-          {
-            "tier": "A",
-            "name": "体彩官方可下单数据",
-            "status": "手动兜底",
-            "ok": false,
-            "impact": "决定能买什么、让几球、SP是多少。缺失时只能按手动或历史快照参考，不能强行给正式下单项。",
-            "detail": "未抓到官方本场数据，但存在手动赔率或历史快照"
-          },
-          {
-            "tier": "A+",
-            "name": "体彩计算器补充玩法",
-            "status": "最近失败",
-            "ok": false,
-            "impact": "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
-            "detail": "official/public endpoint blocked by WAF or access policy: HTTP 567"
-          },
-          {
-            "tier": "B",
-            "name": "市场走势与盘口参考",
-            "status": "已拿到",
-            "ok": true,
-            "impact": "用于看欧赔、让球、大小球变化。缺失时市场方向和收盘变化判断变弱。",
-            "detail": "本场抓到 14 条可用记录"
-          },
-          {
-            "tier": "C",
-            "name": "国家队基础实力",
-            "status": "部分缺失",
-            "ok": false,
-            "impact": "用于判断强弱底盘。缺少排名或 Elo 时，不能过度相信盘口方向。",
-            "detail": "FIFA 排名或 Elo 不完整"
-          },
-          {
-            "tier": "C",
-            "name": "预选赛/洲际杯正式赛表现",
-            "status": "缺失",
-            "ok": false,
-            "impact": "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。",
-            "detail": "未配置 formal_competition_strength"
-          },
-          {
-            "tier": "C",
-            "name": "小组积分与出线动机",
-            "status": "未验证",
-            "ok": false,
-            "impact": "用于判断抢分、轮换、默契和净胜球需求。缺失时第三轮尤其容易失真。",
-            "detail": "还没有稳定抓取记录"
-          },
-          {
-            "tier": "D",
-            "name": "过程统计/赛后技术数据",
-            "status": "停用",
-            "ok": false,
-            "impact": "用于复盘谁是真强、谁是运气球。缺失时赛后调参只能依赖比分和市场。",
-            "detail": "该源不参与当前抓取"
-          },
-          {
-            "tier": "D",
-            "name": "伤停与首发",
-            "status": "待临场确认",
-            "ok": false,
-            "impact": "用于最后一轮校准。缺失时临场建议要降档，尤其是深盘强队。",
-            "detail": "首发或伤停未确认"
-          }
-        ],
-        "missing_impacts": [
-          "决定能买什么、让几球、SP是多少。缺失时只能按手动或历史快照参考，不能强行给正式下单项。",
-          "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
-          "用于判断强弱底盘。缺少排名或 Elo 时，不能过度相信盘口方向。",
-          "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。",
-          "用于判断抢分、轮换、默契和净胜球需求。缺失时第三轮尤其容易失真。"
-        ],
-        "official_rows": 0,
-        "manual_rows": 3,
-        "market_rows": 9
-      }
-    },
-    {
-      "match_id": "AICAI_5998109",
-      "home_team": "阿根廷",
-      "away_team": "瑞士",
-      "kickoff": "2026-07-12T09:00:00+08:00",
-      "sporttery_handicap": null,
-      "summary": {
-        "main_lean": "阿根廷",
-        "score_group": [
-          "1-0",
-          "2-0",
-          "1-1"
-        ],
-        "market_direction": "市场基本稳定",
-        "upset_level": "中低",
-        "folk_parallel": {
-          "enabled": false,
-          "label": "无民间信号",
-          "effect": "none",
-          "confidence": 0.0,
-          "note": "",
-          "tracks": [],
-          "alignment": "未提供",
-          "model_relation": "本场没有录入支线标签",
-          "side_prediction": "未录入支线预测",
-          "betting_advice": "不生成支线下注建议",
-          "betting_checks": [],
-          "comparison": [
-            {
-              "dimension": "赛果方向",
-              "main": "阿根廷",
-              "side": "未录入",
-              "relation": "无支线对比"
-            },
-            {
-              "dimension": "下注落点",
-              "main": "按EV、SP和风险分筛选",
-              "side": "未录入",
-              "relation": "只看主线"
-            }
-          ],
-          "advice_boundary": "支线为空，按数据模型和官方SP判断",
-          "action_hint": "按数据模型和官方SP判断"
-        },
-        "confidence": 56,
-        "data_score": 82,
-        "data_level": "只适合观察",
-        "source_level": "只适合观察",
-        "model_mode": "低置信参考",
-        "missing_impacts": [
-          "决定能买什么、让几球、SP是多少。缺失时只能按手动或历史快照参考，不能强行给正式下单项。",
-          "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
-          "用于判断强弱底盘。缺少排名或 Elo 时，不能过度相信盘口方向。",
-          "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。",
-          "用于判断抢分、轮换、默契和净胜球需求。缺失时第三轮尤其容易失真。"
-        ],
-        "gap_level": "高分歧",
-        "reference": "最终模型倾向 阿根廷；比分参考 1-0 / 2-0 / 1-1；去水与特征修正后主/平/客为 52.5% / 31.1% / 16.4%；数据状态为 只适合观察，低置信参考。"
-      },
-      "market_scenario": {
-        "probabilities": {
-          "home": 0.4659,
-          "draw": 0.2781,
-          "away": 0.2561
-        },
-        "top_scores": [
-          {
-            "score": "1-0",
-            "probability": 0.1685,
-            "score_group": "常见比分",
-            "score_priority": 3,
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "2-0",
-            "probability": 0.1361,
-            "score_group": "常见比分",
-            "score_priority": 3,
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "1-1",
-            "probability": 0.1144,
-            "score_group": "常见比分",
-            "score_priority": 3,
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "0-0",
-            "probability": 0.1087,
-            "score_group": "常见比分",
-            "score_priority": 3,
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "0-1",
-            "probability": 0.0592,
-            "score_group": "常见比分",
-            "score_priority": 3,
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "0-2",
-            "probability": 0.0182,
-            "score_group": "常见比分",
-            "score_priority": 3,
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "2-1",
-            "probability": 0.0868,
-            "score_group": "常见比分",
-            "score_priority": 3,
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "1-2",
-            "probability": 0.0318,
-            "score_group": "常见比分",
-            "score_priority": 3,
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          }
-        ],
-        "total_goals": {
-          "exact": [
-            {
-              "goals": "0",
-              "probability": 0.1087
-            },
-            {
-              "goals": "1",
-              "probability": 0.2277
-            },
-            {
-              "goals": "2",
-              "probability": 0.2688
-            },
-            {
-              "goals": "3",
-              "probability": 0.1979
-            },
-            {
-              "goals": "4",
-              "probability": 0.1119
-            },
-            {
-              "goals": "5",
-              "probability": 0.0527
-            },
-            {
-              "goals": "6",
-              "probability": 0.0217
-            },
-            {
-              "goals": "7+",
-              "probability": 0.0104
-            }
-          ],
-          "ranges": [
-            {
-              "range": "0-1",
-              "probability": 0.3364
-            },
-            {
-              "range": "2-3",
-              "probability": 0.4668
-            },
-            {
-              "range": "4+",
-              "probability": 0.1968
-            }
-          ],
-          "most_likely": "2",
-          "best_range": "2-3",
-          "low_score_risk": "中",
-          "high_score_risk": "低"
-        },
-        "over_25": 0.3947,
-        "btts": 0.3836,
-        "confidence": 56
-      },
-      "sporttery": {
-        "settlement": "90分钟含伤停补时，不含加时赛和点球大战",
-        "action_summary": {
-          "core": [
-            {
-              "match_id": "AICAI_5998109",
-              "play_type": "胜平负",
-              "selection": "平",
-              "pool_code": "HAD",
-              "single_allowed": true,
-              "allup_allowed": true,
-              "min_legs": 1,
-              "sp": 3.523,
-              "sp_source": "market_h2h_proxy",
-              "model_prob": 0.2973,
-              "market_prob": 0.2716,
-              "fair_sp": 3.363,
-              "implied_prob": 0.2838,
-              "value_gap": 0.0135,
-              "ev": 0.0476,
-              "risk_score": 37,
-              "risk_level": "中低",
-              "kelly": 0.0188,
-              "stake_pct": 0.0047,
-              "decision": "可小注",
-              "reason": "EV达到门槛且风险可控",
-              "risk_adjusted_score": 0.0106,
-              "raw_model_prob": 0.3112,
-              "market_model_gap": 0.0396,
-              "action_score": 81.56,
-              "action_tier": "主推",
-              "action_reason": "价值、风险和玩法稳定性较均衡"
-            }
-          ],
-          "support": [],
-          "hedge": []
-        },
-        "score_reference": [
-          {
-            "score": "1-0",
-            "probability": 0.1685,
-            "score_group": "常见比分",
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "2-0",
-            "probability": 0.1361,
-            "score_group": "常见比分",
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "1-1",
-            "probability": 0.1144,
-            "score_group": "常见比分",
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "0-0",
-            "probability": 0.1087,
-            "score_group": "常见比分",
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "0-1",
-            "probability": 0.0592,
-            "score_group": "常见比分",
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "0-2",
-            "probability": 0.0182,
-            "score_group": "常见比分",
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          }
-        ],
-        "candidate_pool": [
-          {
-            "match_id": "AICAI_5998109",
-            "play_type": "胜平负",
-            "selection": "平",
-            "pool_code": "HAD",
-            "single_allowed": true,
-            "allup_allowed": true,
-            "min_legs": 1,
-            "sp": 3.523,
-            "sp_source": "market_h2h_proxy",
-            "model_prob": 0.2973,
-            "market_prob": 0.2716,
-            "fair_sp": 3.363,
-            "implied_prob": 0.2838,
-            "value_gap": 0.0135,
-            "ev": 0.0476,
-            "risk_score": 37,
-            "risk_level": "中低",
-            "kelly": 0.0188,
-            "stake_pct": 0.0047,
-            "decision": "可小注",
-            "reason": "EV达到门槛且风险可控",
-            "risk_adjusted_score": 0.0106,
-            "raw_model_prob": 0.3112,
-            "market_model_gap": 0.0396,
-            "action_score": 81.56,
-            "action_tier": "主推",
-            "action_reason": "价值、风险和玩法稳定性较均衡"
-          }
-        ],
-        "compound_packages": [
-          {
-            "name": "主队不败",
-            "options": [
-              "胜",
-              "平"
-            ],
-            "hit_prob": 0.8378,
-            "num_bets": 2,
-            "ev": -0.0226,
-            "min_return_sp": 1.679,
-            "max_return_sp": 3.523,
-            "decision": "放弃",
-            "reason": "复选包EV按注数重算"
-          },
-          {
-            "name": "客队不败",
-            "options": [
-              "平",
-              "负"
-            ],
-            "hit_prob": 0.4595,
-            "num_bets": 2,
-            "ev": 0.0109,
-            "min_return_sp": 3.523,
-            "max_return_sp": 6.008,
-            "decision": "观察",
-            "reason": "复选包EV按注数重算"
-          },
-          {
-            "name": "分胜负",
-            "options": [
-              "胜",
-              "负"
-            ],
-            "hit_prob": 0.7027,
-            "num_bets": 2,
-            "ev": -0.059,
-            "min_return_sp": 1.679,
-            "max_return_sp": 6.008,
-            "decision": "放弃",
-            "reason": "复选包EV按注数重算"
-          },
-          {
-            "name": "总进球低位覆盖",
-            "num_bets": 3,
-            "decision": "不可用",
-            "reason": "复选包存在SP缺失"
-          },
-          {
-            "name": "总进球中位覆盖",
-            "num_bets": 3,
-            "decision": "不可用",
-            "reason": "复选包存在SP缺失"
-          }
-        ],
-        "score_combo_pools": []
-      },
-      "data_completeness": {
-        "score": 82,
-        "level": "数据充分",
-        "source_audit": {
-          "score": 24,
-          "level": "只适合观察",
-          "model_mode": "低置信参考",
-          "confidence_penalty": 18,
-          "rows": [
-            {
-              "tier": "A",
-              "name": "体彩官方可下单数据",
-              "status": "手动兜底",
-              "ok": false,
-              "impact": "决定能买什么、让几球、SP是多少。缺失时只能按手动或历史快照参考，不能强行给正式下单项。",
-              "detail": "未抓到官方本场数据，但存在手动赔率或历史快照"
-            },
-            {
-              "tier": "A+",
-              "name": "体彩计算器补充玩法",
-              "status": "最近失败",
-              "ok": false,
-              "impact": "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
-              "detail": "official/public endpoint blocked by WAF or access policy: HTTP 567"
-            },
-            {
-              "tier": "B",
-              "name": "市场走势与盘口参考",
-              "status": "已拿到",
-              "ok": true,
-              "impact": "用于看欧赔、让球、大小球变化。缺失时市场方向和收盘变化判断变弱。",
-              "detail": "本场抓到 14 条可用记录"
-            },
-            {
-              "tier": "C",
-              "name": "国家队基础实力",
-              "status": "部分缺失",
-              "ok": false,
-              "impact": "用于判断强弱底盘。缺少排名或 Elo 时，不能过度相信盘口方向。",
-              "detail": "FIFA 排名或 Elo 不完整"
-            },
-            {
-              "tier": "C",
-              "name": "预选赛/洲际杯正式赛表现",
-              "status": "缺失",
-              "ok": false,
-              "impact": "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。",
-              "detail": "未配置 formal_competition_strength"
-            },
-            {
-              "tier": "C",
-              "name": "小组积分与出线动机",
-              "status": "未验证",
-              "ok": false,
-              "impact": "用于判断抢分、轮换、默契和净胜球需求。缺失时第三轮尤其容易失真。",
-              "detail": "还没有稳定抓取记录"
-            },
-            {
-              "tier": "D",
-              "name": "过程统计/赛后技术数据",
-              "status": "停用",
-              "ok": false,
-              "impact": "用于复盘谁是真强、谁是运气球。缺失时赛后调参只能依赖比分和市场。",
-              "detail": "该源不参与当前抓取"
-            },
-            {
-              "tier": "D",
-              "name": "伤停与首发",
-              "status": "待临场确认",
-              "ok": false,
-              "impact": "用于最后一轮校准。缺失时临场建议要降档，尤其是深盘强队。",
-              "detail": "首发或伤停未确认"
-            }
-          ],
-          "missing_impacts": [
-            "决定能买什么、让几球、SP是多少。缺失时只能按手动或历史快照参考，不能强行给正式下单项。",
-            "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
-            "用于判断强弱底盘。缺少排名或 Elo 时，不能过度相信盘口方向。",
-            "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。",
-            "用于判断抢分、轮换、默契和净胜球需求。缺失时第三轮尤其容易失真。"
-          ],
-          "official_rows": 0,
-          "manual_rows": 3,
-          "market_rows": 9
-        },
-        "confidence_penalty": 18,
-        "items": [
-          {
-            "name": "赛程匹配",
-            "ok": true,
-            "weight": 10,
-            "impact": "没有准确比赛和时间，无法对齐体彩和赛程。"
-          },
-          {
-            "name": "Elo",
-            "ok": true,
-            "weight": 10,
-            "impact": "基础实力底盘会变弱。"
-          },
-          {
-            "name": "FIFA世界排名",
-            "ok": false,
-            "weight": 7,
-            "impact": "国家队强弱侧面参考不足。"
-          },
-          {
-            "name": "预选赛/洲际杯正式赛",
-            "ok": false,
-            "weight": 10,
-            "impact": "近期正式赛状态无法修正。"
-          },
-          {
-            "name": "近期/过程数据",
-            "ok": true,
-            "weight": 10,
-            "impact": "进攻/防守质量只能用默认估计。"
-          },
-          {
-            "name": "权威侧面源",
-            "ok": false,
-            "weight": 7,
-            "impact": "媒体和权威数据侧面强度缺失。"
-          },
-          {
-            "name": "赛中/赛后过程统计",
-            "ok": false,
-            "weight": 7,
-            "impact": "复盘时无法区分实力与偶然。"
-          },
-          {
-            "name": "赔率/SP",
-            "ok": true,
-            "weight": 14,
-            "impact": "无法做去水概率和价值判断。"
-          },
-          {
-            "name": "赔率历史",
-            "ok": true,
-            "weight": 8,
-            "impact": "看不到赔率波动，只能看单点价格。"
-          },
-          {
-            "name": "爱彩盘口/赛果统计",
-            "ok": true,
-            "weight": 8,
-            "impact": "市场走势、让球和大小球参考不足。"
-          },
-          {
-            "name": "伤停",
-            "ok": true,
-            "weight": 11,
-            "impact": "临场人员风险未确认。"
-          },
-          {
-            "name": "首发",
-            "ok": false,
-            "weight": 11,
-            "impact": "赛前最后校准不足。"
-          },
-          {
-            "name": "小组积分榜",
-            "ok": false,
-            "weight": 8,
-            "impact": "出线动机和轮换风险不清楚。"
-          },
-          {
-            "name": "天气/裁判/场地",
-            "ok": true,
-            "weight": 7,
-            "impact": "红牌、点球、场地节奏风险无法修正。"
-          },
-          {
-            "name": "战术标签",
-            "ok": true,
-            "weight": 4,
-            "impact": "打法相克只能粗略判断。"
-          }
-        ]
-      },
-      "source_audit": {
-        "score": 24,
-        "level": "只适合观察",
-        "model_mode": "低置信参考",
-        "confidence_penalty": 18,
-        "rows": [
-          {
-            "tier": "A",
-            "name": "体彩官方可下单数据",
-            "status": "手动兜底",
-            "ok": false,
-            "impact": "决定能买什么、让几球、SP是多少。缺失时只能按手动或历史快照参考，不能强行给正式下单项。",
-            "detail": "未抓到官方本场数据，但存在手动赔率或历史快照"
-          },
-          {
-            "tier": "A+",
-            "name": "体彩计算器补充玩法",
-            "status": "最近失败",
-            "ok": false,
-            "impact": "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
-            "detail": "official/public endpoint blocked by WAF or access policy: HTTP 567"
-          },
-          {
-            "tier": "B",
-            "name": "市场走势与盘口参考",
-            "status": "已拿到",
-            "ok": true,
-            "impact": "用于看欧赔、让球、大小球变化。缺失时市场方向和收盘变化判断变弱。",
-            "detail": "本场抓到 14 条可用记录"
-          },
-          {
-            "tier": "C",
-            "name": "国家队基础实力",
-            "status": "部分缺失",
-            "ok": false,
-            "impact": "用于判断强弱底盘。缺少排名或 Elo 时，不能过度相信盘口方向。",
-            "detail": "FIFA 排名或 Elo 不完整"
-          },
-          {
-            "tier": "C",
-            "name": "预选赛/洲际杯正式赛表现",
-            "status": "缺失",
-            "ok": false,
-            "impact": "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。",
-            "detail": "未配置 formal_competition_strength"
-          },
-          {
-            "tier": "C",
-            "name": "小组积分与出线动机",
-            "status": "未验证",
-            "ok": false,
-            "impact": "用于判断抢分、轮换、默契和净胜球需求。缺失时第三轮尤其容易失真。",
-            "detail": "还没有稳定抓取记录"
-          },
-          {
-            "tier": "D",
-            "name": "过程统计/赛后技术数据",
-            "status": "停用",
-            "ok": false,
-            "impact": "用于复盘谁是真强、谁是运气球。缺失时赛后调参只能依赖比分和市场。",
-            "detail": "该源不参与当前抓取"
-          },
-          {
-            "tier": "D",
-            "name": "伤停与首发",
-            "status": "待临场确认",
-            "ok": false,
-            "impact": "用于最后一轮校准。缺失时临场建议要降档，尤其是深盘强队。",
-            "detail": "首发或伤停未确认"
-          }
-        ],
-        "missing_impacts": [
-          "决定能买什么、让几球、SP是多少。缺失时只能按手动或历史快照参考，不能强行给正式下单项。",
-          "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
-          "用于判断强弱底盘。缺少排名或 Elo 时，不能过度相信盘口方向。",
-          "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。",
-          "用于判断抢分、轮换、默契和净胜球需求。缺失时第三轮尤其容易失真。"
-        ],
-        "official_rows": 0,
-        "manual_rows": 3,
-        "market_rows": 9
-      }
-    },
-    {
-      "match_id": "AUTO_FEC549A3F0",
-      "home_team": "W97",
-      "away_team": "W98",
-      "kickoff": "2026-07-14T00:00:00",
-      "sporttery_handicap": null,
-      "summary": {
-        "main_lean": "W97",
-        "score_group": [
-          "1-1",
-          "1-0",
-          "0-1"
-        ],
-        "market_direction": "市场基本稳定",
-        "upset_level": "中低",
-        "folk_parallel": {
-          "enabled": false,
-          "label": "无民间信号",
-          "effect": "none",
-          "confidence": 0.0,
-          "note": "",
-          "tracks": [],
-          "alignment": "未提供",
-          "model_relation": "本场没有录入支线标签",
-          "side_prediction": "未录入支线预测",
-          "betting_advice": "不生成支线下注建议",
-          "betting_checks": [],
-          "comparison": [
-            {
-              "dimension": "赛果方向",
-              "main": "W97",
-              "side": "未录入",
-              "relation": "无支线对比"
-            },
-            {
-              "dimension": "下注落点",
-              "main": "按EV、SP和风险分筛选",
-              "side": "未录入",
-              "relation": "只看主线"
-            }
-          ],
-          "advice_boundary": "支线为空，按数据模型和官方SP判断",
-          "action_hint": "按数据模型和官方SP判断"
-        },
-        "confidence": 48,
-        "data_score": 66,
-        "data_level": "只适合观察",
-        "source_level": "只适合观察",
-        "model_mode": "低置信参考",
-        "missing_impacts": [
-          "决定能买什么、让几球、SP是多少。缺失时只能按手动或历史快照参考，不能强行给正式下单项。",
-          "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
-          "用于看欧赔、让球、大小球变化。缺失时市场方向和收盘变化判断变弱。",
-          "用于判断强弱底盘。缺少排名或 Elo 时，不能过度相信盘口方向。",
-          "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。"
-        ],
-        "gap_level": "一致",
-        "reference": "最终模型倾向 W97；比分参考 1-1 / 1-0 / 0-1；去水与特征修正后主/平/客为 35.2% / 31.1% / 33.7%；数据状态为 只适合观察，低置信参考。"
-      },
-      "market_scenario": {
-        "probabilities": {
-          "home": 0.3536,
-          "draw": 0.2907,
-          "away": 0.3557
-        },
-        "top_scores": [
-          {
-            "score": "1-1",
-            "probability": 0.1381,
-            "score_group": "常见比分",
-            "score_priority": 3,
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "1-0",
-            "probability": 0.1087,
-            "score_group": "常见比分",
-            "score_priority": 3,
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "0-1",
-            "probability": 0.0997,
-            "score_group": "常见比分",
-            "score_priority": 3,
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "0-0",
-            "probability": 0.0996,
-            "score_group": "常见比分",
-            "score_priority": 3,
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "2-1",
-            "probability": 0.0779,
-            "score_group": "常见比分",
-            "score_priority": 3,
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "1-2",
-            "probability": 0.0717,
-            "score_group": "常见比分",
-            "score_priority": 3,
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "2-0",
-            "probability": 0.0684,
-            "score_group": "常见比分",
-            "score_priority": 3,
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "0-2",
-            "probability": 0.058,
-            "score_group": "常见比分",
-            "score_priority": 3,
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          }
-        ],
-        "total_goals": {
-          "exact": [
-            {
-              "goals": "0",
-              "probability": 0.0996
-            },
-            {
-              "goals": "1",
-              "probability": 0.2085
-            },
-            {
-              "goals": "2",
-              "probability": 0.2645
-            },
-            {
-              "goals": "3",
-              "probability": 0.2019
-            },
-            {
-              "goals": "4",
-              "probability": 0.1266
-            },
-            {
-              "goals": "5",
-              "probability": 0.0613
-            },
-            {
-              "goals": "6",
-              "probability": 0.0251
-            },
-            {
-              "goals": "7+",
-              "probability": 0.0125
-            }
-          ],
-          "ranges": [
-            {
-              "range": "0-1",
-              "probability": 0.3081
-            },
-            {
-              "range": "2-3",
-              "probability": 0.4664
-            },
-            {
-              "range": "4+",
-              "probability": 0.2255
-            }
-          ],
-          "most_likely": "2",
-          "best_range": "2-3",
-          "low_score_risk": "中",
-          "high_score_risk": "低"
-        },
-        "over_25": 0.4274,
-        "btts": 0.4921,
-        "confidence": 48
-      },
-      "sporttery": {
-        "settlement": "90分钟含伤停补时，不含加时赛和点球大战",
-        "action_summary": {
-          "core": [
-            {
-              "match_id": "AUTO_FEC549A3F0",
-              "play_type": "胜平负",
-              "selection": "平",
-              "pool_code": "HAD",
-              "single_allowed": true,
-              "allup_allowed": true,
-              "min_legs": 1,
-              "sp": 3.645,
-              "sp_source": "market_h2h_proxy",
-              "model_prob": 0.3045,
-              "market_prob": 0.2925,
-              "fair_sp": 3.285,
-              "implied_prob": 0.2743,
-              "value_gap": 0.0301,
-              "ev": 0.1097,
-              "risk_score": 34,
-              "risk_level": "中低",
-              "kelly": 0.0415,
-              "stake_pct": 0.01,
-              "decision": "可小注",
-              "reason": "EV达到门槛且风险可控",
-              "risk_adjusted_score": 0.0757,
-              "raw_model_prob": 0.3109,
-              "market_model_gap": 0.0184,
-              "action_score": 90.89,
-              "action_tier": "主推",
-              "action_reason": "价值、风险和玩法稳定性较均衡"
-            },
-            {
-              "match_id": "AUTO_FEC549A3F0",
-              "play_type": "胜平负",
-              "selection": "胜",
-              "pool_code": "HAD",
-              "single_allowed": true,
-              "allup_allowed": true,
-              "min_legs": 1,
-              "sp": 3.047,
-              "sp_source": "market_h2h_proxy",
-              "model_prob": 0.3512,
-              "market_prob": 0.3499,
-              "fair_sp": 2.848,
-              "implied_prob": 0.3282,
-              "value_gap": 0.023,
-              "ev": 0.07,
-              "risk_score": 33,
-              "risk_level": "中低",
-              "kelly": 0.0342,
-              "stake_pct": 0.0086,
-              "decision": "可小注",
-              "reason": "EV达到门槛且风险可控",
-              "risk_adjusted_score": 0.037,
-              "raw_model_prob": 0.3519,
-              "market_model_gap": 0.002,
-              "action_score": 87.38,
-              "action_tier": "主推",
-              "action_reason": "价值、风险和玩法稳定性较均衡"
-            }
-          ],
-          "support": [
-            {
-              "match_id": "AUTO_FEC549A3F0",
-              "play_type": "胜平负",
-              "selection": "负",
-              "pool_code": "HAD",
-              "single_allowed": true,
-              "allup_allowed": true,
-              "min_legs": 1,
-              "sp": 2.981,
-              "sp_source": "market_h2h_proxy",
-              "model_prob": 0.3444,
-              "market_prob": 0.3576,
-              "fair_sp": 2.904,
-              "implied_prob": 0.3355,
-              "value_gap": 0.0089,
-              "ev": 0.0266,
-              "risk_score": 34,
-              "risk_level": "中低",
-              "kelly": 0.0134,
-              "stake_pct": 0.0034,
-              "decision": "观察",
-              "reason": "EV为正但不足玩法门槛",
-              "risk_adjusted_score": -0.0074,
-              "raw_model_prob": 0.3372,
-              "market_model_gap": -0.0204,
-              "action_score": 57.2,
-              "action_tier": "可搭配",
-              "action_reason": "有参考价值，但未达到主推门槛"
-            }
-          ],
-          "hedge": []
-        },
-        "score_reference": [
-          {
-            "score": "1-1",
-            "probability": 0.1382,
-            "score_group": "常见比分",
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "1-0",
-            "probability": 0.1088,
-            "score_group": "常见比分",
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "0-1",
-            "probability": 0.0998,
-            "score_group": "常见比分",
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "0-0",
-            "probability": 0.0997,
-            "score_group": "常见比分",
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "2-1",
-            "probability": 0.0779,
-            "score_group": "常见比分",
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          },
-          {
-            "score": "1-2",
-            "probability": 0.0718,
-            "score_group": "常见比分",
-            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
-          }
-        ],
-        "candidate_pool": [
-          {
-            "match_id": "AUTO_FEC549A3F0",
-            "play_type": "胜平负",
-            "selection": "平",
-            "pool_code": "HAD",
-            "single_allowed": true,
-            "allup_allowed": true,
-            "min_legs": 1,
-            "sp": 3.645,
-            "sp_source": "market_h2h_proxy",
-            "model_prob": 0.3045,
-            "market_prob": 0.2925,
-            "fair_sp": 3.285,
-            "implied_prob": 0.2743,
-            "value_gap": 0.0301,
-            "ev": 0.1097,
-            "risk_score": 34,
-            "risk_level": "中低",
-            "kelly": 0.0415,
-            "stake_pct": 0.01,
-            "decision": "可小注",
-            "reason": "EV达到门槛且风险可控",
-            "risk_adjusted_score": 0.0757,
-            "raw_model_prob": 0.3109,
-            "market_model_gap": 0.0184,
-            "action_score": 90.89,
-            "action_tier": "主推",
-            "action_reason": "价值、风险和玩法稳定性较均衡"
-          },
-          {
-            "match_id": "AUTO_FEC549A3F0",
-            "play_type": "胜平负",
-            "selection": "胜",
-            "pool_code": "HAD",
-            "single_allowed": true,
-            "allup_allowed": true,
-            "min_legs": 1,
-            "sp": 3.047,
-            "sp_source": "market_h2h_proxy",
-            "model_prob": 0.3512,
-            "market_prob": 0.3499,
-            "fair_sp": 2.848,
-            "implied_prob": 0.3282,
-            "value_gap": 0.023,
-            "ev": 0.07,
-            "risk_score": 33,
-            "risk_level": "中低",
-            "kelly": 0.0342,
-            "stake_pct": 0.0086,
-            "decision": "可小注",
-            "reason": "EV达到门槛且风险可控",
-            "risk_adjusted_score": 0.037,
-            "raw_model_prob": 0.3519,
-            "market_model_gap": 0.002,
-            "action_score": 87.38,
-            "action_tier": "主推",
-            "action_reason": "价值、风险和玩法稳定性较均衡"
-          },
-          {
-            "match_id": "AUTO_FEC549A3F0",
-            "play_type": "胜平负",
-            "selection": "负",
-            "pool_code": "HAD",
-            "single_allowed": true,
-            "allup_allowed": true,
-            "min_legs": 1,
-            "sp": 2.981,
-            "sp_source": "market_h2h_proxy",
-            "model_prob": 0.3444,
-            "market_prob": 0.3576,
-            "fair_sp": 2.904,
-            "implied_prob": 0.3355,
-            "value_gap": 0.0089,
-            "ev": 0.0266,
-            "risk_score": 34,
-            "risk_level": "中低",
-            "kelly": 0.0134,
-            "stake_pct": 0.0034,
-            "decision": "观察",
-            "reason": "EV为正但不足玩法门槛",
-            "risk_adjusted_score": -0.0074,
-            "raw_model_prob": 0.3372,
-            "market_model_gap": -0.0204,
-            "action_score": 57.2,
-            "action_tier": "可搭配",
-            "action_reason": "有参考价值，但未达到主推门槛"
-          }
-        ],
-        "compound_packages": [
-          {
-            "name": "主队不败",
-            "options": [
-              "胜",
-              "平"
-            ],
-            "hit_prob": 0.6557,
-            "num_bets": 2,
-            "ev": 0.09,
-            "min_return_sp": 3.047,
-            "max_return_sp": 3.645,
-            "decision": "可小注",
-            "reason": "复选包EV按注数重算"
-          },
-          {
-            "name": "客队不败",
-            "options": [
-              "平",
-              "负"
-            ],
-            "hit_prob": 0.6489,
-            "num_bets": 2,
-            "ev": 0.0683,
-            "min_return_sp": 2.981,
-            "max_return_sp": 3.645,
-            "decision": "可小注",
-            "reason": "复选包EV按注数重算"
-          },
-          {
-            "name": "分胜负",
-            "options": [
-              "胜",
-              "负"
-            ],
-            "hit_prob": 0.6956,
-            "num_bets": 2,
-            "ev": 0.0484,
-            "min_return_sp": 2.981,
+            "ev": -0.0246,
+            "min_return_sp": 2.904,
             "max_return_sp": 3.047,
-            "decision": "观察",
+            "decision": "放弃",
+            "reason": "复选包EV按注数重算"
+          },
+          {
+            "name": "分胜负",
+            "options": [
+              "胜",
+              "负"
+            ],
+            "hit_prob": 0.6584,
+            "num_bets": 2,
+            "ev": -0.0616,
+            "min_return_sp": 2.671,
+            "max_return_sp": 3.047,
+            "decision": "放弃",
             "reason": "复选包EV按注数重算"
           },
           {
@@ -1713,10 +367,10 @@
         "score_combo_pools": []
       },
       "data_completeness": {
-        "score": 66,
-        "level": "可正常预测",
+        "score": 82,
+        "level": "数据充分",
         "source_audit": {
-          "score": 10,
+          "score": 24,
           "level": "只适合观察",
           "model_mode": "低置信参考",
           "confidence_penalty": 18,
@@ -1735,15 +389,15 @@
               "status": "最近失败",
               "ok": false,
               "impact": "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
-              "detail": "official/public endpoint blocked by WAF or access policy: HTTP 567"
+              "detail": "<urlopen error timed out>"
             },
             {
               "tier": "B",
               "name": "市场走势与盘口参考",
-              "status": "未验证",
-              "ok": false,
+              "status": "已拿到",
+              "ok": true,
               "impact": "用于看欧赔、让球、大小球变化。缺失时市场方向和收盘变化判断变弱。",
-              "detail": "还没有稳定抓取记录"
+              "detail": "本场抓到 14 条可用记录"
             },
             {
               "tier": "C",
@@ -1789,13 +443,13 @@
           "missing_impacts": [
             "决定能买什么、让几球、SP是多少。缺失时只能按手动或历史快照参考，不能强行给正式下单项。",
             "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
-            "用于看欧赔、让球、大小球变化。缺失时市场方向和收盘变化判断变弱。",
             "用于判断强弱底盘。缺少排名或 Elo 时，不能过度相信盘口方向。",
-            "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。"
+            "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。",
+            "用于判断抢分、轮换、默契和净胜球需求。缺失时第三轮尤其容易失真。"
           ],
           "official_rows": 0,
           "manual_rows": 3,
-          "market_rows": 3
+          "market_rows": 9
         },
         "confidence_penalty": 18,
         "items": [
@@ -1849,13 +503,13 @@
           },
           {
             "name": "赔率历史",
-            "ok": false,
+            "ok": true,
             "weight": 8,
             "impact": "看不到赔率波动，只能看单点价格。"
           },
           {
             "name": "爱彩盘口/赛果统计",
-            "ok": false,
+            "ok": true,
             "weight": 8,
             "impact": "市场走势、让球和大小球参考不足。"
           },
@@ -1892,7 +546,7 @@
         ]
       },
       "source_audit": {
-        "score": 10,
+        "score": 24,
         "level": "只适合观察",
         "model_mode": "低置信参考",
         "confidence_penalty": 18,
@@ -1911,15 +565,15 @@
             "status": "最近失败",
             "ok": false,
             "impact": "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
-            "detail": "official/public endpoint blocked by WAF or access policy: HTTP 567"
+            "detail": "<urlopen error timed out>"
           },
           {
             "tier": "B",
             "name": "市场走势与盘口参考",
-            "status": "未验证",
-            "ok": false,
+            "status": "已拿到",
+            "ok": true,
             "impact": "用于看欧赔、让球、大小球变化。缺失时市场方向和收盘变化判断变弱。",
-            "detail": "还没有稳定抓取记录"
+            "detail": "本场抓到 14 条可用记录"
           },
           {
             "tier": "C",
@@ -1965,23 +619,23 @@
         "missing_impacts": [
           "决定能买什么、让几球、SP是多少。缺失时只能按手动或历史快照参考，不能强行给正式下单项。",
           "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
-          "用于看欧赔、让球、大小球变化。缺失时市场方向和收盘变化判断变弱。",
           "用于判断强弱底盘。缺少排名或 Elo 时，不能过度相信盘口方向。",
-          "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。"
+          "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。",
+          "用于判断抢分、轮换、默契和净胜球需求。缺失时第三轮尤其容易失真。"
         ],
         "official_rows": 0,
         "manual_rows": 3,
-        "market_rows": 3
+        "market_rows": 9
       }
     },
     {
-      "match_id": "AUTO_09BB2543E8",
-      "home_team": "W99",
-      "away_team": "W100",
-      "kickoff": "2026-07-15T00:00:00",
+      "match_id": "AUTO_63329EE867",
+      "home_team": "L101",
+      "away_team": "L102",
+      "kickoff": "2026-07-18T00:00:00",
       "sporttery_handicap": null,
       "summary": {
-        "main_lean": "W100",
+        "main_lean": "L102",
         "score_group": [
           "1-1",
           "1-0",
@@ -2004,7 +658,7 @@
           "comparison": [
             {
               "dimension": "赛果方向",
-              "main": "W100",
+              "main": "L102",
               "side": "未录入",
               "relation": "无支线对比"
             },
@@ -2031,13 +685,13 @@
           "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。"
         ],
         "gap_level": "一致",
-        "reference": "最终模型倾向 W100；比分参考 1-1 / 1-0 / 0-1；去水与特征修正后主/平/客为 33.8% / 30.6% / 35.6%；数据状态为 只适合观察，低置信参考。"
+        "reference": "最终模型倾向 L102；比分参考 1-1 / 1-0 / 0-1；去水与特征修正后主/平/客为 33.8% / 30.8% / 35.3%；数据状态为 只适合观察，低置信参考。"
       },
       "market_scenario": {
         "probabilities": {
-          "home": 0.3559,
-          "draw": 0.2893,
-          "away": 0.3548
+          "home": 0.356,
+          "draw": 0.29,
+          "away": 0.3539
         },
         "top_scores": [
           {
@@ -2160,94 +814,95 @@
         "action_summary": {
           "core": [
             {
-              "match_id": "AUTO_09BB2543E8",
+              "match_id": "AUTO_63329EE867",
               "play_type": "胜平负",
               "selection": "平",
               "pool_code": "HAD",
               "single_allowed": true,
               "allup_allowed": true,
               "min_legs": 1,
-              "sp": 3.743,
+              "sp": 3.674,
               "sp_source": "market_h2h_proxy",
-              "model_prob": 0.2992,
-              "market_prob": 0.2874,
-              "fair_sp": 3.342,
-              "implied_prob": 0.2672,
-              "value_gap": 0.032,
-              "ev": 0.1199,
+              "model_prob": 0.3021,
+              "market_prob": 0.2902,
+              "fair_sp": 3.31,
+              "implied_prob": 0.2722,
+              "value_gap": 0.0299,
+              "ev": 0.1098,
               "risk_score": 34,
               "risk_level": "中低",
-              "kelly": 0.0437,
+              "kelly": 0.0411,
               "stake_pct": 0.01,
               "decision": "可小注",
               "reason": "EV达到门槛且风险可控",
-              "risk_adjusted_score": 0.0859,
-              "raw_model_prob": 0.3056,
-              "market_model_gap": 0.0182,
-              "action_score": 92.06,
+              "risk_adjusted_score": 0.0758,
+              "raw_model_prob": 0.3085,
+              "market_model_gap": 0.0183,
+              "action_score": 90.83,
               "action_tier": "主推",
               "action_reason": "价值、风险和玩法稳定性较均衡"
             },
             {
-              "match_id": "AUTO_09BB2543E8",
+              "match_id": "AUTO_63329EE867",
               "play_type": "胜平负",
               "selection": "负",
               "pool_code": "HAD",
               "single_allowed": true,
               "allup_allowed": true,
               "min_legs": 1,
-              "sp": 3.037,
+              "sp": 3.036,
               "sp_source": "market_h2h_proxy",
-              "model_prob": 0.3556,
-              "market_prob": 0.3542,
-              "fair_sp": 2.812,
-              "implied_prob": 0.3293,
-              "value_gap": 0.0263,
-              "ev": 0.0799,
+              "model_prob": 0.3525,
+              "market_prob": 0.3511,
+              "fair_sp": 2.837,
+              "implied_prob": 0.3294,
+              "value_gap": 0.0231,
+              "ev": 0.0701,
               "risk_score": 33,
               "risk_level": "中低",
-              "kelly": 0.0392,
-              "stake_pct": 0.0098,
+              "kelly": 0.0344,
+              "stake_pct": 0.0086,
               "decision": "可小注",
               "reason": "EV达到门槛且风险可控",
-              "risk_adjusted_score": 0.0469,
-              "raw_model_prob": 0.3563,
+              "risk_adjusted_score": 0.0371,
+              "raw_model_prob": 0.3532,
               "market_model_gap": 0.0021,
-              "action_score": 88.79,
+              "action_score": 87.43,
               "action_tier": "主推",
               "action_reason": "价值、风险和玩法稳定性较均衡"
-            },
+            }
+          ],
+          "support": [
             {
-              "match_id": "AUTO_09BB2543E8",
+              "match_id": "AUTO_63329EE867",
               "play_type": "胜平负",
               "selection": "胜",
               "pool_code": "HAD",
               "single_allowed": true,
               "allup_allowed": true,
               "min_legs": 1,
-              "sp": 3.001,
+              "sp": 2.972,
               "sp_source": "market_h2h_proxy",
-              "model_prob": 0.3452,
-              "market_prob": 0.3584,
-              "fair_sp": 2.897,
-              "implied_prob": 0.3332,
-              "value_gap": 0.012,
-              "ev": 0.036,
+              "model_prob": 0.3454,
+              "market_prob": 0.3587,
+              "fair_sp": 2.895,
+              "implied_prob": 0.3365,
+              "value_gap": 0.009,
+              "ev": 0.0267,
               "risk_score": 34,
               "risk_level": "中低",
-              "kelly": 0.018,
-              "stake_pct": 0.0045,
-              "decision": "可小注",
-              "reason": "EV达到门槛且风险可控",
-              "risk_adjusted_score": 0.002,
-              "raw_model_prob": 0.3381,
-              "market_model_gap": -0.0203,
-              "action_score": 82.45,
-              "action_tier": "主推",
-              "action_reason": "价值、风险和玩法稳定性较均衡"
+              "kelly": 0.0135,
+              "stake_pct": 0.0034,
+              "decision": "观察",
+              "reason": "EV为正但不足玩法门槛",
+              "risk_adjusted_score": -0.0073,
+              "raw_model_prob": 0.3383,
+              "market_model_gap": -0.0204,
+              "action_score": 57.24,
+              "action_tier": "可搭配",
+              "action_reason": "有参考价值，但未达到主推门槛"
             }
           ],
-          "support": [],
           "hedge": []
         },
         "score_reference": [
@@ -2290,91 +945,91 @@
         ],
         "candidate_pool": [
           {
-            "match_id": "AUTO_09BB2543E8",
+            "match_id": "AUTO_63329EE867",
             "play_type": "胜平负",
             "selection": "平",
             "pool_code": "HAD",
             "single_allowed": true,
             "allup_allowed": true,
             "min_legs": 1,
-            "sp": 3.743,
+            "sp": 3.674,
             "sp_source": "market_h2h_proxy",
-            "model_prob": 0.2992,
-            "market_prob": 0.2874,
-            "fair_sp": 3.342,
-            "implied_prob": 0.2672,
-            "value_gap": 0.032,
-            "ev": 0.1199,
+            "model_prob": 0.3021,
+            "market_prob": 0.2902,
+            "fair_sp": 3.31,
+            "implied_prob": 0.2722,
+            "value_gap": 0.0299,
+            "ev": 0.1098,
             "risk_score": 34,
             "risk_level": "中低",
-            "kelly": 0.0437,
+            "kelly": 0.0411,
             "stake_pct": 0.01,
             "decision": "可小注",
             "reason": "EV达到门槛且风险可控",
-            "risk_adjusted_score": 0.0859,
-            "raw_model_prob": 0.3056,
-            "market_model_gap": 0.0182,
-            "action_score": 92.06,
+            "risk_adjusted_score": 0.0758,
+            "raw_model_prob": 0.3085,
+            "market_model_gap": 0.0183,
+            "action_score": 90.83,
             "action_tier": "主推",
             "action_reason": "价值、风险和玩法稳定性较均衡"
           },
           {
-            "match_id": "AUTO_09BB2543E8",
+            "match_id": "AUTO_63329EE867",
             "play_type": "胜平负",
             "selection": "负",
             "pool_code": "HAD",
             "single_allowed": true,
             "allup_allowed": true,
             "min_legs": 1,
-            "sp": 3.037,
+            "sp": 3.036,
             "sp_source": "market_h2h_proxy",
-            "model_prob": 0.3556,
-            "market_prob": 0.3542,
-            "fair_sp": 2.812,
-            "implied_prob": 0.3293,
-            "value_gap": 0.0263,
-            "ev": 0.0799,
+            "model_prob": 0.3525,
+            "market_prob": 0.3511,
+            "fair_sp": 2.837,
+            "implied_prob": 0.3294,
+            "value_gap": 0.0231,
+            "ev": 0.0701,
             "risk_score": 33,
             "risk_level": "中低",
-            "kelly": 0.0392,
-            "stake_pct": 0.0098,
+            "kelly": 0.0344,
+            "stake_pct": 0.0086,
             "decision": "可小注",
             "reason": "EV达到门槛且风险可控",
-            "risk_adjusted_score": 0.0469,
-            "raw_model_prob": 0.3563,
+            "risk_adjusted_score": 0.0371,
+            "raw_model_prob": 0.3532,
             "market_model_gap": 0.0021,
-            "action_score": 88.79,
+            "action_score": 87.43,
             "action_tier": "主推",
             "action_reason": "价值、风险和玩法稳定性较均衡"
           },
           {
-            "match_id": "AUTO_09BB2543E8",
+            "match_id": "AUTO_63329EE867",
             "play_type": "胜平负",
             "selection": "胜",
             "pool_code": "HAD",
             "single_allowed": true,
             "allup_allowed": true,
             "min_legs": 1,
-            "sp": 3.001,
+            "sp": 2.972,
             "sp_source": "market_h2h_proxy",
-            "model_prob": 0.3452,
-            "market_prob": 0.3584,
-            "fair_sp": 2.897,
-            "implied_prob": 0.3332,
-            "value_gap": 0.012,
-            "ev": 0.036,
+            "model_prob": 0.3454,
+            "market_prob": 0.3587,
+            "fair_sp": 2.895,
+            "implied_prob": 0.3365,
+            "value_gap": 0.009,
+            "ev": 0.0267,
             "risk_score": 34,
             "risk_level": "中低",
-            "kelly": 0.018,
-            "stake_pct": 0.0045,
-            "decision": "可小注",
-            "reason": "EV达到门槛且风险可控",
-            "risk_adjusted_score": 0.002,
-            "raw_model_prob": 0.3381,
-            "market_model_gap": -0.0203,
-            "action_score": 82.45,
-            "action_tier": "主推",
-            "action_reason": "价值、风险和玩法稳定性较均衡"
+            "kelly": 0.0135,
+            "stake_pct": 0.0034,
+            "decision": "观察",
+            "reason": "EV为正但不足玩法门槛",
+            "risk_adjusted_score": -0.0073,
+            "raw_model_prob": 0.3383,
+            "market_model_gap": -0.0204,
+            "action_score": 57.24,
+            "action_tier": "可搭配",
+            "action_reason": "有参考价值，但未达到主推门槛"
           }
         ],
         "compound_packages": [
@@ -2384,11 +1039,11 @@
               "胜",
               "平"
             ],
-            "hit_prob": 0.6444,
+            "hit_prob": 0.6475,
             "num_bets": 2,
-            "ev": 0.0779,
-            "min_return_sp": 3.001,
-            "max_return_sp": 3.743,
+            "ev": 0.0682,
+            "min_return_sp": 2.972,
+            "max_return_sp": 3.674,
             "decision": "可小注",
             "reason": "复选包EV按注数重算"
           },
@@ -2398,11 +1053,11 @@
               "平",
               "负"
             ],
-            "hit_prob": 0.6548,
+            "hit_prob": 0.6546,
             "num_bets": 2,
-            "ev": 0.0999,
-            "min_return_sp": 3.037,
-            "max_return_sp": 3.743,
+            "ev": 0.0901,
+            "min_return_sp": 3.036,
+            "max_return_sp": 3.674,
             "decision": "可小注",
             "reason": "复选包EV按注数重算"
           },
@@ -2412,12 +1067,12 @@
               "胜",
               "负"
             ],
-            "hit_prob": 0.7008,
+            "hit_prob": 0.6979,
             "num_bets": 2,
-            "ev": 0.058,
-            "min_return_sp": 3.001,
-            "max_return_sp": 3.037,
-            "decision": "可小注",
+            "ev": 0.0484,
+            "min_return_sp": 2.972,
+            "max_return_sp": 3.036,
+            "decision": "观察",
             "reason": "复选包EV按注数重算"
           },
           {
@@ -2458,7 +1113,7 @@
               "status": "最近失败",
               "ok": false,
               "impact": "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
-              "detail": "official/public endpoint blocked by WAF or access policy: HTTP 567"
+              "detail": "<urlopen error timed out>"
             },
             {
               "tier": "B",
@@ -2634,7 +1289,1453 @@
             "status": "最近失败",
             "ok": false,
             "impact": "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
-            "detail": "official/public endpoint blocked by WAF or access policy: HTTP 567"
+            "detail": "<urlopen error timed out>"
+          },
+          {
+            "tier": "B",
+            "name": "市场走势与盘口参考",
+            "status": "未验证",
+            "ok": false,
+            "impact": "用于看欧赔、让球、大小球变化。缺失时市场方向和收盘变化判断变弱。",
+            "detail": "还没有稳定抓取记录"
+          },
+          {
+            "tier": "C",
+            "name": "国家队基础实力",
+            "status": "部分缺失",
+            "ok": false,
+            "impact": "用于判断强弱底盘。缺少排名或 Elo 时，不能过度相信盘口方向。",
+            "detail": "FIFA 排名或 Elo 不完整"
+          },
+          {
+            "tier": "C",
+            "name": "预选赛/洲际杯正式赛表现",
+            "status": "缺失",
+            "ok": false,
+            "impact": "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。",
+            "detail": "未配置 formal_competition_strength"
+          },
+          {
+            "tier": "C",
+            "name": "小组积分与出线动机",
+            "status": "未验证",
+            "ok": false,
+            "impact": "用于判断抢分、轮换、默契和净胜球需求。缺失时第三轮尤其容易失真。",
+            "detail": "还没有稳定抓取记录"
+          },
+          {
+            "tier": "D",
+            "name": "过程统计/赛后技术数据",
+            "status": "停用",
+            "ok": false,
+            "impact": "用于复盘谁是真强、谁是运气球。缺失时赛后调参只能依赖比分和市场。",
+            "detail": "该源不参与当前抓取"
+          },
+          {
+            "tier": "D",
+            "name": "伤停与首发",
+            "status": "待临场确认",
+            "ok": false,
+            "impact": "用于最后一轮校准。缺失时临场建议要降档，尤其是深盘强队。",
+            "detail": "首发或伤停未确认"
+          }
+        ],
+        "missing_impacts": [
+          "决定能买什么、让几球、SP是多少。缺失时只能按手动或历史快照参考，不能强行给正式下单项。",
+          "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
+          "用于看欧赔、让球、大小球变化。缺失时市场方向和收盘变化判断变弱。",
+          "用于判断强弱底盘。缺少排名或 Elo 时，不能过度相信盘口方向。",
+          "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。"
+        ],
+        "official_rows": 0,
+        "manual_rows": 3,
+        "market_rows": 3
+      }
+    },
+    {
+      "match_id": "AUTO_DC30F146CD",
+      "home_team": "W101",
+      "away_team": "W102",
+      "kickoff": "2026-07-19T00:00:00",
+      "sporttery_handicap": null,
+      "summary": {
+        "main_lean": "W101",
+        "score_group": [
+          "1-1",
+          "1-0",
+          "0-1"
+        ],
+        "market_direction": "市场基本稳定",
+        "upset_level": "中低",
+        "folk_parallel": {
+          "enabled": false,
+          "label": "无民间信号",
+          "effect": "none",
+          "confidence": 0.0,
+          "note": "",
+          "tracks": [],
+          "alignment": "未提供",
+          "model_relation": "本场没有录入支线标签",
+          "side_prediction": "未录入支线预测",
+          "betting_advice": "不生成支线下注建议",
+          "betting_checks": [],
+          "comparison": [
+            {
+              "dimension": "赛果方向",
+              "main": "W101",
+              "side": "未录入",
+              "relation": "无支线对比"
+            },
+            {
+              "dimension": "下注落点",
+              "main": "按EV、SP和风险分筛选",
+              "side": "未录入",
+              "relation": "只看主线"
+            }
+          ],
+          "advice_boundary": "支线为空，按数据模型和官方SP判断",
+          "action_hint": "按数据模型和官方SP判断"
+        },
+        "confidence": 48,
+        "data_score": 66,
+        "data_level": "只适合观察",
+        "source_level": "只适合观察",
+        "model_mode": "低置信参考",
+        "missing_impacts": [
+          "决定能买什么、让几球、SP是多少。缺失时只能按手动或历史快照参考，不能强行给正式下单项。",
+          "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
+          "用于看欧赔、让球、大小球变化。缺失时市场方向和收盘变化判断变弱。",
+          "用于判断强弱底盘。缺少排名或 Elo 时，不能过度相信盘口方向。",
+          "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。"
+        ],
+        "gap_level": "一致",
+        "reference": "最终模型倾向 W101；比分参考 1-1 / 1-0 / 0-1；去水与特征修正后主/平/客为 35.4% / 31.3% / 33.3%；数据状态为 只适合观察，低置信参考。"
+      },
+      "market_scenario": {
+        "probabilities": {
+          "home": 0.3541,
+          "draw": 0.2912,
+          "away": 0.3547
+        },
+        "top_scores": [
+          {
+            "score": "1-1",
+            "probability": 0.1381,
+            "score_group": "常见比分",
+            "score_priority": 3,
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "1-0",
+            "probability": 0.1087,
+            "score_group": "常见比分",
+            "score_priority": 3,
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "0-1",
+            "probability": 0.0997,
+            "score_group": "常见比分",
+            "score_priority": 3,
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "0-0",
+            "probability": 0.0996,
+            "score_group": "常见比分",
+            "score_priority": 3,
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "2-1",
+            "probability": 0.0779,
+            "score_group": "常见比分",
+            "score_priority": 3,
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "1-2",
+            "probability": 0.0717,
+            "score_group": "常见比分",
+            "score_priority": 3,
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "2-0",
+            "probability": 0.0684,
+            "score_group": "常见比分",
+            "score_priority": 3,
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "0-2",
+            "probability": 0.058,
+            "score_group": "常见比分",
+            "score_priority": 3,
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          }
+        ],
+        "total_goals": {
+          "exact": [
+            {
+              "goals": "0",
+              "probability": 0.0996
+            },
+            {
+              "goals": "1",
+              "probability": 0.2085
+            },
+            {
+              "goals": "2",
+              "probability": 0.2645
+            },
+            {
+              "goals": "3",
+              "probability": 0.2019
+            },
+            {
+              "goals": "4",
+              "probability": 0.1266
+            },
+            {
+              "goals": "5",
+              "probability": 0.0613
+            },
+            {
+              "goals": "6",
+              "probability": 0.0251
+            },
+            {
+              "goals": "7+",
+              "probability": 0.0125
+            }
+          ],
+          "ranges": [
+            {
+              "range": "0-1",
+              "probability": 0.3081
+            },
+            {
+              "range": "2-3",
+              "probability": 0.4664
+            },
+            {
+              "range": "4+",
+              "probability": 0.2255
+            }
+          ],
+          "most_likely": "2",
+          "best_range": "2-3",
+          "low_score_risk": "中",
+          "high_score_risk": "低"
+        },
+        "over_25": 0.4274,
+        "btts": 0.4921,
+        "confidence": 48
+      },
+      "sporttery": {
+        "settlement": "90分钟含伤停补时，不含加时赛和点球大战",
+        "action_summary": {
+          "core": [
+            {
+              "match_id": "AUTO_DC30F146CD",
+              "play_type": "胜平负",
+              "selection": "平",
+              "pool_code": "HAD",
+              "single_allowed": true,
+              "allup_allowed": true,
+              "min_legs": 1,
+              "sp": 3.637,
+              "sp_source": "market_h2h_proxy",
+              "model_prob": 0.3065,
+              "market_prob": 0.2945,
+              "fair_sp": 3.262,
+              "implied_prob": 0.275,
+              "value_gap": 0.0316,
+              "ev": 0.1148,
+              "risk_score": 34,
+              "risk_level": "中低",
+              "kelly": 0.0435,
+              "stake_pct": 0.01,
+              "decision": "可小注",
+              "reason": "EV达到门槛且风险可控",
+              "risk_adjusted_score": 0.0808,
+              "raw_model_prob": 0.313,
+              "market_model_gap": 0.0185,
+              "action_score": 91.61,
+              "action_tier": "主推",
+              "action_reason": "价值、风险和玩法稳定性较均衡"
+            },
+            {
+              "match_id": "AUTO_DC30F146CD",
+              "play_type": "胜平负",
+              "selection": "胜",
+              "pool_code": "HAD",
+              "single_allowed": true,
+              "allup_allowed": true,
+              "min_legs": 1,
+              "sp": 3.046,
+              "sp_source": "market_h2h_proxy",
+              "model_prob": 0.3529,
+              "market_prob": 0.3517,
+              "fair_sp": 2.834,
+              "implied_prob": 0.3283,
+              "value_gap": 0.0246,
+              "ev": 0.0749,
+              "risk_score": 33,
+              "risk_level": "中低",
+              "kelly": 0.0366,
+              "stake_pct": 0.0092,
+              "decision": "可小注",
+              "reason": "EV达到门槛且风险可控",
+              "risk_adjusted_score": 0.0419,
+              "raw_model_prob": 0.3536,
+              "market_model_gap": 0.0019,
+              "action_score": 88.07,
+              "action_tier": "主推",
+              "action_reason": "价值、风险和玩法稳定性较均衡"
+            },
+            {
+              "match_id": "AUTO_DC30F146CD",
+              "play_type": "胜平负",
+              "selection": "负",
+              "pool_code": "HAD",
+              "single_allowed": true,
+              "allup_allowed": true,
+              "min_legs": 1,
+              "sp": 3.028,
+              "sp_source": "market_h2h_proxy",
+              "model_prob": 0.3406,
+              "market_prob": 0.3538,
+              "fair_sp": 2.936,
+              "implied_prob": 0.3303,
+              "value_gap": 0.0103,
+              "ev": 0.0313,
+              "risk_score": 34,
+              "risk_level": "中低",
+              "kelly": 0.0154,
+              "stake_pct": 0.0039,
+              "decision": "可小注",
+              "reason": "EV达到门槛且风险可控",
+              "risk_adjusted_score": -0.0027,
+              "raw_model_prob": 0.3335,
+              "market_model_gap": -0.0203,
+              "action_score": 81.71,
+              "action_tier": "主推",
+              "action_reason": "价值、风险和玩法稳定性较均衡"
+            }
+          ],
+          "support": [],
+          "hedge": []
+        },
+        "score_reference": [
+          {
+            "score": "1-1",
+            "probability": 0.1382,
+            "score_group": "常见比分",
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "1-0",
+            "probability": 0.1088,
+            "score_group": "常见比分",
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "0-1",
+            "probability": 0.0998,
+            "score_group": "常见比分",
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "0-0",
+            "probability": 0.0997,
+            "score_group": "常见比分",
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "2-1",
+            "probability": 0.0779,
+            "score_group": "常见比分",
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "1-2",
+            "probability": 0.0718,
+            "score_group": "常见比分",
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          }
+        ],
+        "candidate_pool": [
+          {
+            "match_id": "AUTO_DC30F146CD",
+            "play_type": "胜平负",
+            "selection": "平",
+            "pool_code": "HAD",
+            "single_allowed": true,
+            "allup_allowed": true,
+            "min_legs": 1,
+            "sp": 3.637,
+            "sp_source": "market_h2h_proxy",
+            "model_prob": 0.3065,
+            "market_prob": 0.2945,
+            "fair_sp": 3.262,
+            "implied_prob": 0.275,
+            "value_gap": 0.0316,
+            "ev": 0.1148,
+            "risk_score": 34,
+            "risk_level": "中低",
+            "kelly": 0.0435,
+            "stake_pct": 0.01,
+            "decision": "可小注",
+            "reason": "EV达到门槛且风险可控",
+            "risk_adjusted_score": 0.0808,
+            "raw_model_prob": 0.313,
+            "market_model_gap": 0.0185,
+            "action_score": 91.61,
+            "action_tier": "主推",
+            "action_reason": "价值、风险和玩法稳定性较均衡"
+          },
+          {
+            "match_id": "AUTO_DC30F146CD",
+            "play_type": "胜平负",
+            "selection": "胜",
+            "pool_code": "HAD",
+            "single_allowed": true,
+            "allup_allowed": true,
+            "min_legs": 1,
+            "sp": 3.046,
+            "sp_source": "market_h2h_proxy",
+            "model_prob": 0.3529,
+            "market_prob": 0.3517,
+            "fair_sp": 2.834,
+            "implied_prob": 0.3283,
+            "value_gap": 0.0246,
+            "ev": 0.0749,
+            "risk_score": 33,
+            "risk_level": "中低",
+            "kelly": 0.0366,
+            "stake_pct": 0.0092,
+            "decision": "可小注",
+            "reason": "EV达到门槛且风险可控",
+            "risk_adjusted_score": 0.0419,
+            "raw_model_prob": 0.3536,
+            "market_model_gap": 0.0019,
+            "action_score": 88.07,
+            "action_tier": "主推",
+            "action_reason": "价值、风险和玩法稳定性较均衡"
+          },
+          {
+            "match_id": "AUTO_DC30F146CD",
+            "play_type": "胜平负",
+            "selection": "负",
+            "pool_code": "HAD",
+            "single_allowed": true,
+            "allup_allowed": true,
+            "min_legs": 1,
+            "sp": 3.028,
+            "sp_source": "market_h2h_proxy",
+            "model_prob": 0.3406,
+            "market_prob": 0.3538,
+            "fair_sp": 2.936,
+            "implied_prob": 0.3303,
+            "value_gap": 0.0103,
+            "ev": 0.0313,
+            "risk_score": 34,
+            "risk_level": "中低",
+            "kelly": 0.0154,
+            "stake_pct": 0.0039,
+            "decision": "可小注",
+            "reason": "EV达到门槛且风险可控",
+            "risk_adjusted_score": -0.0027,
+            "raw_model_prob": 0.3335,
+            "market_model_gap": -0.0203,
+            "action_score": 81.71,
+            "action_tier": "主推",
+            "action_reason": "价值、风险和玩法稳定性较均衡"
+          }
+        ],
+        "compound_packages": [
+          {
+            "name": "主队不败",
+            "options": [
+              "胜",
+              "平"
+            ],
+            "hit_prob": 0.6594,
+            "num_bets": 2,
+            "ev": 0.0948,
+            "min_return_sp": 3.046,
+            "max_return_sp": 3.637,
+            "decision": "可小注",
+            "reason": "复选包EV按注数重算"
+          },
+          {
+            "name": "客队不败",
+            "options": [
+              "平",
+              "负"
+            ],
+            "hit_prob": 0.6471,
+            "num_bets": 2,
+            "ev": 0.073,
+            "min_return_sp": 3.028,
+            "max_return_sp": 3.637,
+            "decision": "可小注",
+            "reason": "复选包EV按注数重算"
+          },
+          {
+            "name": "分胜负",
+            "options": [
+              "胜",
+              "负"
+            ],
+            "hit_prob": 0.6935,
+            "num_bets": 2,
+            "ev": 0.0531,
+            "min_return_sp": 3.028,
+            "max_return_sp": 3.046,
+            "decision": "可小注",
+            "reason": "复选包EV按注数重算"
+          },
+          {
+            "name": "总进球低位覆盖",
+            "num_bets": 3,
+            "decision": "不可用",
+            "reason": "复选包存在SP缺失"
+          },
+          {
+            "name": "总进球中位覆盖",
+            "num_bets": 3,
+            "decision": "不可用",
+            "reason": "复选包存在SP缺失"
+          }
+        ],
+        "score_combo_pools": []
+      },
+      "data_completeness": {
+        "score": 66,
+        "level": "可正常预测",
+        "source_audit": {
+          "score": 10,
+          "level": "只适合观察",
+          "model_mode": "低置信参考",
+          "confidence_penalty": 18,
+          "rows": [
+            {
+              "tier": "A",
+              "name": "体彩官方可下单数据",
+              "status": "手动兜底",
+              "ok": false,
+              "impact": "决定能买什么、让几球、SP是多少。缺失时只能按手动或历史快照参考，不能强行给正式下单项。",
+              "detail": "未抓到官方本场数据，但存在手动赔率或历史快照"
+            },
+            {
+              "tier": "A+",
+              "name": "体彩计算器补充玩法",
+              "status": "最近失败",
+              "ok": false,
+              "impact": "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
+              "detail": "<urlopen error timed out>"
+            },
+            {
+              "tier": "B",
+              "name": "市场走势与盘口参考",
+              "status": "未验证",
+              "ok": false,
+              "impact": "用于看欧赔、让球、大小球变化。缺失时市场方向和收盘变化判断变弱。",
+              "detail": "还没有稳定抓取记录"
+            },
+            {
+              "tier": "C",
+              "name": "国家队基础实力",
+              "status": "部分缺失",
+              "ok": false,
+              "impact": "用于判断强弱底盘。缺少排名或 Elo 时，不能过度相信盘口方向。",
+              "detail": "FIFA 排名或 Elo 不完整"
+            },
+            {
+              "tier": "C",
+              "name": "预选赛/洲际杯正式赛表现",
+              "status": "缺失",
+              "ok": false,
+              "impact": "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。",
+              "detail": "未配置 formal_competition_strength"
+            },
+            {
+              "tier": "C",
+              "name": "小组积分与出线动机",
+              "status": "未验证",
+              "ok": false,
+              "impact": "用于判断抢分、轮换、默契和净胜球需求。缺失时第三轮尤其容易失真。",
+              "detail": "还没有稳定抓取记录"
+            },
+            {
+              "tier": "D",
+              "name": "过程统计/赛后技术数据",
+              "status": "停用",
+              "ok": false,
+              "impact": "用于复盘谁是真强、谁是运气球。缺失时赛后调参只能依赖比分和市场。",
+              "detail": "该源不参与当前抓取"
+            },
+            {
+              "tier": "D",
+              "name": "伤停与首发",
+              "status": "待临场确认",
+              "ok": false,
+              "impact": "用于最后一轮校准。缺失时临场建议要降档，尤其是深盘强队。",
+              "detail": "首发或伤停未确认"
+            }
+          ],
+          "missing_impacts": [
+            "决定能买什么、让几球、SP是多少。缺失时只能按手动或历史快照参考，不能强行给正式下单项。",
+            "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
+            "用于看欧赔、让球、大小球变化。缺失时市场方向和收盘变化判断变弱。",
+            "用于判断强弱底盘。缺少排名或 Elo 时，不能过度相信盘口方向。",
+            "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。"
+          ],
+          "official_rows": 0,
+          "manual_rows": 3,
+          "market_rows": 3
+        },
+        "confidence_penalty": 18,
+        "items": [
+          {
+            "name": "赛程匹配",
+            "ok": true,
+            "weight": 10,
+            "impact": "没有准确比赛和时间，无法对齐体彩和赛程。"
+          },
+          {
+            "name": "Elo",
+            "ok": true,
+            "weight": 10,
+            "impact": "基础实力底盘会变弱。"
+          },
+          {
+            "name": "FIFA世界排名",
+            "ok": false,
+            "weight": 7,
+            "impact": "国家队强弱侧面参考不足。"
+          },
+          {
+            "name": "预选赛/洲际杯正式赛",
+            "ok": false,
+            "weight": 10,
+            "impact": "近期正式赛状态无法修正。"
+          },
+          {
+            "name": "近期/过程数据",
+            "ok": true,
+            "weight": 10,
+            "impact": "进攻/防守质量只能用默认估计。"
+          },
+          {
+            "name": "权威侧面源",
+            "ok": false,
+            "weight": 7,
+            "impact": "媒体和权威数据侧面强度缺失。"
+          },
+          {
+            "name": "赛中/赛后过程统计",
+            "ok": false,
+            "weight": 7,
+            "impact": "复盘时无法区分实力与偶然。"
+          },
+          {
+            "name": "赔率/SP",
+            "ok": true,
+            "weight": 14,
+            "impact": "无法做去水概率和价值判断。"
+          },
+          {
+            "name": "赔率历史",
+            "ok": false,
+            "weight": 8,
+            "impact": "看不到赔率波动，只能看单点价格。"
+          },
+          {
+            "name": "爱彩盘口/赛果统计",
+            "ok": false,
+            "weight": 8,
+            "impact": "市场走势、让球和大小球参考不足。"
+          },
+          {
+            "name": "伤停",
+            "ok": true,
+            "weight": 11,
+            "impact": "临场人员风险未确认。"
+          },
+          {
+            "name": "首发",
+            "ok": false,
+            "weight": 11,
+            "impact": "赛前最后校准不足。"
+          },
+          {
+            "name": "小组积分榜",
+            "ok": false,
+            "weight": 8,
+            "impact": "出线动机和轮换风险不清楚。"
+          },
+          {
+            "name": "天气/裁判/场地",
+            "ok": true,
+            "weight": 7,
+            "impact": "红牌、点球、场地节奏风险无法修正。"
+          },
+          {
+            "name": "战术标签",
+            "ok": true,
+            "weight": 4,
+            "impact": "打法相克只能粗略判断。"
+          }
+        ]
+      },
+      "source_audit": {
+        "score": 10,
+        "level": "只适合观察",
+        "model_mode": "低置信参考",
+        "confidence_penalty": 18,
+        "rows": [
+          {
+            "tier": "A",
+            "name": "体彩官方可下单数据",
+            "status": "手动兜底",
+            "ok": false,
+            "impact": "决定能买什么、让几球、SP是多少。缺失时只能按手动或历史快照参考，不能强行给正式下单项。",
+            "detail": "未抓到官方本场数据，但存在手动赔率或历史快照"
+          },
+          {
+            "tier": "A+",
+            "name": "体彩计算器补充玩法",
+            "status": "最近失败",
+            "ok": false,
+            "impact": "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
+            "detail": "<urlopen error timed out>"
+          },
+          {
+            "tier": "B",
+            "name": "市场走势与盘口参考",
+            "status": "未验证",
+            "ok": false,
+            "impact": "用于看欧赔、让球、大小球变化。缺失时市场方向和收盘变化判断变弱。",
+            "detail": "还没有稳定抓取记录"
+          },
+          {
+            "tier": "C",
+            "name": "国家队基础实力",
+            "status": "部分缺失",
+            "ok": false,
+            "impact": "用于判断强弱底盘。缺少排名或 Elo 时，不能过度相信盘口方向。",
+            "detail": "FIFA 排名或 Elo 不完整"
+          },
+          {
+            "tier": "C",
+            "name": "预选赛/洲际杯正式赛表现",
+            "status": "缺失",
+            "ok": false,
+            "impact": "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。",
+            "detail": "未配置 formal_competition_strength"
+          },
+          {
+            "tier": "C",
+            "name": "小组积分与出线动机",
+            "status": "未验证",
+            "ok": false,
+            "impact": "用于判断抢分、轮换、默契和净胜球需求。缺失时第三轮尤其容易失真。",
+            "detail": "还没有稳定抓取记录"
+          },
+          {
+            "tier": "D",
+            "name": "过程统计/赛后技术数据",
+            "status": "停用",
+            "ok": false,
+            "impact": "用于复盘谁是真强、谁是运气球。缺失时赛后调参只能依赖比分和市场。",
+            "detail": "该源不参与当前抓取"
+          },
+          {
+            "tier": "D",
+            "name": "伤停与首发",
+            "status": "待临场确认",
+            "ok": false,
+            "impact": "用于最后一轮校准。缺失时临场建议要降档，尤其是深盘强队。",
+            "detail": "首发或伤停未确认"
+          }
+        ],
+        "missing_impacts": [
+          "决定能买什么、让几球、SP是多少。缺失时只能按手动或历史快照参考，不能强行给正式下单项。",
+          "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
+          "用于看欧赔、让球、大小球变化。缺失时市场方向和收盘变化判断变弱。",
+          "用于判断强弱底盘。缺少排名或 Elo 时，不能过度相信盘口方向。",
+          "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。"
+        ],
+        "official_rows": 0,
+        "manual_rows": 3,
+        "market_rows": 3
+      }
+    },
+    {
+      "match_id": "AICAI_5997550",
+      "home_team": "法国",
+      "away_team": "英格兰/阿根廷败者",
+      "kickoff": "2026-07-19T05:00:00+08:00",
+      "sporttery_handicap": null,
+      "summary": {
+        "main_lean": "英格兰/阿根廷败者",
+        "score_group": [
+          "1-1",
+          "1-0",
+          "0-1"
+        ],
+        "market_direction": "市场基本稳定",
+        "upset_level": "中低",
+        "folk_parallel": {
+          "enabled": false,
+          "label": "无民间信号",
+          "effect": "none",
+          "confidence": 0.0,
+          "note": "",
+          "tracks": [],
+          "alignment": "未提供",
+          "model_relation": "本场没有录入支线标签",
+          "side_prediction": "未录入支线预测",
+          "betting_advice": "不生成支线下注建议",
+          "betting_checks": [],
+          "comparison": [
+            {
+              "dimension": "赛果方向",
+              "main": "英格兰/阿根廷败者",
+              "side": "未录入",
+              "relation": "无支线对比"
+            },
+            {
+              "dimension": "下注落点",
+              "main": "按EV、SP和风险分筛选",
+              "side": "未录入",
+              "relation": "只看主线"
+            }
+          ],
+          "advice_boundary": "支线为空，按数据模型和官方SP判断",
+          "action_hint": "按数据模型和官方SP判断"
+        },
+        "confidence": 48,
+        "data_score": 66,
+        "data_level": "只适合观察",
+        "source_level": "只适合观察",
+        "model_mode": "低置信参考",
+        "missing_impacts": [
+          "决定能买什么、让几球、SP是多少。缺失时只能按手动或历史快照参考，不能强行给正式下单项。",
+          "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
+          "用于看欧赔、让球、大小球变化。缺失时市场方向和收盘变化判断变弱。",
+          "用于判断强弱底盘。缺少排名或 Elo 时，不能过度相信盘口方向。",
+          "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。"
+        ],
+        "gap_level": "一致",
+        "reference": "最终模型倾向 英格兰/阿根廷败者；比分参考 1-1 / 1-0 / 0-1；去水与特征修正后主/平/客为 34.4% / 30.4% / 35.2%；数据状态为 只适合观察，低置信参考。"
+      },
+      "market_scenario": {
+        "probabilities": {
+          "home": 0.3446,
+          "draw": 0.2879,
+          "away": 0.3675
+        },
+        "top_scores": [
+          {
+            "score": "1-1",
+            "probability": 0.1381,
+            "score_group": "常见比分",
+            "score_priority": 3,
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "1-0",
+            "probability": 0.1087,
+            "score_group": "常见比分",
+            "score_priority": 3,
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "0-1",
+            "probability": 0.0997,
+            "score_group": "常见比分",
+            "score_priority": 3,
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "0-0",
+            "probability": 0.0996,
+            "score_group": "常见比分",
+            "score_priority": 3,
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "2-1",
+            "probability": 0.0779,
+            "score_group": "常见比分",
+            "score_priority": 3,
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "1-2",
+            "probability": 0.0717,
+            "score_group": "常见比分",
+            "score_priority": 3,
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "2-0",
+            "probability": 0.0684,
+            "score_group": "常见比分",
+            "score_priority": 3,
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "0-2",
+            "probability": 0.058,
+            "score_group": "常见比分",
+            "score_priority": 3,
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          }
+        ],
+        "total_goals": {
+          "exact": [
+            {
+              "goals": "0",
+              "probability": 0.0996
+            },
+            {
+              "goals": "1",
+              "probability": 0.2085
+            },
+            {
+              "goals": "2",
+              "probability": 0.2645
+            },
+            {
+              "goals": "3",
+              "probability": 0.2019
+            },
+            {
+              "goals": "4",
+              "probability": 0.1266
+            },
+            {
+              "goals": "5",
+              "probability": 0.0613
+            },
+            {
+              "goals": "6",
+              "probability": 0.0251
+            },
+            {
+              "goals": "7+",
+              "probability": 0.0125
+            }
+          ],
+          "ranges": [
+            {
+              "range": "0-1",
+              "probability": 0.3081
+            },
+            {
+              "range": "2-3",
+              "probability": 0.4664
+            },
+            {
+              "range": "4+",
+              "probability": 0.2255
+            }
+          ],
+          "most_likely": "2",
+          "best_range": "2-3",
+          "low_score_risk": "中",
+          "high_score_risk": "低"
+        },
+        "over_25": 0.4274,
+        "btts": 0.4921,
+        "confidence": 48
+      },
+      "sporttery": {
+        "settlement": "90分钟含伤停补时，不含加时赛和点球大战",
+        "action_summary": {
+          "core": [
+            {
+              "match_id": "AICAI_5997550",
+              "play_type": "胜平负",
+              "selection": "平",
+              "pool_code": "HAD",
+              "single_allowed": true,
+              "allup_allowed": true,
+              "min_legs": 1,
+              "sp": 3.733,
+              "sp_source": "market_h2h_proxy",
+              "model_prob": 0.298,
+              "market_prob": 0.2864,
+              "fair_sp": 3.356,
+              "implied_prob": 0.2679,
+              "value_gap": 0.0301,
+              "ev": 0.1125,
+              "risk_score": 34,
+              "risk_level": "中低",
+              "kelly": 0.0411,
+              "stake_pct": 0.01,
+              "decision": "可小注",
+              "reason": "EV达到门槛且风险可控",
+              "risk_adjusted_score": 0.0785,
+              "raw_model_prob": 0.3042,
+              "market_model_gap": 0.0178,
+              "action_score": 91.07,
+              "action_tier": "主推",
+              "action_reason": "价值、风险和玩法稳定性较均衡"
+            },
+            {
+              "match_id": "AICAI_5997550",
+              "play_type": "胜平负",
+              "selection": "胜",
+              "pool_code": "HAD",
+              "single_allowed": true,
+              "allup_allowed": true,
+              "min_legs": 1,
+              "sp": 3.126,
+              "sp_source": "market_h2h_proxy",
+              "model_prob": 0.3433,
+              "market_prob": 0.342,
+              "fair_sp": 2.913,
+              "implied_prob": 0.3199,
+              "value_gap": 0.0234,
+              "ev": 0.0731,
+              "risk_score": 33,
+              "risk_level": "中低",
+              "kelly": 0.0344,
+              "stake_pct": 0.0086,
+              "decision": "可小注",
+              "reason": "EV达到门槛且风险可控",
+              "risk_adjusted_score": 0.0401,
+              "raw_model_prob": 0.3439,
+              "market_model_gap": 0.0019,
+              "action_score": 87.57,
+              "action_tier": "主推",
+              "action_reason": "价值、风险和玩法稳定性较均衡"
+            },
+            {
+              "match_id": "AICAI_5997550",
+              "play_type": "胜平负",
+              "selection": "负",
+              "pool_code": "HAD",
+              "single_allowed": true,
+              "allup_allowed": true,
+              "min_legs": 1,
+              "sp": 2.878,
+              "sp_source": "market_h2h_proxy",
+              "model_prob": 0.3587,
+              "market_prob": 0.3715,
+              "fair_sp": 2.788,
+              "implied_prob": 0.3475,
+              "value_gap": 0.0113,
+              "ev": 0.0324,
+              "risk_score": 34,
+              "risk_level": "中低",
+              "kelly": 0.0172,
+              "stake_pct": 0.0043,
+              "decision": "可小注",
+              "reason": "EV达到门槛且风险可控",
+              "risk_adjusted_score": -0.0016,
+              "raw_model_prob": 0.3518,
+              "market_model_gap": -0.0197,
+              "action_score": 82.36,
+              "action_tier": "主推",
+              "action_reason": "价值、风险和玩法稳定性较均衡"
+            }
+          ],
+          "support": [],
+          "hedge": []
+        },
+        "score_reference": [
+          {
+            "score": "1-1",
+            "probability": 0.1381,
+            "score_group": "常见比分",
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "1-0",
+            "probability": 0.1087,
+            "score_group": "常见比分",
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "0-1",
+            "probability": 0.0997,
+            "score_group": "常见比分",
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "0-0",
+            "probability": 0.0996,
+            "score_group": "常见比分",
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "2-1",
+            "probability": 0.0779,
+            "score_group": "常见比分",
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          },
+          {
+            "score": "1-2",
+            "probability": 0.0717,
+            "score_group": "常见比分",
+            "score_note": "和胜平负、总进球主线一致，可作为比分参考"
+          }
+        ],
+        "candidate_pool": [
+          {
+            "match_id": "AICAI_5997550",
+            "play_type": "胜平负",
+            "selection": "平",
+            "pool_code": "HAD",
+            "single_allowed": true,
+            "allup_allowed": true,
+            "min_legs": 1,
+            "sp": 3.733,
+            "sp_source": "market_h2h_proxy",
+            "model_prob": 0.298,
+            "market_prob": 0.2864,
+            "fair_sp": 3.356,
+            "implied_prob": 0.2679,
+            "value_gap": 0.0301,
+            "ev": 0.1125,
+            "risk_score": 34,
+            "risk_level": "中低",
+            "kelly": 0.0411,
+            "stake_pct": 0.01,
+            "decision": "可小注",
+            "reason": "EV达到门槛且风险可控",
+            "risk_adjusted_score": 0.0785,
+            "raw_model_prob": 0.3042,
+            "market_model_gap": 0.0178,
+            "action_score": 91.07,
+            "action_tier": "主推",
+            "action_reason": "价值、风险和玩法稳定性较均衡"
+          },
+          {
+            "match_id": "AICAI_5997550",
+            "play_type": "胜平负",
+            "selection": "胜",
+            "pool_code": "HAD",
+            "single_allowed": true,
+            "allup_allowed": true,
+            "min_legs": 1,
+            "sp": 3.126,
+            "sp_source": "market_h2h_proxy",
+            "model_prob": 0.3433,
+            "market_prob": 0.342,
+            "fair_sp": 2.913,
+            "implied_prob": 0.3199,
+            "value_gap": 0.0234,
+            "ev": 0.0731,
+            "risk_score": 33,
+            "risk_level": "中低",
+            "kelly": 0.0344,
+            "stake_pct": 0.0086,
+            "decision": "可小注",
+            "reason": "EV达到门槛且风险可控",
+            "risk_adjusted_score": 0.0401,
+            "raw_model_prob": 0.3439,
+            "market_model_gap": 0.0019,
+            "action_score": 87.57,
+            "action_tier": "主推",
+            "action_reason": "价值、风险和玩法稳定性较均衡"
+          },
+          {
+            "match_id": "AICAI_5997550",
+            "play_type": "胜平负",
+            "selection": "负",
+            "pool_code": "HAD",
+            "single_allowed": true,
+            "allup_allowed": true,
+            "min_legs": 1,
+            "sp": 2.878,
+            "sp_source": "market_h2h_proxy",
+            "model_prob": 0.3587,
+            "market_prob": 0.3715,
+            "fair_sp": 2.788,
+            "implied_prob": 0.3475,
+            "value_gap": 0.0113,
+            "ev": 0.0324,
+            "risk_score": 34,
+            "risk_level": "中低",
+            "kelly": 0.0172,
+            "stake_pct": 0.0043,
+            "decision": "可小注",
+            "reason": "EV达到门槛且风险可控",
+            "risk_adjusted_score": -0.0016,
+            "raw_model_prob": 0.3518,
+            "market_model_gap": -0.0197,
+            "action_score": 82.36,
+            "action_tier": "主推",
+            "action_reason": "价值、风险和玩法稳定性较均衡"
+          }
+        ],
+        "compound_packages": [
+          {
+            "name": "主队不败",
+            "options": [
+              "胜",
+              "平"
+            ],
+            "hit_prob": 0.6413,
+            "num_bets": 2,
+            "ev": 0.0928,
+            "min_return_sp": 3.126,
+            "max_return_sp": 3.733,
+            "decision": "可小注",
+            "reason": "复选包EV按注数重算"
+          },
+          {
+            "name": "客队不败",
+            "options": [
+              "平",
+              "负"
+            ],
+            "hit_prob": 0.6567,
+            "num_bets": 2,
+            "ev": 0.0724,
+            "min_return_sp": 2.878,
+            "max_return_sp": 3.733,
+            "decision": "可小注",
+            "reason": "复选包EV按注数重算"
+          },
+          {
+            "name": "分胜负",
+            "options": [
+              "胜",
+              "负"
+            ],
+            "hit_prob": 0.702,
+            "num_bets": 2,
+            "ev": 0.0527,
+            "min_return_sp": 2.878,
+            "max_return_sp": 3.126,
+            "decision": "可小注",
+            "reason": "复选包EV按注数重算"
+          },
+          {
+            "name": "总进球低位覆盖",
+            "num_bets": 3,
+            "decision": "不可用",
+            "reason": "复选包存在SP缺失"
+          },
+          {
+            "name": "总进球中位覆盖",
+            "num_bets": 3,
+            "decision": "不可用",
+            "reason": "复选包存在SP缺失"
+          }
+        ],
+        "score_combo_pools": []
+      },
+      "data_completeness": {
+        "score": 66,
+        "level": "可正常预测",
+        "source_audit": {
+          "score": 10,
+          "level": "只适合观察",
+          "model_mode": "低置信参考",
+          "confidence_penalty": 18,
+          "rows": [
+            {
+              "tier": "A",
+              "name": "体彩官方可下单数据",
+              "status": "手动兜底",
+              "ok": false,
+              "impact": "决定能买什么、让几球、SP是多少。缺失时只能按手动或历史快照参考，不能强行给正式下单项。",
+              "detail": "未抓到官方本场数据，但存在手动赔率或历史快照"
+            },
+            {
+              "tier": "A+",
+              "name": "体彩计算器补充玩法",
+              "status": "最近失败",
+              "ok": false,
+              "impact": "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
+              "detail": "<urlopen error timed out>"
+            },
+            {
+              "tier": "B",
+              "name": "市场走势与盘口参考",
+              "status": "未验证",
+              "ok": false,
+              "impact": "用于看欧赔、让球、大小球变化。缺失时市场方向和收盘变化判断变弱。",
+              "detail": "还没有稳定抓取记录"
+            },
+            {
+              "tier": "C",
+              "name": "国家队基础实力",
+              "status": "部分缺失",
+              "ok": false,
+              "impact": "用于判断强弱底盘。缺少排名或 Elo 时，不能过度相信盘口方向。",
+              "detail": "FIFA 排名或 Elo 不完整"
+            },
+            {
+              "tier": "C",
+              "name": "预选赛/洲际杯正式赛表现",
+              "status": "缺失",
+              "ok": false,
+              "impact": "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。",
+              "detail": "未配置 formal_competition_strength"
+            },
+            {
+              "tier": "C",
+              "name": "小组积分与出线动机",
+              "status": "未验证",
+              "ok": false,
+              "impact": "用于判断抢分、轮换、默契和净胜球需求。缺失时第三轮尤其容易失真。",
+              "detail": "还没有稳定抓取记录"
+            },
+            {
+              "tier": "D",
+              "name": "过程统计/赛后技术数据",
+              "status": "停用",
+              "ok": false,
+              "impact": "用于复盘谁是真强、谁是运气球。缺失时赛后调参只能依赖比分和市场。",
+              "detail": "该源不参与当前抓取"
+            },
+            {
+              "tier": "D",
+              "name": "伤停与首发",
+              "status": "待临场确认",
+              "ok": false,
+              "impact": "用于最后一轮校准。缺失时临场建议要降档，尤其是深盘强队。",
+              "detail": "首发或伤停未确认"
+            }
+          ],
+          "missing_impacts": [
+            "决定能买什么、让几球、SP是多少。缺失时只能按手动或历史快照参考，不能强行给正式下单项。",
+            "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
+            "用于看欧赔、让球、大小球变化。缺失时市场方向和收盘变化判断变弱。",
+            "用于判断强弱底盘。缺少排名或 Elo 时，不能过度相信盘口方向。",
+            "用于国家队近期硬表现修正。缺失时只靠排名，容易低估状态变化。"
+          ],
+          "official_rows": 0,
+          "manual_rows": 3,
+          "market_rows": 3
+        },
+        "confidence_penalty": 18,
+        "items": [
+          {
+            "name": "赛程匹配",
+            "ok": true,
+            "weight": 10,
+            "impact": "没有准确比赛和时间，无法对齐体彩和赛程。"
+          },
+          {
+            "name": "Elo",
+            "ok": true,
+            "weight": 10,
+            "impact": "基础实力底盘会变弱。"
+          },
+          {
+            "name": "FIFA世界排名",
+            "ok": false,
+            "weight": 7,
+            "impact": "国家队强弱侧面参考不足。"
+          },
+          {
+            "name": "预选赛/洲际杯正式赛",
+            "ok": false,
+            "weight": 10,
+            "impact": "近期正式赛状态无法修正。"
+          },
+          {
+            "name": "近期/过程数据",
+            "ok": true,
+            "weight": 10,
+            "impact": "进攻/防守质量只能用默认估计。"
+          },
+          {
+            "name": "权威侧面源",
+            "ok": false,
+            "weight": 7,
+            "impact": "媒体和权威数据侧面强度缺失。"
+          },
+          {
+            "name": "赛中/赛后过程统计",
+            "ok": false,
+            "weight": 7,
+            "impact": "复盘时无法区分实力与偶然。"
+          },
+          {
+            "name": "赔率/SP",
+            "ok": true,
+            "weight": 14,
+            "impact": "无法做去水概率和价值判断。"
+          },
+          {
+            "name": "赔率历史",
+            "ok": false,
+            "weight": 8,
+            "impact": "看不到赔率波动，只能看单点价格。"
+          },
+          {
+            "name": "爱彩盘口/赛果统计",
+            "ok": false,
+            "weight": 8,
+            "impact": "市场走势、让球和大小球参考不足。"
+          },
+          {
+            "name": "伤停",
+            "ok": true,
+            "weight": 11,
+            "impact": "临场人员风险未确认。"
+          },
+          {
+            "name": "首发",
+            "ok": false,
+            "weight": 11,
+            "impact": "赛前最后校准不足。"
+          },
+          {
+            "name": "小组积分榜",
+            "ok": false,
+            "weight": 8,
+            "impact": "出线动机和轮换风险不清楚。"
+          },
+          {
+            "name": "天气/裁判/场地",
+            "ok": true,
+            "weight": 7,
+            "impact": "红牌、点球、场地节奏风险无法修正。"
+          },
+          {
+            "name": "战术标签",
+            "ok": true,
+            "weight": 4,
+            "impact": "打法相克只能粗略判断。"
+          }
+        ]
+      },
+      "source_audit": {
+        "score": 10,
+        "level": "只适合观察",
+        "model_mode": "低置信参考",
+        "confidence_penalty": 18,
+        "rows": [
+          {
+            "tier": "A",
+            "name": "体彩官方可下单数据",
+            "status": "手动兜底",
+            "ok": false,
+            "impact": "决定能买什么、让几球、SP是多少。缺失时只能按手动或历史快照参考，不能强行给正式下单项。",
+            "detail": "未抓到官方本场数据，但存在手动赔率或历史快照"
+          },
+          {
+            "tier": "A+",
+            "name": "体彩计算器补充玩法",
+            "status": "最近失败",
+            "ok": false,
+            "impact": "补充比分、总进球、半全场等细玩法。缺失时这些玩法只保留概率池，不应重仓。",
+            "detail": "<urlopen error timed out>"
           },
           {
             "tier": "B",
