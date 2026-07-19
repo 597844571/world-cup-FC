@@ -1,7 +1,7 @@
 [
   {
     "match_id": "AICAI_5998043",
-    "captured_at": "2026-07-19T12:56:34+00:00",
+    "captured_at": "2026-07-19T16:47:03+00:00",
     "scenario": "baseline",
     "home_prob": 0.3503,
     "draw_prob": 0.2892,
@@ -14,11 +14,11 @@
   },
   {
     "match_id": "AICAI_5998043",
-    "captured_at": "2026-07-19T12:56:34+00:00",
+    "captured_at": "2026-07-19T16:47:03+00:00",
     "scenario": "market",
-    "home_prob": 0.3728,
-    "draw_prob": 0.2973,
-    "away_prob": 0.3299,
+    "home_prob": 0.3734,
+    "draw_prob": 0.2975,
+    "away_prob": 0.3291,
     "top_score": "1-1",
     "over_25": 0.4262,
     "btts": 0.4812,
@@ -27,11 +27,11 @@
   },
   {
     "match_id": "AICAI_5998043",
-    "captured_at": "2026-07-19T12:56:34+00:00",
+    "captured_at": "2026-07-19T16:47:03+00:00",
     "scenario": "live",
-    "home_prob": 0.3728,
-    "draw_prob": 0.2973,
-    "away_prob": 0.3299,
+    "home_prob": 0.3734,
+    "draw_prob": 0.2975,
+    "away_prob": 0.3291,
     "top_score": "1-1",
     "over_25": 0.4262,
     "btts": 0.4812,
@@ -40,7 +40,7 @@
   },
   {
     "match_id": "AICAI_5998043",
-    "captured_at": "2026-07-19T12:56:34+00:00",
+    "captured_at": "2026-07-19T16:47:03+00:00",
     "scenario": "conservative",
     "home_prob": 0.3201,
     "draw_prob": 0.3505,
@@ -53,7 +53,7 @@
   },
   {
     "match_id": "AICAI_5998043",
-    "captured_at": "2026-07-19T12:56:34+00:00",
+    "captured_at": "2026-07-19T16:47:03+00:00",
     "scenario": "open",
     "home_prob": 0.3801,
     "draw_prob": 0.2287,
@@ -66,7 +66,7 @@
   },
   {
     "match_id": "AICAI_5998043",
-    "captured_at": "2026-07-19T12:56:34+00:00",
+    "captured_at": "2026-07-19T16:47:03+00:00",
     "scenario": "upset",
     "home_prob": 0.3683,
     "draw_prob": 0.3162,
