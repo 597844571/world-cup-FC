@@ -1,14 +1,14 @@
 {
-  "captured_at": "2026-07-19T06:24:16+00:00",
+  "captured_at": "2026-07-19T09:45:24+00:00",
   "refresh_status": {
     "enabled": true,
     "interval_seconds": 14400,
     "running": false,
-    "last_started_at": "2026-07-19T06:23:06+00:00",
-    "last_finished_at": "2026-07-19T06:24:16+00:00",
+    "last_started_at": "2026-07-19T09:44:39+00:00",
+    "last_finished_at": "2026-07-19T09:45:24+00:00",
     "last_ok": true,
     "last_error": null,
-    "runs": 176,
+    "runs": 177,
     "last_summary": {
       "reason": "github-actions",
       "fixtures": 208,
@@ -108,13 +108,13 @@
           "用于判断抢分、轮换、默契和净胜球需求。缺失时第三轮尤其容易失真。"
         ],
         "gap_level": "明显分歧",
-        "reference": "最终模型倾向 西班牙；比分参考 1-1 / 1-0 / 0-0；去水与特征修正后主/平/客为 39.5% / 33.5% / 27.0%；数据状态为 只适合观察，低置信参考。"
+        "reference": "最终模型倾向 西班牙；比分参考 1-1 / 1-0 / 0-0；去水与特征修正后主/平/客为 39.7% / 33.6% / 26.7%；数据状态为 只适合观察，低置信参考。"
       },
       "market_scenario": {
         "probabilities": {
-          "home": 0.3725,
-          "draw": 0.2974,
-          "away": 0.3301
+          "home": 0.373,
+          "draw": 0.2978,
+          "away": 0.3292
         },
         "top_scores": [
           {
@@ -285,11 +285,11 @@
               "胜",
               "平"
             ],
-            "hit_prob": 0.731,
+            "hit_prob": 0.7339,
             "num_bets": 2,
-            "ev": -0.0415,
-            "min_return_sp": 2.284,
-            "max_return_sp": 3.039,
+            "ev": -0.0443,
+            "min_return_sp": 2.268,
+            "max_return_sp": 3.019,
             "decision": "放弃",
             "reason": "复选包EV按注数重算"
           },
@@ -299,11 +299,11 @@
               "平",
               "负"
             ],
-            "hit_prob": 0.5967,
+            "hit_prob": 0.595,
             "num_bets": 2,
-            "ev": -0.0211,
-            "min_return_sp": 3.039,
-            "max_return_sp": 3.576,
+            "ev": -0.024,
+            "min_return_sp": 3.019,
+            "max_return_sp": 3.604,
             "decision": "放弃",
             "reason": "复选包EV按注数重算"
           },
@@ -313,11 +313,11 @@
               "胜",
               "负"
             ],
-            "hit_prob": 0.6723,
+            "hit_prob": 0.6711,
             "num_bets": 2,
-            "ev": -0.0585,
-            "min_return_sp": 2.284,
-            "max_return_sp": 3.576,
+            "ev": -0.0612,
+            "min_return_sp": 2.268,
+            "max_return_sp": 3.604,
             "decision": "放弃",
             "reason": "复选包EV按注数重算"
           },
