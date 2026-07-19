@@ -2,77 +2,32 @@
   "enabled": true,
   "interval_seconds": 14400,
   "running": false,
-  "last_started_at": "2026-07-19T01:48:06+00:00",
-  "last_finished_at": "2026-07-19T01:51:00+00:00",
+  "last_started_at": "2026-07-19T06:23:06+00:00",
+  "last_finished_at": "2026-07-19T06:24:16+00:00",
   "last_ok": true,
   "last_error": null,
-  "runs": 175,
+  "runs": 176,
   "last_summary": {
     "reason": "github-actions",
     "fixtures": 208,
-    "selected_matches": 4,
+    "selected_matches": 1,
     "refreshed": [
       {
-        "match_id": "AICAI_5998046",
-        "match": "英格兰 vs 阿根廷",
+        "match_id": "AICAI_5998043",
+        "match": "西班牙 vs 阿根廷",
         "inserted": 17,
-        "process_source": null
-      },
-      {
-        "match_id": "AUTO_63329EE867",
-        "match": "L101 vs L102",
-        "inserted": 3,
-        "process_source": null
-      },
-      {
-        "match_id": "AUTO_DC30F146CD",
-        "match": "W101 vs W102",
-        "inserted": 3,
-        "process_source": null
-      },
-      {
-        "match_id": "AICAI_5997550",
-        "match": "法国 vs 英格兰/阿根廷败者",
-        "inserted": 3,
         "process_source": null
       }
     ],
     "archived": [
       {
-        "match_id": "AICAI_5998046",
-        "snapshots": 6
-      },
-      {
-        "match_id": "AUTO_63329EE867",
-        "snapshots": 6
-      },
-      {
-        "match_id": "AUTO_DC30F146CD",
-        "snapshots": 6
-      },
-      {
-        "match_id": "AICAI_5997550",
+        "match_id": "AICAI_5998043",
         "snapshots": 6
       }
     ],
     "backtest": {
-      "inserted": 12,
-      "evaluated": [
-        {
-          "match_id": "AICAI_5998046",
-          "matched_ids": [
-            "AICAI_5998046"
-          ],
-          "results": 6
-        },
-        {
-          "match_id": "AICAI_5997550",
-          "matched_ids": [
-            "AICAI_5997550"
-          ],
-          "results": 6
-        }
-      ]
+      "inserted": 0,
+      "evaluated": []
     },
     "logs_removed": 0,
     "public_meta": {
