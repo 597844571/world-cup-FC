@@ -1,22 +1,22 @@
 [
   {
-    "match_id": "AICAI_5998043",
-    "home_team": "西班牙",
-    "away_team": "阿根廷",
+    "match_id": "AUTO_C8AA7C9935",
+    "home_team": "Mexico",
+    "away_team": "South Africa",
     "home_aliases": [
-      "西班牙"
+      "Mexico"
     ],
     "away_aliases": [
-      "阿根廷"
+      "South Africa"
     ],
-    "kickoff": "2026-07-20T03:00:00+08:00",
-    "stage": "决赛",
+    "kickoff": "2026-06-11T00:00:00",
+    "stage": "Matchday 1",
     "neutral": true,
-    "home_elo": 2060,
-    "away_elo": 2065,
+    "home_elo": 1800,
+    "away_elo": 1800,
     "expected_goals": {
-      "home": 1.4,
-      "away": 1.0
+      "home": 1.25,
+      "away": 1.15
     },
     "lineup_status": "unknown",
     "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
@@ -27,11 +27,96 @@
       "underdog_low_block": true,
       "underdog_set_piece": true,
       "early_event_risk": true
+    }
+  },
+  {
+    "match_id": "AUTO_AE7BF820DC",
+    "home_team": "South Korea",
+    "away_team": "Czech Republic",
+    "home_aliases": [
+      "South Korea"
+    ],
+    "away_aliases": [
+      "Czech Republic"
+    ],
+    "kickoff": "2026-06-11T00:00:00",
+    "stage": "Matchday 1",
+    "neutral": true,
+    "home_elo": 1800,
+    "away_elo": 1800,
+    "expected_goals": {
+      "home": 1.25,
+      "away": 1.15
     },
-    "manual_odds": {
-      "home": 2.29,
-      "draw": 3.05,
-      "away": 3.6
+    "lineup_status": "unknown",
+    "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
+    "tactical_notes": "自动建模：先使用市场倍率、球队排名和盘口作为底盘；战术细节需后续补充。",
+    "weather_notes": "待确认",
+    "referee_notes": "待确认",
+    "upset_triggers": {
+      "underdog_low_block": true,
+      "underdog_set_piece": true,
+      "early_event_risk": true
+    }
+  },
+  {
+    "match_id": "AUTO_7518AC6934",
+    "home_team": "Canada",
+    "away_team": "Bosnia & Herzegovina",
+    "home_aliases": [
+      "Canada"
+    ],
+    "away_aliases": [
+      "Bosnia & Herzegovina"
+    ],
+    "kickoff": "2026-06-12T00:00:00",
+    "stage": "Matchday 2",
+    "neutral": true,
+    "home_elo": 1800,
+    "away_elo": 1800,
+    "expected_goals": {
+      "home": 1.25,
+      "away": 1.15
+    },
+    "lineup_status": "unknown",
+    "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
+    "tactical_notes": "自动建模：先使用市场倍率、球队排名和盘口作为底盘；战术细节需后续补充。",
+    "weather_notes": "待确认",
+    "referee_notes": "待确认",
+    "upset_triggers": {
+      "underdog_low_block": true,
+      "underdog_set_piece": true,
+      "early_event_risk": true
+    }
+  },
+  {
+    "match_id": "AUTO_E11B8E2ECD",
+    "home_team": "USA",
+    "away_team": "Paraguay",
+    "home_aliases": [
+      "USA"
+    ],
+    "away_aliases": [
+      "Paraguay"
+    ],
+    "kickoff": "2026-06-12T00:00:00",
+    "stage": "Matchday 2",
+    "neutral": true,
+    "home_elo": 1800,
+    "away_elo": 1800,
+    "expected_goals": {
+      "home": 1.25,
+      "away": 1.15
+    },
+    "lineup_status": "unknown",
+    "injury_notes": "自动从赛程加入，首发和伤停需赛前复核。",
+    "tactical_notes": "自动建模：先使用市场倍率、球队排名和盘口作为底盘；战术细节需后续补充。",
+    "weather_notes": "待确认",
+    "referee_notes": "待确认",
+    "upset_triggers": {
+      "underdog_low_block": true,
+      "underdog_set_piece": true,
+      "early_event_risk": true
     }
   }
 ]

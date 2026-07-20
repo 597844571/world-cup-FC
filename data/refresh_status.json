@@ -2,40 +2,62 @@
   "enabled": true,
   "interval_seconds": 14400,
   "running": false,
-  "last_started_at": "2026-07-19T20:38:03+00:00",
-  "last_finished_at": "2026-07-19T20:39:29+00:00",
+  "last_started_at": "2026-07-20T03:16:36+00:00",
+  "last_finished_at": "2026-07-20T03:21:22+00:00",
   "last_ok": true,
   "last_error": null,
-  "runs": 180,
+  "runs": 181,
   "last_summary": {
     "reason": "github-actions",
     "fixtures": 208,
-    "selected_matches": 1,
+    "selected_matches": 4,
     "refreshed": [
       {
-        "match_id": "AICAI_5998043",
-        "match": "西班牙 vs 阿根廷",
-        "inserted": 17,
+        "match_id": "AUTO_C8AA7C9935",
+        "match": "Mexico vs South Africa",
+        "inserted": 3,
+        "process_source": null
+      },
+      {
+        "match_id": "AUTO_AE7BF820DC",
+        "match": "South Korea vs Czech Republic",
+        "inserted": 3,
+        "process_source": null
+      },
+      {
+        "match_id": "AUTO_7518AC6934",
+        "match": "Canada vs Bosnia & Herzegovina",
+        "inserted": 3,
+        "process_source": null
+      },
+      {
+        "match_id": "AUTO_E11B8E2ECD",
+        "match": "USA vs Paraguay",
+        "inserted": 3,
         "process_source": null
       }
     ],
     "archived": [
       {
-        "match_id": "AICAI_5998043",
+        "match_id": "AUTO_C8AA7C9935",
+        "snapshots": 6
+      },
+      {
+        "match_id": "AUTO_AE7BF820DC",
+        "snapshots": 6
+      },
+      {
+        "match_id": "AUTO_7518AC6934",
+        "snapshots": 6
+      },
+      {
+        "match_id": "AUTO_E11B8E2ECD",
         "snapshots": 6
       }
     ],
     "backtest": {
-      "inserted": 6,
-      "evaluated": [
-        {
-          "match_id": "AICAI_5998043",
-          "matched_ids": [
-            "AICAI_5998043"
-          ],
-          "results": 6
-        }
-      ]
+      "inserted": 0,
+      "evaluated": []
     },
     "logs_removed": 0,
     "public_meta": {
