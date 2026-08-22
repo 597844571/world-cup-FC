@@ -2,14 +2,14 @@
   "enabled": true,
   "interval_seconds": 14400,
   "running": false,
-  "last_started_at": "2026-08-22T08:17:38+00:00",
-  "last_finished_at": "2026-08-22T08:18:26+00:00",
+  "last_started_at": "2026-08-22T12:19:20+00:00",
+  "last_finished_at": "2026-08-22T12:20:07+00:00",
   "last_ok": true,
   "last_error": null,
-  "runs": 379,
+  "runs": 380,
   "last_summary": {
     "reason": "github-actions",
-    "fixtures": 208,
+    "fixtures": 104,
     "selected_matches": 4,
     "refreshed": [
       {
@@ -71,9 +71,9 @@
       "error": "HTTP Error 567: Unknown Status"
     },
     "aicai_meta": {
-      "source": "https://sport.ttyingqiu.com/sportdata/f",
-      "count": 104,
-      "error": null
+      "source": "https://live.aicai.com/league/index.htm?leagueId=1999&tab=4",
+      "count": 0,
+      "error": "HTTP Error 502: Bad Gateway"
     }
   },
   "reason": "github-actions"
