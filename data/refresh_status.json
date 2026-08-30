@@ -2,11 +2,11 @@
   "enabled": true,
   "interval_seconds": 14400,
   "running": false,
-  "last_started_at": "2026-08-30T09:34:48+00:00",
-  "last_finished_at": "2026-08-30T09:35:29+00:00",
+  "last_started_at": "2026-08-30T15:43:36+00:00",
+  "last_finished_at": "2026-08-30T15:44:23+00:00",
   "last_ok": true,
   "last_error": null,
-  "runs": 417,
+  "runs": 418,
   "last_summary": {
     "reason": "github-actions",
     "fixtures": 208,
@@ -68,7 +68,7 @@
     "sporttery_meta": {
       "source": "https://webapi.sporttery.cn/gateway/uniform/football/getMatchListV1.qry?clientCode=3001",
       "count": 0,
-      "error": "Expecting value: line 1 column 1 (char 0)"
+      "error": "HTTP Error 567: Unknown Status"
     },
     "aicai_meta": {
       "source": "https://sport.ttyingqiu.com/sportdata/f",
